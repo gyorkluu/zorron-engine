@@ -1,0 +1,70 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Package manager
+.pnpm-store/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE / Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local development data
+pgdata/
+redisdata/
+.uploads/
+uploads/
+
+# Temporary files
+*.tmp
+.cache/
+
+# Test artifacts
+apps/zorron-editor/playwright-report/
+apps/zorron-editor/test-results/
+apps/zorron-editor/blob-report/
+apps/zorron-editor/playwright/.cache/
+
+# Drizzle generated artifacts (keep migrations; ignore build cache)
+apps/zorron-server/.drizzle/
+
+# AIOS meta-framework runtime cache
+.zorron-cache/
+.aiox-cache/
+.aios-cache/
+
+# Legacy code kept on disk for reference but excluded from version control
+# (the new stack is under apps/ and zorron-server/ was Koa+MongoDB legacy)
+/zorron-editor/
+/zorron-server/
+/产品设计文档.md

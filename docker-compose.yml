@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zorron-postgres
+    environment:
+      POSTGRES_USER: zorron
+      POSTGRES_PASSWORD: zorron
+      POSTGRES_DB: zorron
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zorron -d zorron"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: zorron-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./apps/zorron-server
+      dockerfile: Dockerfile
+    container_name: zorron-server
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://zorron:zorron@postgres:5432/zorron
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: http://localhost:5173
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_ROOT: ./uploads
+      STORAGE_BASE_URL: http://localhost:3000/uploads
+      JWT_SECRET: dev-only-jwt-secret-replace-in-production-32chars
+      JWT_EXPIRES_IN: 15m
+      REFRESH_TOKEN_EXPIRES_IN: 7d
+    ports:
+      - "3000:3000"
+    volumes:
+      - server-uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  redisdata:
+  server-uploads:

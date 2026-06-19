@@ -1,0 +1,31 @@
+{
+  "name": "zorron-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zorron Engine - Universal interactive narrative editor",
+  "type": "module",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "dev:editor": "pnpm --filter zorron-editor dev",
+    "dev:server": "pnpm --filter zorron-server dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter zorron-server db:generate",
+    "db:migrate": "pnpm --filter zorron-server db:migrate",
+    "db:seed": "pnpm --filter zorron-server db:seed",
+    "db:studio": "pnpm --filter zorron-server db:studio",
+    "db:rollback": "pnpm --filter zorron-server db:rollback",
+    "compose:up": "docker compose up -d",
+    "compose:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "turbo": "^2.3.3"
+  }
+}

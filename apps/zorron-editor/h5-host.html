@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Zorron Player - H5 Embed Test</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: ui-sans-serif, system-ui, sans-serif; background: #020617; color: #e2e8f0; }
+      .header { padding: 12px 16px; background: #0f172a; border-bottom: 1px solid #1e293b; }
+      .header h1 { font-size: 14px; font-weight: 600; color: #67e8f9; }
+      .header p { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+      .controls { padding: 12px 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+      .controls input { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; padding: 6px 10px; border-radius: 6px; font-size: 12px; }
+      .controls button { background: #0e7490; color: #ecfeff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+      .controls button:hover { background: #0891b2; }
+      #player-container { width: 100%; height: 70vh; max-width: 480px; margin: 0 auto; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; }
+      .note { padding: 12px 16px; font-size: 11px; color: #64748b; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Zorron Player - H5 Embed Test</h1>
+      <p>Test host page for the embed.js SDK. Enter a project id and click Mount.</p>
+    </div>
+    <div class="controls">
+      <input id="project-id" type="text" placeholder="Project UUID" />
+      <input id="api-base" type="text" placeholder="API base (default: http://localhost:3000)" />
+      <button id="mount-btn">Mount Player</button>
+      <button id="unmount-btn">Unmount</button>
+    </div>
+    <div id="player-container" data-zorron-player></div>
+    <p class="note">
+      The container above has <code>data-zorron-player</code> so autoMount will
+      pick it up on load. You can also mount programmatically with the button.
+    </p>
+
+    <!-- The embed SDK bundle (built with `pnpm build:h5`). -->
+    <script type="module" src="/dist-h5/embed.umd.js"></script>
+    <script type="module">
+      window.addEventListener('DOMContentLoaded', () => {
+        const mountBtn = document.getElementById('mount-btn');
+        const unmountBtn = document.getElementById('unmount-btn');
+        const projectIdInput = document.getElementById('project-id');
+        const apiBaseInput = document.getElementById('api-base');
+        const container = document.getElementById('player-container');
+
+        mountBtn.addEventListener('click', () => {
+          const projectId = projectIdInput.value.trim();
+          const apiBase = apiBaseInput.value.trim() || undefined;
+          if (!projectId) {
+            alert('Please enter a project id');
+            return;
+          }
+          window.ZorronPlayer.mount({
+            container,
+            projectId,
+            apiBase,
+            theme: 'dark',
+            features: { vector3d: true },
+          });
+        });
+
+        unmountBtn.addEventListener('click', () => {
+          window.ZorronPlayer.unmount(container);
+        });
+      });
+    </script>
+  </body>
+</html>
