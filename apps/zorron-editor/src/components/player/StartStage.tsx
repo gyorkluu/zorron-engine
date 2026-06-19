@@ -39,7 +39,7 @@ function StartStageImpl({ state }: StartStageProps) {
         onClick={advance}
         className="relative rounded-full bg-cyan-500/20 px-8 py-3 text-sm font-medium text-cyan-200 hover:bg-cyan-500/30"
       >
-        Begin
+        开始
       </button>
     </div>
   );

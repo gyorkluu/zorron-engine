@@ -119,7 +119,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
         isLoading: false,
       });
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to load assets';
+      const message = err instanceof AppError ? err.message : '加载资源失败';
       set({ isLoading: false, error: message });
     }
   },
@@ -144,7 +144,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
       }));
       return asset;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to upload asset';
+      const message = err instanceof AppError ? err.message : '上传资源失败';
       set({ isUploading: false, error: message });
       throw err;
     }
@@ -188,7 +188,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
         }));
       }
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to delete asset';
+      const message = err instanceof AppError ? err.message : '删除资源失败';
       set({ error: message });
       throw err;
     }

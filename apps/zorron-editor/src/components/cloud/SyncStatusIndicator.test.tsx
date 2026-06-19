@@ -38,7 +38,7 @@ describe('SyncStatusIndicator', () => {
     useWorkspaceStore.getState().setMode('local');
     render(<SyncStatusIndicator />);
     expect(screen.getByTestId('sync-status-local')).toBeInTheDocument();
-    expect(screen.getByText('Local')).toBeInTheDocument();
+    expect(screen.getByText('本地')).toBeInTheDocument();
   });
 
   it('renders the synced status in cloud mode', () => {
@@ -46,21 +46,21 @@ describe('SyncStatusIndicator', () => {
     useWorkspaceStore.getState().setSyncStatus('synced');
     render(<SyncStatusIndicator />);
     expect(screen.getByTestId('sync-status-indicator')).toBeInTheDocument();
-    expect(screen.getByText('Synced')).toBeInTheDocument();
+    expect(screen.getByText('已同步')).toBeInTheDocument();
   });
 
   it('renders the offline status', () => {
     useWorkspaceStore.getState().setMode('cloud');
     useWorkspaceStore.getState().setSyncStatus('offline');
     render(<SyncStatusIndicator />);
-    expect(screen.getByText('Offline')).toBeInTheDocument();
+    expect(screen.getByText('离线')).toBeInTheDocument();
   });
 
   it('renders the conflict status', () => {
     useWorkspaceStore.getState().setMode('cloud');
     useWorkspaceStore.getState().setSyncStatus('conflict');
     render(<SyncStatusIndicator />);
-    expect(screen.getByText('Conflict')).toBeInTheDocument();
+    expect(screen.getByText('冲突')).toBeInTheDocument();
   });
 
   it('renders the error status', () => {
@@ -68,13 +68,13 @@ describe('SyncStatusIndicator', () => {
     useWorkspaceStore.getState().setSyncStatus('error');
     useWorkspaceStore.getState().setError('Network failed');
     render(<SyncStatusIndicator />);
-    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('错误')).toBeInTheDocument();
   });
 
   it('renders the syncing status', () => {
     useWorkspaceStore.getState().setMode('cloud');
     useWorkspaceStore.getState().setSyncStatus('syncing');
     render(<SyncStatusIndicator />);
-    expect(screen.getByText('Syncing')).toBeInTheDocument();
+    expect(screen.getByText('同步中')).toBeInTheDocument();
   });
 });

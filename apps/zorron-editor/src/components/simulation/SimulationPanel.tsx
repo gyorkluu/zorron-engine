@@ -85,7 +85,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <h2 className="text-sm font-semibold text-slate-100">
-            Monte Carlo Simulation
+            蒙特卡洛模拟
           </h2>
           <button
             type="button"
@@ -103,14 +103,13 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
           ) : (
             <div className="space-y-4 p-4" data-testid="simulation-config">
               <p className="text-xs text-slate-400">
-                Run random traversals of the current flow graph to discover dead
-                ends, unreachable nodes and settlement distribution imbalances.
+                对当前流程图进行随机遍历，以发现死胡同、不可达节点和结算分布不均。
               </p>
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block space-y-1">
                   <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Runs
+                    运行次数
                   </span>
                   <input
                     type="number"
@@ -123,13 +122,13 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                 </label>
                 <label className="block space-y-1">
                   <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Seed (optional)
+                    随机种子（可选）
                   </span>
                   <input
                     type="text"
                     value={seed}
                     onChange={(e) => setSeed(e.target.value)}
-                    placeholder="random"
+                    placeholder="随机"
                     className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
                   />
                 </label>
@@ -137,7 +136,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
 
               <label className="block space-y-1">
                 <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Strategy
+                  策略
                 </span>
                 <select
                   value={strategy}
@@ -146,8 +145,8 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                   }
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
                 >
-                  <option value="random">Random (uniform)</option>
-                  <option value="weighted">Weighted (by choice order)</option>
+                  <option value="random">随机（均匀）</option>
+                  <option value="weighted">加权（按选项顺序）</option>
                 </select>
               </label>
 
@@ -164,7 +163,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                 className="w-full rounded-lg border border-cyan-600/50 bg-cyan-600/20 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-600/30 disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="simulation-run-button"
               >
-                {running ? 'Running...' : 'Run Simulation'}
+                {running ? '运行中...' : '运行模拟'}
               </button>
             </div>
           )}

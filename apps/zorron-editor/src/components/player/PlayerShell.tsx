@@ -50,7 +50,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
   if (!isRunning || !state) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-slate-950 text-slate-400">
-        Loading...
+        加载中...
       </div>
     );
   }
@@ -71,7 +71,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
           onClick={onExit}
           className="absolute left-4 top-4 z-10 rounded-full border border-slate-600 bg-slate-900/70 px-4 py-2 text-xs text-slate-200 backdrop-blur-sm hover:bg-slate-800"
         >
-          Exit
+          退出
         </button>
       )}
     </div>

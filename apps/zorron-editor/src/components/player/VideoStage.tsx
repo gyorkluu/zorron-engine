@@ -42,7 +42,7 @@ function VideoStageImpl({ state }: VideoStageProps) {
           onClick={skipVideo}
           className="absolute right-4 top-4 rounded-full border border-slate-600 bg-slate-900/70 px-4 py-2 text-sm text-slate-200 backdrop-blur-sm hover:bg-slate-800"
         >
-          Skip
+          跳过
         </button>
       )}
     </div>

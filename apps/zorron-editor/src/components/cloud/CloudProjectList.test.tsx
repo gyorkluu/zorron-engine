@@ -71,7 +71,7 @@ describe('CloudProjectList', () => {
     useAuthStore.setState({ isAuthenticated: false });
     render(<CloudProjectList />);
     expect(screen.getByTestId('cloud-list-unauth')).toBeInTheDocument();
-    expect(screen.getByText('Sign in required')).toBeInTheDocument();
+    expect(screen.getByText('需要登录')).toBeInTheDocument();
   });
 
   it('shows a loading state initially', () => {
@@ -100,7 +100,7 @@ describe('CloudProjectList', () => {
     expect(screen.getByTestId('project-list-items')).toBeInTheDocument();
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
-    expect(screen.getByText('Published')).toBeInTheDocument();
+    expect(screen.getByText('已发布')).toBeInTheDocument();
   });
 
   it('navigates to the editor when Open is clicked', () => {

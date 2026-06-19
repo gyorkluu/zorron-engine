@@ -11,7 +11,7 @@ function LinkNodeImpl({ data, selected }: ZorronNodeProps) {
   return (
     <NodeShell
       type="link"
-      label={d.label ?? 'Link'}
+      label={d.label ?? '链接'}
       selected={selected}
       showSource={false}
       icon="↗"
@@ -21,7 +21,7 @@ function LinkNodeImpl({ data, selected }: ZorronNodeProps) {
         {d.url ? (
           <p className="truncate text-slate-400">{d.url}</p>
         ) : (
-          <p className="italic text-slate-500">No URL</p>
+          <p className="italic text-slate-500">暂无链接</p>
         )}
       </div>
     </NodeShell>

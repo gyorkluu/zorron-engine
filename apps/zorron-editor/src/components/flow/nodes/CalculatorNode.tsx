@@ -10,7 +10,7 @@ function CalculatorNodeImpl({ data, selected }: ZorronNodeProps) {
   const d = data as CalculatorNodeData;
   const v = d.vector ?? { x: 0, y: 0, z: 0 };
   return (
-    <NodeShell type="calculator" label={d.label ?? 'Calculator'} selected={selected} icon="V">
+    <NodeShell type="calculator" label={d.label ?? '计算器'} selected={selected} icon="V">
       <div className="space-y-1">
         <div className="flex gap-2 font-mono text-[11px]">
           <span className="text-cyan-300">X:{v.x}</span>

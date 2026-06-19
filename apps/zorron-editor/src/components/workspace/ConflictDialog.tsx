@@ -62,7 +62,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <h2 className="text-sm font-semibold text-amber-200">
-            Sync Conflict Detected
+            检测到同步冲突
           </h2>
           <button
             type="button"
@@ -77,27 +77,27 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
         {/* Body */}
         <div className="space-y-3 p-4">
           <p className="text-xs text-slate-400">
-            The project <span className="font-medium text-slate-200">{local.title}</span> was
-            modified both locally and in the cloud. Choose which version to keep.
+            项目 <span className="font-medium text-slate-200">{local.title}</span>
+            在本地和云端均被修改。请选择保留哪个版本。
           </p>
 
           <div className="grid grid-cols-2 gap-3">
             {/* Local version card */}
             <div className="rounded-lg border border-emerald-700/40 bg-emerald-900/20 p-3">
               <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-                Local
+                本地
               </div>
               <dl className="space-y-1 text-[11px] text-slate-300">
                 <div>
-                  <dt className="inline text-slate-500">Title: </dt>
+                  <dt className="inline text-slate-500">标题： </dt>
                   <dd className="inline">{local.title}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Updated: </dt>
+                  <dt className="inline text-slate-500">更新时间： </dt>
                   <dd className="inline">{local.updatedAt}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Nodes: </dt>
+                  <dt className="inline text-slate-500">节点数： </dt>
                   <dd className="inline">{local.data.nodes.length}</dd>
                 </div>
               </dl>
@@ -106,19 +106,19 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             {/* Cloud version card */}
             <div className="rounded-lg border border-cyan-700/40 bg-cyan-900/20 p-3">
               <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Cloud
+                云端
               </div>
               <dl className="space-y-1 text-[11px] text-slate-300">
                 <div>
-                  <dt className="inline text-slate-500">Title: </dt>
+                  <dt className="inline text-slate-500">标题： </dt>
                   <dd className="inline">{cloud.title}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Updated: </dt>
+                  <dt className="inline text-slate-500">更新时间： </dt>
                   <dd className="inline">{cloud.updatedAt}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Nodes: </dt>
+                  <dt className="inline text-slate-500">节点数： </dt>
                   <dd className="inline">{cloud.data.nodes.length}</dd>
                 </div>
               </dl>
@@ -137,7 +137,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             )}
             data-testid="conflict-keep-local"
           >
-            Keep Local
+            保留本地
           </button>
           <button
             type="button"
@@ -148,7 +148,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             )}
             data-testid="conflict-keep-cloud"
           >
-            Keep Cloud
+            保留云端
           </button>
         </div>
       </div>

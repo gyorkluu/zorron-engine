@@ -62,8 +62,7 @@ function VectorSpacePanelImpl({
         className={`rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-center text-xs text-slate-500 ${className ?? ''}`}
         data-testid="vector-space-disabled"
       >
-        Vector space is disabled. Enable it in the project settings to
-        visualize the 3D personality space.
+        向量空间已禁用。在项目设置中启用以可视化 3D 人格空间。
       </div>
     );
   }
@@ -75,10 +74,10 @@ function VectorSpacePanelImpl({
     >
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          3D Vector Space
+          3D 向量空间
         </h3>
         <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-medium text-cyan-200">
-          {sects.length} sects
+          {sects.length} 个宗派
         </span>
       </div>
       <VectorScene

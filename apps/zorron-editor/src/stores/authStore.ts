@@ -63,7 +63,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: res.user, token: res.token, isAuthenticated: true, isLoading: false });
       return res.user;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Login failed';
+      const message = err instanceof AppError ? err.message : '登录失败';
       set({ isLoading: false, error: message, isAuthenticated: false });
       throw err;
     }
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: res.user, token: res.token, isAuthenticated: true, isLoading: false });
       return res.user;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Registration failed';
+      const message = err instanceof AppError ? err.message : '注册失败';
       set({ isLoading: false, error: message, isAuthenticated: false });
       throw err;
     }

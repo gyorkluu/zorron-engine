@@ -90,7 +90,7 @@ export function buildFlowData(
 
 export const useProjectStore = create<ProjectState>((set, get) => ({
   id: null,
-  title: 'Untitled Project',
+  title: '未命名项目',
   description: null,
   coverUrl: null,
   isPublished: false,
@@ -124,7 +124,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       });
       return detail;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to load project';
+      const message = err instanceof AppError ? err.message : '加载项目失败';
       set({ saveStatus: 'error', error: message });
       throw err;
     }
@@ -150,7 +150,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       });
       return detail;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to create project';
+      const message = err instanceof AppError ? err.message : '创建项目失败';
       set({ saveStatus: 'error', error: message });
       throw err;
     }
@@ -176,7 +176,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         saveStatus: 'saved',
       });
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to save project';
+      const message = err instanceof AppError ? err.message : '保存项目失败';
       set({ saveStatus: 'error', error: message });
       throw err;
     }
@@ -189,7 +189,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       ...(state.id === id
         ? {
             id: null,
-            title: 'Untitled Project',
+            title: '未命名项目',
             description: null,
             coverUrl: null,
             isPublished: false,
@@ -223,7 +223,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       });
       return detail;
     } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to import project';
+      const message = err instanceof AppError ? err.message : '导入项目失败';
       set({ saveStatus: 'error', error: message });
       throw err;
     }
@@ -256,7 +256,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   reset: () =>
     set({
       id: null,
-      title: 'Untitled Project',
+      title: '未命名项目',
       description: null,
       coverUrl: null,
       isPublished: false,

@@ -107,6 +107,8 @@ describe('useSimulation', () => {
     let promise: Promise<unknown> | undefined;
     act(() => {
       promise = result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      // 立即附加 catch 以避免未处理的 rejection
+      promise?.catch(() => {});
     });
     act(() => {
       mockWorker.onmessage?.({
@@ -160,8 +162,11 @@ describe('useSimulation', () => {
   it('invokes onError when a run fails', async () => {
     const onError = vi.fn();
     const { result } = renderHook(() => useSimulation({ onError }));
+    let promise: Promise<unknown> | undefined;
     act(() => {
-      result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      promise = result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      // 立即附加 catch 以避免未处理的 rejection
+      promise?.catch(() => {});
     });
     act(() => {
       mockWorker.onmessage?.({

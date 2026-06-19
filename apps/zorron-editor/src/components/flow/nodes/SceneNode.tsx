@@ -10,12 +10,12 @@ function SceneNodeImpl({ data, selected }: ZorronNodeProps) {
   const d = data as SceneNodeData;
   const choices = d.choices ?? [];
   return (
-    <NodeShell type="scene" label={d.label ?? 'Scene'} selected={selected} icon="D">
+    <NodeShell type="scene" label={d.label ?? '场景'} selected={selected} icon="D">
       <div className="space-y-1.5">
         {d.dialogue ? (
           <p className="line-clamp-2 text-slate-300">{d.dialogue}</p>
         ) : (
-          <p className="italic text-slate-500">No dialogue yet</p>
+          <p className="italic text-slate-500">暂无对话</p>
         )}
         {choices.length > 0 && (
           <ul className="space-y-1">
@@ -29,7 +29,7 @@ function SceneNodeImpl({ data, selected }: ZorronNodeProps) {
               </li>
             ))}
             {choices.length > 3 && (
-              <li className="text-[10px] text-slate-500">+{choices.length - 3} more</li>
+              <li className="text-[10px] text-slate-500">+{choices.length - 3} 项</li>
             )}
           </ul>
         )}

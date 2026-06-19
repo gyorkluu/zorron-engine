@@ -62,14 +62,14 @@ function toAppError(error: unknown): AppError {
   if (error instanceof AxiosError && error.request) {
     return new AppError({
       code: 'NETWORK_ERROR',
-      message: 'Network error: unable to reach the server.',
+      message: '网络错误：无法连接到服务器。',
       requestId: '',
       status: 0,
     });
   }
   return new AppError({
     code: 'UNKNOWN_ERROR',
-    message: error instanceof Error ? error.message : 'Unknown error',
+    message: error instanceof Error ? error.message : '未知错误',
     requestId: '',
     status: 0,
   });

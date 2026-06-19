@@ -108,7 +108,7 @@ export function UrlField({
         className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
       />
       {value && (
-        <span className="flex-shrink-0 text-[10px] text-emerald-400">set</span>
+        <span className="flex-shrink-0 text-[10px] text-emerald-400">已设置</span>
       )}
     </div>
   );

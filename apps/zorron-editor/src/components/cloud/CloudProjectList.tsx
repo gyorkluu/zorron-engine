@@ -59,7 +59,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
 
   const handleDelete = useCallback(
     async (id: string) => {
-      if (!confirm('Delete this project? This cannot be undone.')) return;
+      if (!confirm('删除此项目？此操作无法撤销。')) return;
       try {
         await deleteProject(id);
       } catch {
@@ -72,7 +72,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
   const handleCreate = useCallback(async () => {
     setCreating(true);
     try {
-      const detail = await createProject('Untitled Project');
+      const detail = await createProject('未命名项目');
       navigate(`/projects/${detail.id}`);
     } catch {
       // Error is surfaced via the project store.
@@ -97,10 +97,9 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
         data-testid="cloud-list-unauth"
       >
         <div className="max-w-sm rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-center">
-          <h1 className="mb-2 text-lg font-semibold text-slate-100">Sign in required</h1>
+          <h1 className="mb-2 text-lg font-semibold text-slate-100">需要登录</h1>
           <p className="mb-4 text-sm text-slate-400">
-            Cloud projects are only available after signing in. Switch to local mode to work
-            without an account.
+            云端项目仅在登录后可用。切换到本地模式可无需账号工作。
           </p>
           <div className="flex justify-center">
             <WorkspaceSwitcher />
@@ -117,7 +116,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
     >
       {/* Header */}
       <header className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-        <h1 className="text-lg font-bold tracking-tight text-cyan-300">Cloud Projects</h1>
+        <h1 className="text-lg font-bold tracking-tight text-cyan-300">云端项目</h1>
         <div className="flex items-center gap-3">
           <WorkspaceSwitcher />
           <button
@@ -127,7 +126,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
             className="rounded-lg border border-cyan-600/50 bg-cyan-600/20 px-4 py-1.5 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30 disabled:opacity-50"
             data-testid="new-project-button"
           >
-            {creating ? 'Creating...' : 'New Project'}
+            {creating ? '创建中...' : '新建项目'}
           </button>
         </div>
       </header>
@@ -141,7 +140,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSearch();
           }}
-          placeholder="Search projects..."
+          placeholder="搜索项目..."
           className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
           data-testid="project-search-input"
         />
@@ -150,7 +149,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
           onClick={handleSearch}
           className="rounded-lg border border-slate-700 bg-slate-900/60 px-4 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Search
+          搜索
         </button>
       </div>
 
@@ -158,11 +157,11 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
       <div className="px-6 py-4">
         {listLoading && list.length === 0 ? (
           <div className="py-12 text-center text-sm text-slate-500" data-testid="list-loading">
-            Loading projects...
+            加载项目中...
           </div>
         ) : list.length === 0 ? (
           <div className="py-12 text-center text-sm text-slate-500" data-testid="list-empty">
-            No projects yet. Click "New Project" to create one.
+            暂无项目。点击"新建项目"创建一个。
           </div>
         ) : (
           <ul className="space-y-2" data-testid="project-list-items">
@@ -178,13 +177,13 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     </span>
                     {project.isPublished && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-300">
-                        Published
+                        已发布
                       </span>
                     )}
                   </div>
                   <div className="mt-0.5 truncate text-xs text-slate-500">
-                    {project.description ?? 'No description'}
-                    {' — Updated '}
+                    {project.description ?? '暂无描述'}
+                    {' — 更新于 '}
                     {new Date(project.updatedAt).toLocaleString()}
                   </div>
                 </div>
@@ -195,7 +194,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     className="rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1 text-xs text-slate-200 hover:bg-slate-800"
                     data-testid={`open-project-${project.id}`}
                   >
-                    Open
+                    打开
                   </button>
                   <button
                     type="button"
@@ -203,7 +202,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     className="rounded-md border border-rose-700/50 bg-rose-900/30 px-3 py-1 text-xs text-rose-200 hover:bg-rose-900/50"
                     data-testid={`delete-project-${project.id}`}
                   >
-                    Delete
+                    删除
                   </button>
                 </div>
               </li>
@@ -214,7 +213,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
         {/* Pagination */}
         {list.length > 0 && (
           <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-            <span>Page {page}</span>
+            <span>第 {page} 页</span>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -222,14 +221,14 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                 disabled={page <= 1}
                 className="rounded-md border border-slate-700 px-3 py-1 disabled:opacity-30"
               >
-                Prev
+                上一页
               </button>
               <button
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 className="rounded-md border border-slate-700 px-3 py-1"
               >
-                Next
+                下一页
               </button>
             </div>
           </div>

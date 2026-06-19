@@ -84,9 +84,9 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
         <p className="text-xs font-medium text-slate-300">
-          {isUploading ? 'Uploading...' : 'Upload or drop files'}
+          {isUploading ? '上传中...' : '上传或拖拽文件'}
         </p>
-        <p className="text-[10px] text-slate-500">Image / Audio / Video / Font</p>
+        <p className="text-[10px] text-slate-500">图片 / 音频 / 视频 / 字体</p>
       </div>
       <input
         ref={inputRef}

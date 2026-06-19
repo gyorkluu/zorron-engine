@@ -31,7 +31,7 @@ export function PlayerPage() {
     const load = async () => {
       if (!projectId) {
         if (!cancelled) {
-          setState({ status: 'error', message: 'No project id provided' });
+          setState({ status: 'error', message: '未提供项目 ID' });
         }
         return;
       }
@@ -43,7 +43,7 @@ export function PlayerPage() {
         setState({ status: 'ready', flowData: flow });
       } catch (err) {
         if (cancelled) return;
-        const message = err instanceof Error ? err.message : 'Failed to load project';
+        const message = err instanceof Error ? err.message : '加载项目失败';
         setState({ status: 'error', message });
       }
     };
@@ -56,7 +56,7 @@ export function PlayerPage() {
   if (state.status === 'loading') {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-slate-400">
-        <div className="text-sm">Loading player...</div>
+        <div className="text-sm">播放器加载中...</div>
       </div>
     );
   }
@@ -64,13 +64,13 @@ export function PlayerPage() {
   if (state.status === 'error') {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center gap-2 bg-slate-950 text-center text-slate-400">
-        <div className="text-base font-medium text-rose-400">Failed to load</div>
+        <div className="text-base font-medium text-rose-400">加载失败</div>
         <div className="text-sm opacity-70">{state.message}</div>
         <a
           href="/"
           className="mt-4 rounded-full border border-slate-600 bg-slate-900/70 px-6 py-2 text-sm text-slate-200 hover:bg-slate-800"
         >
-          Back to Editor
+          返回编辑器
         </a>
       </div>
     );

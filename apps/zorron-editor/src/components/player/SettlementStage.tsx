@@ -62,9 +62,9 @@ function SettlementStageImpl({ state, onRestart }: SettlementStageProps) {
         )}
 
         <div className="flex gap-3 text-xs text-slate-500">
-          <span>Magnitude: {result.magnitude.toFixed(2)}</span>
-          <span>Quadrant: {result.quadrant}</span>
-          <span>Distance: {result.distance === Infinity ? '—' : result.distance.toFixed(2)}</span>
+          <span>模长：{result.magnitude.toFixed(2)}</span>
+          <span>象限：{result.quadrant}</span>
+          <span>距离：{result.distance === Infinity ? '—' : result.distance.toFixed(2)}</span>
         </div>
 
         {onRestart && (
@@ -73,7 +73,7 @@ function SettlementStageImpl({ state, onRestart }: SettlementStageProps) {
             onClick={onRestart}
             className="mt-4 rounded-full border border-slate-600 bg-slate-900/70 px-6 py-2 text-sm text-slate-200 hover:bg-slate-800"
           >
-            Restart
+            重新开始
           </button>
         )}
       </div>

@@ -210,7 +210,7 @@ describe('useCloudSync', () => {
       act(async () => {
         await result.current.syncProjectToCloud('nonexistent');
       }),
-    ).rejects.toThrow('No cached project found for id: nonexistent');
+    ).rejects.toThrow('未找到 ID 为 nonexistent 的缓存项目');
   });
 
   it('detectConflict returns null when there is no cached dirty copy', async () => {

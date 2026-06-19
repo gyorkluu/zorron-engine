@@ -19,5 +19,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // E2E 测试由 Playwright 运行，不应被 Vitest 收集
+    exclude: ['node_modules', 'tests/e2e/**'],
   },
 });

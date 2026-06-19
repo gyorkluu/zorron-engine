@@ -57,7 +57,7 @@ export function isFileSystemAccessSupported(): boolean {
  */
 export async function pickLocalDirectory(): Promise<FileSystemDirectoryHandle> {
   if (!isFileSystemAccessSupported()) {
-    throw new Error('File System Access API is not supported in this browser.');
+    throw new Error('此浏览器不支持文件系统访问 API。');
   }
   return window.showDirectoryPicker({ mode: 'readwrite' });
 }

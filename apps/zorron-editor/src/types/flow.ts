@@ -32,26 +32,26 @@ export const NODE_TYPES: NodeType[] = [
 
 /** Human-readable labels for each node type, used in the palette and inspector. */
 export const NODE_TYPE_LABELS: Record<NodeType, string> = {
-  start: 'Start',
-  scene: 'Scene',
-  logic: 'Logic',
-  setter: 'Setter',
-  calculator: 'Calculator',
-  settlement: 'Settlement',
-  video: 'Video',
-  link: 'External Link',
+  start: '开始',
+  scene: '场景',
+  logic: '逻辑',
+  setter: '赋值器',
+  calculator: '计算器',
+  settlement: '结算',
+  video: '视频',
+  link: '外部链接',
 };
 
 /** Short descriptions for the node palette. */
 export const NODE_TYPE_DESCRIPTIONS: Record<NodeType, string> = {
-  start: 'Entry point of the narrative flow',
-  scene: 'Dialogue stage with choices and media',
-  logic: 'Branch flow based on variables or fragments',
-  setter: 'Modify narrative variables',
-  calculator: 'Apply pending personality vector deltas',
-  settlement: 'Final result and archetype matching',
-  video: 'Fullscreen video playback node',
-  link: 'Open an external URL',
+  start: '叙事流程的入口',
+  scene: '带选项和媒体的对话场景',
+  logic: '基于变量或碎片分支流程',
+  setter: '修改变量',
+  calculator: '应用待处理的人格向量增量',
+  settlement: '最终结果与原型匹配',
+  video: '全屏视频播放节点',
+  link: '打开外部链接',
 };
 
 /** Accent color per node type for canvas visuals. */
@@ -252,21 +252,21 @@ export function createEmptyFlowData(): FlowData {
 export function createDefaultNodeData(type: NodeType): GameNodeData {
   switch (type) {
     case 'start':
-      return { label: 'Start', title: 'New Story', intro: '' };
+      return { label: '开始', title: '新故事', intro: '' };
     case 'scene':
-      return { label: 'Scene', dialogue: '', choices: [] };
+      return { label: '场景', dialogue: '', choices: [] };
     case 'logic':
-      return { label: 'Logic', condition: '', checkType: 'variable' };
+      return { label: '逻辑', condition: '', checkType: 'variable' };
     case 'setter':
-      return { label: 'Setter', assignments: [] };
+      return { label: '赋值器', assignments: [] };
     case 'calculator':
-      return { label: 'Calculator', vector: { x: 0, y: 0, z: 0 } };
+      return { label: '计算器', vector: { x: 0, y: 0, z: 0 } };
     case 'settlement':
-      return { label: 'Settlement', resultMapping: [] };
+      return { label: '结算', resultMapping: [] };
     case 'video':
-      return { label: 'Video', videoUrl: '', autoPlay: true, skipAllowed: true };
+      return { label: '视频', videoUrl: '', autoPlay: true, skipAllowed: true };
     case 'link':
-      return { label: 'Link', url: '', title: '' };
+      return { label: '链接', url: '', title: '' };
   }
 }
 

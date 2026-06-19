@@ -14,14 +14,14 @@ function LogicNodeImpl({ data, selected }: ZorronNodeProps) {
   return (
     <NodeShell
       type="logic"
-      label={d.label ?? 'Logic'}
+      label={d.label ?? '逻辑'}
       selected={selected}
       showSource={false}
       icon="?"
     >
       <div className="space-y-1">
         <p className="text-amber-200/80">
-          {d.checkType ?? 'variable'} check
+          {d.checkType ?? 'variable'} 检查
         </p>
         {d.varName && (
           <p className="font-mono text-[11px] text-slate-400">
@@ -29,8 +29,8 @@ function LogicNodeImpl({ data, selected }: ZorronNodeProps) {
           </p>
         )}
         <div className="flex justify-between pt-1">
-          <span className="text-[10px] text-emerald-300">true</span>
-          <span className="text-[10px] text-rose-300">false</span>
+          <span className="text-[10px] text-emerald-300">真</span>
+          <span className="text-[10px] text-rose-300">假</span>
         </div>
       </div>
       {/* True output (top-right) */}

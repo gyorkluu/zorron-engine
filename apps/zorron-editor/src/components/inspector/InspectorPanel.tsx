@@ -38,9 +38,9 @@ function EmptyInspector() {
             <path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-slate-300">No node selected</p>
+        <p className="text-sm font-medium text-slate-300">未选中节点</p>
         <p className="text-xs text-slate-500">
-          Click a node on the canvas to edit its properties.
+          在画布上点击节点以编辑其属性。
         </p>
       </div>
       {featureFlags.vector3d && (
@@ -81,10 +81,10 @@ function StartForm({ node, update }: { node: FlowNode; update: (data: Partial<St
   const d = node.data as StartNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Title"><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
-      <Field label="Intro"><TextAreaField value={d.intro ?? ''} onChange={(intro) => update({ intro })} /></Field>
-      <Field label="Cover URL" hint="Drag an image asset here."><UrlField value={d.coverUrl ?? ''} onChange={(coverUrl) => update({ coverUrl })} /></Field>
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="标题"><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
+      <Field label="简介"><TextAreaField value={d.intro ?? ''} onChange={(intro) => update({ intro })} /></Field>
+      <Field label="封面地址" hint="拖拽图片资源到此处。"><UrlField value={d.coverUrl ?? ''} onChange={(coverUrl) => update({ coverUrl })} /></Field>
     </div>
   );
 }
@@ -94,12 +94,12 @@ function SceneForm({ node, update }: { node: FlowNode; update: (data: Partial<Sc
   const d = node.data as SceneNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Speaker"><TextField value={d.speaker ?? ''} onChange={(speaker) => update({ speaker })} /></Field>
-      <Field label="Dialogue"><TextAreaField value={d.dialogue ?? ''} onChange={(dialogue) => update({ dialogue })} rows={4} /></Field>
-      <Field label="Background URL" hint="Drag an image asset here."><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
-      <Field label="Character URL" hint="Drag an image asset here."><UrlField value={d.characterUrl ?? ''} onChange={(characterUrl) => update({ characterUrl })} /></Field>
-      <Field label="BGM URL"><UrlField value={d.bgm ?? ''} onChange={(bgm) => update({ bgm })} /></Field>
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="说话人"><TextField value={d.speaker ?? ''} onChange={(speaker) => update({ speaker })} /></Field>
+      <Field label="对话"><TextAreaField value={d.dialogue ?? ''} onChange={(dialogue) => update({ dialogue })} rows={4} /></Field>
+      <Field label="背景地址" hint="拖拽图片资源到此处。"><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
+      <Field label="角色地址" hint="拖拽图片资源到此处。"><UrlField value={d.characterUrl ?? ''} onChange={(characterUrl) => update({ characterUrl })} /></Field>
+      <Field label="背景音乐地址"><UrlField value={d.bgm ?? ''} onChange={(bgm) => update({ bgm })} /></Field>
       <ChoicesEditor choices={d.choices ?? []} onChange={(choices) => update({ choices })} />
     </div>
   );
@@ -117,37 +117,37 @@ function LogicForm({ node, update }: { node: FlowNode; update: (data: Partial<Lo
   ];
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Check Type">
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="检查类型">
         <SelectField
           value={d.checkType ?? 'variable'}
           onChange={(checkType) => update({ checkType })}
           options={[
-            { value: 'variable', label: 'Variable' },
-            { value: 'count', label: 'Fragment count' },
-            { value: 'has-specific', label: 'Has fragment' },
+            { value: 'variable', label: '变量' },
+            { value: 'count', label: '碎片数量' },
+            { value: 'has-specific', label: '拥有碎片' },
           ]}
         />
       </Field>
       {d.checkType === 'variable' && (
         <div className="grid grid-cols-3 gap-2">
-          <Field label="Variable"><TextField value={d.varName ?? ''} onChange={(varName) => update({ varName })} /></Field>
-          <Field label="Operator">
+          <Field label="变量"><TextField value={d.varName ?? ''} onChange={(varName) => update({ varName })} /></Field>
+          <Field label="运算符">
             <SelectField value={d.operator ?? '>='} onChange={(operator) => update({ operator })} options={operators} />
           </Field>
-          <Field label="Value"><NumberField value={d.value ?? 0} onChange={(value) => update({ value })} /></Field>
+          <Field label="值"><NumberField value={d.value ?? 0} onChange={(value) => update({ value })} /></Field>
         </div>
       )}
       {d.checkType === 'count' && (
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Operator">
+          <Field label="运算符">
             <SelectField value={d.operator ?? '>='} onChange={(operator) => update({ operator })} options={operators} />
           </Field>
-          <Field label="Threshold"><NumberField value={d.countThreshold ?? 0} onChange={(countThreshold) => update({ countThreshold })} /></Field>
+          <Field label="阈值"><NumberField value={d.countThreshold ?? 0} onChange={(countThreshold) => update({ countThreshold })} /></Field>
         </div>
       )}
       {d.checkType === 'has-specific' && (
-        <Field label="Fragment ID"><TextField value={d.targetFragmentId ?? ''} onChange={(targetFragmentId) => update({ targetFragmentId })} /></Field>
+        <Field label="碎片 ID"><TextField value={d.targetFragmentId ?? ''} onChange={(targetFragmentId) => update({ targetFragmentId })} /></Field>
       )}
     </div>
   );
@@ -158,7 +158,7 @@ function SetterForm({ node, update }: { node: FlowNode; update: (data: Partial<S
   const d = node.data as SetterNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
       <AssignmentsEditor assignments={d.assignments ?? []} onChange={(assignments) => update({ assignments })} />
     </div>
   );
@@ -169,13 +169,13 @@ function CalculatorForm({ node, update }: { node: FlowNode; update: (data: Parti
   const d = node.data as CalculatorNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Description"><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
-      <Field label="Vector Delta" hint="Applied to the personality vector on traversal.">
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="描述"><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
+      <Field label="向量增量" hint="在遍历时应用到人格向量。">
         <VectorEditor value={d.vector ?? { x: 0, y: 0, z: 0 }} onChange={(vector) => update({ vector })} />
       </Field>
-      <Field label="Target Variable" hint="Optional: store the vector magnitude into this variable.">
-        <TextField value={d.targetVariable ?? ''} onChange={(targetVariable) => update({ targetVariable })} placeholder="vectorMagnitude" />
+      <Field label="目标变量" hint="可选：将向量长度存入此变量。">
+        <TextField value={d.targetVariable ?? ''} onChange={(targetVariable) => update({ targetVariable })} placeholder="向量长度" />
       </Field>
     </div>
   );
@@ -187,11 +187,11 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
   const mappings = d.resultMapping ?? [];
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-            Results ({mappings.length})
+            结果 ({mappings.length})
           </span>
           <button
             type="button"
@@ -199,13 +199,13 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
               update({
                 resultMapping: [
                   ...mappings,
-                  { resultId: `r_${mappings.length + 1}`, title: 'New result' },
+                  { resultId: `r_${mappings.length + 1}`, title: '新结果' },
                 ],
               })
             }
             className="rounded-md bg-pink-500/20 px-2 py-1 text-xs text-pink-200 hover:bg-pink-500/30"
           >
-            + Add
+            + 添加
           </button>
         </div>
         {mappings.map((m, i) => (
@@ -221,14 +221,14 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
                 onClick={() => update({ resultMapping: mappings.filter((_, idx) => idx !== i) })}
                 className="flex-shrink-0 rounded-md px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/20"
               >
-                Del
+                删除
               </button>
             </div>
             <TextAreaField value={m.description ?? ''} onChange={(description) => {
               const next = [...mappings];
               next[i] = { ...m, description };
               update({ resultMapping: next });
-            }} rows={2} placeholder="Description" />
+            }} rows={2} placeholder="描述" />
           </div>
         ))}
       </div>
@@ -246,10 +246,10 @@ function VideoForm({ node, update }: { node: FlowNode; update: (data: Partial<Vi
   const d = node.data as VideoNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Video URL" hint="Drag a video asset here."><UrlField value={d.videoUrl ?? ''} onChange={(videoUrl) => update({ videoUrl })} /></Field>
-      <SwitchField checked={d.autoPlay} onChange={(autoPlay) => update({ autoPlay })} label="Auto play" />
-      <SwitchField checked={d.skipAllowed} onChange={(skipAllowed) => update({ skipAllowed })} label="Allow skip" />
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="视频地址" hint="拖拽视频资源到此处。"><UrlField value={d.videoUrl ?? ''} onChange={(videoUrl) => update({ videoUrl })} /></Field>
+      <SwitchField checked={d.autoPlay} onChange={(autoPlay) => update({ autoPlay })} label="自动播放" />
+      <SwitchField checked={d.skipAllowed} onChange={(skipAllowed) => update({ skipAllowed })} label="允许跳过" />
     </div>
   );
 }
@@ -259,10 +259,10 @@ function LinkForm({ node, update }: { node: FlowNode; update: (data: Partial<Lin
   const d = node.data as LinkNodeData;
   return (
     <div className="space-y-3">
-      <Field label="Label"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
-      <Field label="Title"><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
-      <Field label="URL"><UrlField value={d.url ?? ''} onChange={(url) => update({ url })} /></Field>
-      <Field label="Description"><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
+      <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label="标题"><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
+      <Field label="地址"><UrlField value={d.url ?? ''} onChange={(url) => update({ url })} /></Field>
+      <Field label="描述"><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
     </div>
   );
 }
@@ -307,14 +307,14 @@ function InspectorPanelImpl() {
           onClick={() => duplicateNode(node.id)}
           className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Duplicate
+          复制
         </button>
         <button
           type="button"
           onClick={() => removeNode(node.id)}
           className="flex-1 rounded-lg border border-rose-700/50 bg-rose-900/30 px-3 py-1.5 text-xs text-rose-200 hover:bg-rose-900/50"
         >
-          Delete
+          删除
         </button>
       </div>
     </aside>

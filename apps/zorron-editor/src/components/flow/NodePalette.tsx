@@ -59,7 +59,7 @@ function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
   return (
     <aside className="flex h-full w-56 flex-col gap-2 overflow-y-auto border-r border-slate-800/60 bg-slate-950/40 p-3 backdrop-blur-sm">
       <h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-        Node Palette
+        节点面板
       </h2>
       <div className="flex flex-col gap-2">
         {NODE_TYPES.map((type) => (
@@ -67,7 +67,7 @@ function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
         ))}
       </div>
       <div className="mt-auto rounded-lg border border-slate-800/60 bg-slate-900/40 p-2 text-[10px] text-slate-500">
-        Drag a node onto the canvas, or click to add at center.
+        拖拽节点到画布，或点击在中心添加。
       </div>
     </aside>
   );

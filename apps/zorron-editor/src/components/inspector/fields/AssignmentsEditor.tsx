@@ -13,9 +13,9 @@ export interface AssignmentsEditorProps {
 }
 
 const OPERATOR_OPTIONS: ReadonlyArray<{ value: SetterAssignment['operator']; label: string }> = [
-  { value: 'set', label: '= set' },
-  { value: 'add', label: '+= add' },
-  { value: 'sub', label: '-= sub' },
+  { value: 'set', label: '= 赋值' },
+  { value: 'add', label: '+= 加' },
+  { value: 'sub', label: '-= 减' },
 ];
 
 function AssignmentsEditorImpl({ assignments, onChange }: AssignmentsEditorProps) {
@@ -34,19 +34,19 @@ function AssignmentsEditorImpl({ assignments, onChange }: AssignmentsEditorProps
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-          Assignments ({assignments.length})
+          赋值 ({assignments.length})
         </span>
         <button
           type="button"
           onClick={add}
           className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs text-emerald-200 hover:bg-emerald-500/30"
         >
-          + Add
+          + 添加
         </button>
       </div>
       {assignments.length === 0 && (
         <p className="rounded-lg border border-dashed border-slate-700 p-3 text-center text-xs text-slate-500">
-          No assignments yet.
+          暂无赋值。
         </p>
       )}
       <div className="space-y-2">
@@ -56,14 +56,14 @@ function AssignmentsEditorImpl({ assignments, onChange }: AssignmentsEditorProps
             className="space-y-2 rounded-lg border border-slate-700/60 bg-slate-900/40 p-2"
           >
             <div className="grid grid-cols-2 gap-2">
-              <Field label="Variable">
+              <Field label="变量">
                 <TextField
                   value={assignment.variable}
                   onChange={(variable) => update(index, { variable })}
-                  placeholder="score"
+                  placeholder="分数"
                 />
               </Field>
-              <Field label="Operator">
+              <Field label="运算符">
                 <SelectField
                   value={assignment.operator}
                   onChange={(operator) => update(index, { operator })}
@@ -73,7 +73,7 @@ function AssignmentsEditorImpl({ assignments, onChange }: AssignmentsEditorProps
             </div>
             <div className="flex items-end gap-2">
               <div className="flex-1">
-                <Field label="Value">
+                <Field label="值">
                   <NumberField
                     value={Number(assignment.value) || 0}
                     onChange={(value) => update(index, { value })}
@@ -85,7 +85,7 @@ function AssignmentsEditorImpl({ assignments, onChange }: AssignmentsEditorProps
                 onClick={() => remove(index)}
                 className="flex-shrink-0 rounded-md px-2 py-1.5 text-xs text-rose-300 hover:bg-rose-500/20"
               >
-                Del
+                删除
               </button>
             </div>
           </div>

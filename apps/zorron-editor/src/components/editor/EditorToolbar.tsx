@@ -82,10 +82,10 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   }, [importProject, loadFlow, title]);
 
   const statusLabel: Record<string, string> = {
-    saved: 'Saved',
-    saving: 'Saving...',
-    unsaved: 'Unsaved',
-    error: 'Error',
+    saved: '已保存',
+    saving: '保存中...',
+    unsaved: '未保存',
+    error: '错误',
   };
 
   return (
@@ -103,7 +103,7 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Untitled Project"
+          placeholder="未命名项目"
           className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-slate-100 outline-none hover:border-slate-700 focus:border-cyan-500/60 focus:bg-slate-900/60"
         />
       </div>
@@ -131,9 +131,9 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
             type="button"
             onClick={() => navigate('/projects')}
             className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
-            title="Browse cloud projects"
+            title="浏览云端项目"
           >
-            Projects
+            项目
           </button>
         )}
         <button
@@ -141,21 +141,21 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
           onClick={handleImport}
           className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Import
+          导入
         </button>
         <button
           type="button"
           onClick={handleExport}
           className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Export
+          导出
         </button>
         <button
           type="button"
           onClick={handleSave}
           className="rounded-md border border-cyan-600/50 bg-cyan-600/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30"
         >
-          Save
+          保存
         </button>
       </div>
     </header>

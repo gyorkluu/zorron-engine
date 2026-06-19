@@ -12,14 +12,14 @@ function SettlementNodeImpl({ data, selected }: ZorronNodeProps) {
   return (
     <NodeShell
       type="settlement"
-      label={d.label ?? 'Settlement'}
+      label={d.label ?? '结算'}
       selected={selected}
       showSource={false}
       icon="★"
     >
       <div className="space-y-1">
         {mappings.length === 0 ? (
-          <p className="italic text-slate-500">No results mapped</p>
+          <p className="italic text-slate-500">暂无结果映射</p>
         ) : (
           <ul className="space-y-0.5">
             {mappings.slice(0, 3).map((m) => (
@@ -28,7 +28,7 @@ function SettlementNodeImpl({ data, selected }: ZorronNodeProps) {
               </li>
             ))}
             {mappings.length > 3 && (
-              <li className="text-[10px] text-slate-500">+{mappings.length - 3} more</li>
+              <li className="text-[10px] text-slate-500">+{mappings.length - 3} 项</li>
             )}
           </ul>
         )}

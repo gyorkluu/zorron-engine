@@ -18,12 +18,12 @@ import { cn } from '@/lib/utils';
 
 /** Filter tab definitions. */
 const TYPE_TABS: ReadonlyArray<{ value: AssetType | undefined; label: string }> = [
-  { value: undefined, label: 'All' },
-  { value: 'image', label: 'Image' },
-  { value: 'audio', label: 'Audio' },
-  { value: 'video', label: 'Video' },
-  { value: 'font', label: 'Font' },
-  { value: 'other', label: 'Other' },
+  { value: undefined, label: '全部' },
+  { value: 'image', label: '图片' },
+  { value: 'audio', label: '音频' },
+  { value: 'video', label: '视频' },
+  { value: 'font', label: '字体' },
+  { value: 'other', label: '其他' },
 ];
 
 /** Extract every URL-valued field from a node's data for reference scanning. */
@@ -98,7 +98,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
     >
       <div className="border-b border-slate-800/60 px-3 py-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Assets
+          资源
         </h2>
       </div>
 
@@ -127,7 +127,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
           type="search"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Search assets..."
+          placeholder="搜索资源..."
           className="w-full rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
         />
       </div>

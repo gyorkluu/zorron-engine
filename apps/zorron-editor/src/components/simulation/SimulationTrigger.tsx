@@ -20,7 +20,7 @@ function SimulationTriggerImpl() {
         onClick={handleClick}
         className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 shadow-lg backdrop-blur-sm hover:bg-slate-800"
         data-testid="simulation-trigger"
-        title="Run Monte Carlo simulation"
+        title="运行蒙特卡洛模拟"
       >
         <svg
           width="14"
@@ -33,7 +33,7 @@ function SimulationTriggerImpl() {
           <path d="M3 3v18h18" />
           <path d="M7 14l4-4 4 4 5-5" />
         </svg>
-        Simulate
+        模拟
       </button>
       <SimulationPanel open={open} onClose={handleClose} />
     </>

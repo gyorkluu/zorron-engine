@@ -108,24 +108,24 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
     >
       {/* Summary */}
       <div className="grid grid-cols-4 gap-2">
-        <StatCard label="Runs" value={report.totalRuns} color="text-cyan-300" />
+        <StatCard label="运行次数" value={report.totalRuns} color="text-cyan-300" />
         <StatCard
-          label="Settlements"
+          label="结算数"
           value={Object.values(report.settlementHits).reduce((a, b) => a + b, 0)}
           color="text-emerald-300"
         />
-        <StatCard label="Dead ends" value={report.deadEnds} color="text-amber-300" />
-        <StatCard label="Timeouts" value={report.timedOuts} color="text-rose-300" />
+        <StatCard label="死胡同" value={report.deadEnds} color="text-amber-300" />
+        <StatCard label="超时" value={report.timedOuts} color="text-rose-300" />
       </div>
 
       {/* Settlement distribution chart */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Settlement Distribution
+          结算分布
         </h3>
         {settlementBars.length === 0 ? (
           <p className="py-4 text-center text-xs text-slate-500">
-            No settlement nodes were reached.
+            未到达任何结算节点。
           </p>
         ) : (
           <div className="space-y-2">
@@ -155,18 +155,18 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
       {/* Vector statistics */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Vector Statistics
+          向量统计
         </h3>
         <div className="grid grid-cols-3 gap-2 text-center">
           <VectorStat
             label="Axis"
-            value="Mean ± StdDev"
+            value="均值 ± 标准差"
             header
           />
           <VectorStat label="X" value="" header />
           <VectorStat label="Y" value="" header />
           <VectorStat
-            label="Mean"
+            label="均值"
             value={report.meanVector.x.toFixed(2)}
           />
           <VectorStat
@@ -178,7 +178,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
             value={report.meanVector.z.toFixed(2)}
           />
           <VectorStat
-            label="StdDev"
+            label="标准差"
             value={report.stdDevVector.x.toFixed(2)}
           />
           <VectorStat
@@ -195,7 +195,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
       {/* Node hit rates */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Node Reachability
+          节点可达性
         </h3>
         <div className="space-y-1">
           {nodeRows.map((row) => {
@@ -224,7 +224,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
           })}
           {nodeRows.length === 0 && (
             <p className="py-2 text-center text-xs text-slate-500">
-              No nodes in the flow.
+              流程中无节点。
             </p>
           )}
         </div>
@@ -237,7 +237,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
           onClick={handleExport}
           className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Export Report
+          导出报告
         </button>
         {onClose && (
           <button
@@ -245,7 +245,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
             onClick={onClose}
             className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
           >
-            Close
+            关闭
           </button>
         )}
       </div>

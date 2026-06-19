@@ -81,7 +81,7 @@ describe('VectorSpacePanel', () => {
     });
     render(<VectorSpacePanel />);
     expect(screen.getByTestId('vector-space-panel')).toBeInTheDocument();
-    expect(screen.getByText('1 sects')).toBeInTheDocument();
+    expect(screen.getByText('1 个宗派')).toBeInTheDocument();
   });
 
   it('uses the player vector when no override is provided', () => {
@@ -128,7 +128,7 @@ describe('VectorSpaceSettings', () => {
 
   it('renders the enable toggle', () => {
     render(<VectorSpaceSettings />);
-    expect(screen.getByText('Enable 3D vector space')).toBeInTheDocument();
+    expect(screen.getByText('启用 3D 向量空间')).toBeInTheDocument();
   });
 
   it('shows dimension labels and sect editor when enabled', () => {
@@ -143,7 +143,7 @@ describe('VectorSpaceSettings', () => {
     });
     render(<VectorSpaceSettings />);
     expect(screen.getByPlaceholderText('处世')).toBeInTheDocument();
-    expect(screen.getByText('Sect Anchors (0)')).toBeInTheDocument();
+    expect(screen.getByText('宗派锚点 (0)')).toBeInTheDocument();
   });
 
   it('adds a sect anchor when the add button is clicked', () => {
@@ -157,7 +157,7 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('+ Add Sect'));
+    fireEvent.click(screen.getByText('+ 添加宗派'));
     expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(1);
   });
 
@@ -174,13 +174,13 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('Del'));
+    fireEvent.click(screen.getByText('删除'));
     expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(0);
   });
 
   it('toggles the vector space enabled state', () => {
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('Enable 3D vector space'));
+    fireEvent.click(screen.getByText('启用 3D 向量空间'));
     expect(useProjectStore.getState().settings.vectorSpace.enabled).toBe(true);
   });
 });

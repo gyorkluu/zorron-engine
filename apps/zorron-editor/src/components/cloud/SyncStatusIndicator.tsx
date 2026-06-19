@@ -21,37 +21,37 @@ const STATUS_CONFIG: Record<
   { label: string; dot: string; text: string; bg: string }
 > = {
   idle: {
-    label: 'Idle',
+    label: '空闲',
     dot: 'bg-slate-400',
     text: 'text-slate-300',
     bg: 'bg-slate-500/10',
   },
   syncing: {
-    label: 'Syncing',
+    label: '同步中',
     dot: 'bg-amber-400 animate-pulse',
     text: 'text-amber-200',
     bg: 'bg-amber-500/10',
   },
   synced: {
-    label: 'Synced',
+    label: '已同步',
     dot: 'bg-emerald-400',
     text: 'text-emerald-200',
     bg: 'bg-emerald-500/10',
   },
   offline: {
-    label: 'Offline',
+    label: '离线',
     dot: 'bg-slate-500',
     text: 'text-slate-400',
     bg: 'bg-slate-500/10',
   },
   conflict: {
-    label: 'Conflict',
+    label: '冲突',
     dot: 'bg-rose-400',
     text: 'text-rose-200',
     bg: 'bg-rose-500/10',
   },
   error: {
-    label: 'Error',
+    label: '错误',
     dot: 'bg-rose-500',
     text: 'text-rose-200',
     bg: 'bg-rose-500/10',
@@ -89,10 +89,10 @@ function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
           className,
         )}
         data-testid="sync-status-local"
-        title="Working in local mode — changes save to your device."
+        title="正在本地模式工作 — 更改将保存到您的设备。"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-        Local
+        本地
       </span>
     );
   }
@@ -101,7 +101,7 @@ function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
   const tooltip = error
     ? error
     : lastSyncedAt
-      ? `Last synced: ${new Date(lastSyncedAt).toLocaleString()}`
+      ? `上次同步：${new Date(lastSyncedAt).toLocaleString()}`
       : config.label;
 
   return (

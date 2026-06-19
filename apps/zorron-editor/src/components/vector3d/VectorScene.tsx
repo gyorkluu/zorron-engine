@@ -152,7 +152,7 @@ function VectorSceneImpl({
         data-testid="vector-scene-canvas"
       />
       <div className="pointer-events-none absolute bottom-2 left-2 rounded-md bg-slate-950/70 px-2 py-1 text-[10px] text-slate-400 backdrop-blur-sm">
-        Drag to rotate · Scroll to zoom
+        拖拽旋转 · 滚轮缩放
       </div>
     </div>
   );

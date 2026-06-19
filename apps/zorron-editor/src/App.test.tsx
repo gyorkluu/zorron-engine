@@ -68,6 +68,6 @@ describe('App', () => {
 
   it('renders the asset panel header', () => {
     render(<App />);
-    expect(screen.getByText('Assets')).toBeInTheDocument();
+    expect(screen.getByText('资源')).toBeInTheDocument();
   });
 });

@@ -61,7 +61,7 @@ function ZorronEdgeImpl({
               className="rounded-full px-1.5 py-0.5 text-[9px] font-medium"
               style={{ background: `${color}33`, color }}
             >
-              {sourceHandleId ?? 'flow'}
+              {sourceHandleId ?? '流转'}
             </span>
           )}
         </div>

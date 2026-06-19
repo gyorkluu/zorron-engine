@@ -142,7 +142,7 @@ export function useCloudSync(options: UseCloudSyncOptions = {}): UseCloudSyncRet
       setLastSyncedAt(new Date().toISOString());
       await refreshPendingCount();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Sync failed';
+      const message = err instanceof Error ? err.message : '同步失败';
       setError(message);
       setSyncStatus('error');
     }
@@ -153,7 +153,7 @@ export function useCloudSync(options: UseCloudSyncOptions = {}): UseCloudSyncRet
     async (projectId: string): Promise<ProjectDetail> => {
       const cached = await getCachedProject(projectId);
       if (!cached) {
-        throw new Error(`No cached project found for id: ${projectId}`);
+        throw new Error(`未找到 ID 为 ${projectId} 的缓存项目`);
       }
       const { detail } = cached;
       try {
@@ -232,7 +232,7 @@ export function useCloudSync(options: UseCloudSyncOptions = {}): UseCloudSyncRet
         setLastSyncedAt(new Date().toISOString());
         await refreshPendingCount();
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Conflict resolution failed';
+        const message = err instanceof Error ? err.message : '冲突解决失败';
         setError(message);
         setSyncStatus('error');
       }

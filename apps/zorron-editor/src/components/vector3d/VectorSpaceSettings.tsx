@@ -57,9 +57,9 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     const sects = vectorSpace.sects ?? [];
     const newSect: SectAnchor = {
       id: `sect_${nanoid(6)}`,
-      name: `Sect ${sects.length + 1}`,
+      name: `宗派 ${sects.length + 1}`,
       vector: { x: 0, y: 0, z: 0 },
-      title: `Sect ${sects.length + 1}`,
+      title: `宗派 ${sects.length + 1}`,
     };
     updateVectorSpace({ sects: [...sects, newSect] });
   }, [vectorSpace.sects, updateVectorSpace]);
@@ -77,7 +77,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     <div className={className} data-testid="vector-space-settings">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Vector Space
+          向量空间
         </h3>
       </div>
 
@@ -85,13 +85,13 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
         <SwitchField
           checked={vectorSpace.enabled}
           onChange={(enabled) => updateVectorSpace({ enabled })}
-          label="Enable 3D vector space"
+          label="启用 3D 向量空间"
         />
 
         {vectorSpace.enabled && (
           <>
             <div className="grid grid-cols-3 gap-2">
-              <Field label="X Axis">
+              <Field label="X 轴">
                 <TextField
                   value={vectorSpace.dimensions.x}
                   onChange={(x) =>
@@ -102,7 +102,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                   placeholder="处世"
                 />
               </Field>
-              <Field label="Y Axis">
+              <Field label="Y 轴">
                 <TextField
                   value={vectorSpace.dimensions.y}
                   onChange={(y) =>
@@ -113,7 +113,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                   placeholder="立场"
                 />
               </Field>
-              <Field label="Z Axis">
+              <Field label="Z 轴">
                 <TextField
                   value={vectorSpace.dimensions.z}
                   onChange={(z) =>
@@ -129,20 +129,20 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Sect Anchors ({vectorSpace.sects?.length ?? 0})
+                  宗派锚点 ({vectorSpace.sects?.length ?? 0})
                 </span>
                 <button
                   type="button"
                   onClick={addSect}
                   className="rounded-md bg-violet-500/20 px-2 py-1 text-xs text-violet-200 hover:bg-violet-500/30"
                 >
-                  + Add Sect
+                  + 添加宗派
                 </button>
               </div>
 
               {(vectorSpace.sects ?? []).length === 0 && (
                 <p className="rounded-lg border border-dashed border-slate-700 p-3 text-center text-xs text-slate-500">
-                  No sect anchors yet. Add one to define a personality archetype.
+                  暂无宗派锚点。添加一个以定义人格原型。
                 </p>
               )}
 
@@ -156,26 +156,26 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                       <TextField
                         value={sect.name}
                         onChange={(name) => updateSect(sect.id, { name })}
-                        placeholder="Sect name"
+                        placeholder="宗派名称"
                       />
                       <button
                         type="button"
                         onClick={() => removeSect(sect.id)}
                         className="flex-shrink-0 rounded-md px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/20"
                       >
-                        Del
+                        删除
                       </button>
                     </div>
-                    <Field label="Title">
+                    <Field label="标题">
                       <TextField
                         value={sect.title}
                         onChange={(title) => updateSect(sect.id, { title })}
-                        placeholder="Display title"
+                        placeholder="显示标题"
                       />
                     </Field>
                     <Field
-                      label="Anchor Vector"
-                      hint="Position of this sect in the 3D space."
+                      label="锚点向量"
+                      hint="此宗派在 3D 空间中的位置。"
                     >
                       <VectorEditor
                         value={sect.vector}

@@ -116,7 +116,7 @@ function AssetCard({ asset }: { asset: Asset }) {
         </span>
         {local && (
           <span className="absolute right-1 top-1 rounded bg-amber-500/30 px-1 py-0.5 text-[9px] font-semibold text-amber-200">
-            local
+            本地
           </span>
         )}
       </div>
@@ -137,9 +137,9 @@ function AssetGridImpl({ assets, className }: AssetGridProps) {
     return (
       <div className={cn('flex flex-1 items-center justify-center p-6 text-center', className)}>
         <div>
-          <p className="text-xs font-medium text-slate-400">No assets</p>
+          <p className="text-xs font-medium text-slate-400">暂无资源</p>
           <p className="mt-1 text-[10px] text-slate-600">
-            Upload a file or adjust your filters.
+            上传文件或调整筛选条件。
           </p>
         </div>
       </div>

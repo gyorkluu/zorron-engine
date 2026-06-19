@@ -46,7 +46,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
 
       if (next === 'cloud') {
         if (!isAuthenticated) {
-          setError('Please sign in to use cloud mode.');
+          setError('请登录后使用云端模式。');
           return;
         }
         setMode('cloud');
@@ -78,7 +78,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
         if (err instanceof DOMException && err.name === 'AbortError') {
           // Silent: user cancelled.
         } else {
-          setError(err instanceof Error ? err.message : 'Failed to switch to local mode.');
+          setError(err instanceof Error ? err.message : '切换到本地模式失败。');
         }
       } finally {
         setPicking(false);
@@ -111,10 +111,10 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
               : 'text-slate-400 hover:text-slate-200',
             !isAuthenticated && 'cursor-not-allowed opacity-50',
           )}
-          title={isAuthenticated ? 'Cloud workspace' : 'Sign in to use cloud mode'}
+          title={isAuthenticated ? '云端工作区' : '请登录后使用云端模式'}
           data-testid="workspace-mode-cloud"
         >
-          Cloud
+          云端
         </button>
         <button
           type="button"
@@ -126,15 +126,15 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
               ? 'bg-emerald-600/30 text-emerald-100'
               : 'text-slate-400 hover:text-slate-200',
           )}
-          title="Local workspace (files saved to your device)"
+          title="本地工作区（文件保存到您的设备）"
           data-testid="workspace-mode-local"
         >
-          Local
+          本地
         </button>
       </div>
       {mode === 'local' && !fileSystemAccessSupported && (
         <span className="text-[10px] text-amber-300/80">
-          Using browser storage (IndexedDB) — File System Access API not available.
+          使用浏览器存储（IndexedDB）— 文件系统访问 API 不可用。
         </span>
       )}
       {mode === 'local' && directoryHandle && (
