@@ -52,9 +52,9 @@ function NodeShellImpl({
   return (
     <div
       className={cn(
-        'group relative w-60 rounded-2xl border bg-slate-900/70 text-slate-100 shadow-xl backdrop-blur-md transition-all',
-        'border-slate-700/60 hover:border-slate-500/70',
-        selected && 'border-cyan-400/80 ring-2 ring-cyan-400/40',
+        'group relative w-60 rounded-2xl border bg-[hsl(22,16%,8%,0.8)] text-[hsl(40,30%,92%)] shadow-xl backdrop-blur-md transition-all duration-200',
+        'border-[hsl(28,14%,20%)] hover:border-[hsl(38,92%,56%,0.4)]',
+        selected && 'border-[hsl(38,92%,56%,0.6)] ring-2 ring-[hsl(38,92%,56%,0.2)]',
       )}
       style={{
         boxShadow: selected
@@ -67,7 +67,7 @@ function NodeShellImpl({
           id={targetHandleId}
           type="target"
           position={Position.Left}
-          className="!h-3 !w-3 !border-2 !border-slate-900 !bg-slate-300"
+          className="!h-3 !w-3 !border-2 !border-[hsl(20,14%,4%)] !bg-[hsl(40,30%,70%)]"
         />
       )}
 
@@ -93,7 +93,7 @@ function NodeShellImpl({
         </span>
       </div>
 
-      {children && <div className="px-3 py-2 text-xs">{children}</div>}
+      {children && <div className="px-3 py-2 text-xs text-[hsl(40,30%,85%)]">{children}</div>}
 
       {showSource && (
         <Handle

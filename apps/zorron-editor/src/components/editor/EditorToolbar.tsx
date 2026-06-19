@@ -20,10 +20,10 @@ import { cn } from '@/lib/utils';
 
 /** Status badge color mapping. */
 const STATUS_STYLES: Record<string, string> = {
-  saved: 'bg-emerald-500/20 text-emerald-300',
-  saving: 'bg-amber-500/20 text-amber-300',
-  unsaved: 'bg-slate-500/20 text-slate-300',
-  error: 'bg-rose-500/20 text-rose-300',
+  saved: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+  saving: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+  unsaved: 'bg-[hsl(28,14%,16%)] text-[hsl(35,15%,55%)] border-[hsl(28,14%,22%)]',
+  error: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
 };
 
 /** Props for the EditorToolbar. */
@@ -91,31 +91,35 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   return (
     <header
       className={cn(
-        'flex h-12 items-center justify-between gap-3 border-b border-slate-800/60 bg-slate-950/60 px-4 backdrop-blur-sm',
+        'flex h-12 items-center justify-between gap-3 border-b border-[hsl(28,14%,18%)] bg-[hsl(22,16%,7%,0.6)] px-4 backdrop-blur-md',
         className,
       )}
     >
       <div className="flex min-w-0 items-center gap-3">
-        <span className="flex-shrink-0 text-sm font-bold tracking-tight text-cyan-300">
+        <span className="font-display flex-shrink-0 text-base font-bold tracking-tight text-[hsl(38,92%,66%)]">
           Zorron
         </span>
+        <span className="hidden text-[10px] font-medium tracking-widest text-[hsl(35,15%,40%)] sm:inline">
+          叙事引擎
+        </span>
+        <div className="mx-1 h-4 w-px bg-[hsl(28,14%,18%)]" />
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="未命名项目"
-          className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-slate-100 outline-none hover:border-slate-700 focus:border-cyan-500/60 focus:bg-slate-900/60"
+          className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-[hsl(40,30%,92%)] outline-none transition-colors hover:border-[hsl(28,14%,20%)] focus:border-[hsl(38,92%,56%,0.5)] focus:bg-[hsl(22,16%,10%,0.6)]"
         />
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-2">
-        {/* Cloud sync status indicator (feature-flagged). */}
+        {/* 云同步状态指示器（Feature Flag 控制） */}
         {featureFlags.cloudSync && <SyncStatusIndicator />}
 
-        {/* Save status badge. */}
+        {/* 保存状态徽章 */}
         <span
           className={cn(
-            'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
+            'rounded-full border px-2.5 py-0.5 text-[10px] font-semibold tracking-wider',
             STATUS_STYLES[saveStatus] ?? STATUS_STYLES.unsaved,
           )}
           data-testid="save-status"
@@ -123,14 +127,14 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
           {statusLabel[saveStatus] ?? saveStatus}
         </span>
 
-        {/* Workspace mode switcher (feature-flagged). */}
+        {/* 工作区模式切换器（Feature Flag 控制） */}
         {featureFlags.cloudSync && <WorkspaceSwitcher />}
 
         {featureFlags.cloudSync && (
           <button
             type="button"
             onClick={() => navigate('/projects')}
-            className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
+            className="rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-2.5 py-1 text-xs text-[hsl(40,30%,85%)] transition-colors hover:bg-[hsl(28,14%,14%)]"
             title="浏览云端项目"
           >
             项目
@@ -139,21 +143,21 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
         <button
           type="button"
           onClick={handleImport}
-          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
+          className="rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-2.5 py-1 text-xs text-[hsl(40,30%,85%)] transition-colors hover:bg-[hsl(28,14%,14%)]"
         >
           导入
         </button>
         <button
           type="button"
           onClick={handleExport}
-          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
+          className="rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-2.5 py-1 text-xs text-[hsl(40,30%,85%)] transition-colors hover:bg-[hsl(28,14%,14%)]"
         >
           导出
         </button>
         <button
           type="button"
           onClick={handleSave}
-          className="rounded-md border border-cyan-600/50 bg-cyan-600/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30"
+          className="rounded-lg border border-[hsl(38,92%,56%,0.4)] bg-[hsl(38,92%,56%,0.12)] px-3 py-1 text-xs font-medium text-[hsl(38,92%,72%)] transition-all hover:bg-[hsl(38,92%,56%,0.2)] hover:shadow-[0_0_16px_-4px_hsl(38,92%,56%,0.4)]"
         >
           保存
         </button>

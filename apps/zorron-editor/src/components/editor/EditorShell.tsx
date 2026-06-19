@@ -52,21 +52,21 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   );
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[hsl(20,14%,4%)] text-[hsl(40,30%,92%)]">
       <EditorToolbar />
       <div className="flex min-h-0 flex-1">
         <AssetPanel />
         <main className="relative min-w-0 flex-1">
           <FlowCanvas className="h-full w-full" />
-          {/* Floating node palette overlay on the canvas top-left. */}
-          <div className="absolute left-3 top-3 z-10 max-h-[70vh] w-56 overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/80 shadow-xl backdrop-blur-md">
+          {/* 浮动节点面板 — 画布左上角 */}
+          <div className="absolute left-3 top-3 z-10 max-h-[70vh] w-56 overflow-hidden rounded-2xl border border-[hsl(28,14%,18%)] bg-[hsl(22,16%,7%,0.85)] shadow-2xl backdrop-blur-xl animate-fade-in">
             <NodePalette onCreateNode={handleCreateNode} />
           </div>
-          {/* Floating simulation trigger overlay on the canvas top-right. */}
+          {/* 浮动模拟触发器 — 画布右上角 */}
           <div className="absolute right-3 top-3 z-10">
             <SimulationTrigger />
           </div>
-          {/* Floating 3D vector space panel (feature-flagged). */}
+          {/* 浮动 3D 向量空间面板（Feature Flag 控制） */}
           {featureFlags.vector3d && (
             <div className="absolute bottom-3 right-3 z-10 w-80">
               <VectorSpacePanel compact />
@@ -75,7 +75,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
         </main>
         <InspectorPanel />
       </div>
-      {/* Conflict resolution dialog (feature-flagged, renders when a conflict is active). */}
+      {/* 冲突解决对话框（Feature Flag 控制） */}
       {featureFlags.cloudSync && <ConflictDialog />}
     </div>
   );

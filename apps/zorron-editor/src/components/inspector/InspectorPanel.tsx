@@ -32,19 +32,19 @@ function EmptyInspector() {
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
       <div className="flex flex-col items-center justify-center gap-2 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-900/60 text-slate-500">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[hsl(28,14%,18%)] bg-[hsl(22,16%,10%,0.6)] text-[hsl(35,15%,45%)]">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="3" />
             <path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-slate-300">未选中节点</p>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm font-medium text-[hsl(40,30%,85%)]">未选中节点</p>
+        <p className="text-xs text-[hsl(35,15%,50%)]">
           在画布上点击节点以编辑其属性。
         </p>
       </div>
       {featureFlags.vector3d && (
-        <div className="border-t border-slate-800 pt-3">
+        <div className="border-t border-[hsl(28,14%,18%)] pt-3">
           <VectorSpaceSettings />
         </div>
       )}
@@ -57,14 +57,14 @@ function InspectorHeader({ node }: { node: FlowNode }) {
   const accent = NODE_TYPE_ACCENTS[node.type as keyof typeof NODE_TYPE_ACCENTS] ?? '#64748b';
   return (
     <div
-      className="flex items-center justify-between border-b border-slate-800 px-4 py-3"
+      className="flex items-center justify-between border-b border-[hsl(28,14%,18%)] px-4 py-3"
       style={{ background: `linear-gradient(90deg, ${accent}22, transparent)` }}
     >
       <div>
-        <h2 className="text-sm font-semibold text-slate-100">
+        <h2 className="text-sm font-semibold font-display text-[hsl(40,30%,92%)]">
           {NODE_TYPE_LABELS[node.type as keyof typeof NODE_TYPE_LABELS] ?? node.type}
         </h2>
-        <p className="font-mono text-[10px] text-slate-500">{node.id}</p>
+        <p className="font-mono text-[10px] text-[hsl(35,15%,45%)]">{node.id}</p>
       </div>
       <span
         className="rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wider"
@@ -190,7 +190,7 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
       <Field label="标签"><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-medium uppercase tracking-wider text-[hsl(35,15%,55%)]">
             结果 ({mappings.length})
           </span>
           <button
@@ -203,13 +203,13 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
                 ],
               })
             }
-            className="rounded-md bg-pink-500/20 px-2 py-1 text-xs text-pink-200 hover:bg-pink-500/30"
+            className="rounded-md bg-[hsl(38,92%,56%,0.12)] px-2 py-1 text-xs text-[hsl(38,92%,72%)] hover:bg-[hsl(38,92%,56%,0.2)]"
           >
             + 添加
           </button>
         </div>
         {mappings.map((m, i) => (
-          <div key={i} className="space-y-2 rounded-lg border border-slate-700/60 bg-slate-900/40 p-2">
+          <div key={i} className="space-y-2 rounded-lg border border-[hsl(28,14%,18%)] bg-[hsl(22,16%,10%,0.4)] p-2">
             <div className="flex items-center gap-2">
               <TextField value={m.title} onChange={(title) => {
                 const next = [...mappings];
@@ -219,7 +219,7 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
               <button
                 type="button"
                 onClick={() => update({ resultMapping: mappings.filter((_, idx) => idx !== i) })}
-                className="flex-shrink-0 rounded-md px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/20"
+                className="flex-shrink-0 rounded-md px-2 py-1 text-xs text-[hsl(0,72%,66%)] hover:bg-[hsl(0,72%,56%,0.15)]"
               >
                 删除
               </button>
@@ -233,7 +233,7 @@ function SettlementForm({ node, update }: { node: FlowNode; update: (data: Parti
         ))}
       </div>
       {featureFlags.vector3d && (
-        <div className="border-t border-slate-800 pt-3">
+        <div className="border-t border-[hsl(28,14%,18%)] pt-3">
           <VectorSpaceSettings />
         </div>
       )}
@@ -282,14 +282,14 @@ function InspectorPanelImpl() {
 
   if (!node) {
     return (
-      <aside className="flex h-full w-80 flex-col border-l border-slate-800/60 bg-slate-950/40 backdrop-blur-sm">
+      <aside className="flex h-full w-80 flex-col border-l border-[hsl(28,14%,18%)] bg-[hsl(22,16%,7%,0.4)] backdrop-blur-sm">
         <EmptyInspector />
       </aside>
     );
   }
 
   return (
-    <aside className="flex h-full w-80 flex-col border-l border-slate-800/60 bg-slate-950/40 backdrop-blur-sm">
+    <aside className="flex h-full w-80 flex-col border-l border-[hsl(28,14%,18%)] bg-[hsl(22,16%,7%,0.4)] backdrop-blur-sm">
       <InspectorHeader node={node} />
       <div className="flex-1 overflow-y-auto p-4">
         {node.type === 'start' && <StartForm node={node} update={update} />}
@@ -305,14 +305,14 @@ function InspectorPanelImpl() {
         <button
           type="button"
           onClick={() => duplicateNode(node.id)}
-          className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
+          className="flex-1 rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-xs text-[hsl(40,30%,85%)] hover:bg-[hsl(28,14%,14%)]"
         >
           复制
         </button>
         <button
           type="button"
           onClick={() => removeNode(node.id)}
-          className="flex-1 rounded-lg border border-rose-700/50 bg-rose-900/30 px-3 py-1.5 text-xs text-rose-200 hover:bg-rose-900/50"
+          className="flex-1 rounded-lg border border-[hsl(0,72%,40%,0.4)] bg-[hsl(0,72%,30%,0.15)] px-3 py-1.5 text-xs text-[hsl(0,72%,72%)] hover:bg-[hsl(0,72%,30%,0.25)]"
         >
           删除
         </button>

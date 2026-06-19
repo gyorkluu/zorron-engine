@@ -92,18 +92,18 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
   return (
     <aside
       className={cn(
-        'flex h-full w-64 flex-col border-r border-slate-800/60 bg-slate-950/40 backdrop-blur-sm',
+        'flex h-full w-64 flex-col border-r border-[hsl(28,14%,18%)] bg-[hsl(22,16%,7%,0.4)] backdrop-blur-sm',
         className,
       )}
     >
-      <div className="border-b border-slate-800/60 px-3 py-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <div className="border-b border-[hsl(28,14%,18%)] px-3 py-2">
+        <h2 className="font-display text-xs font-semibold uppercase tracking-wider text-[hsl(35,15%,55%)]">
           资源
         </h2>
       </div>
 
       {/* Type filter tabs */}
-      <div className="flex flex-wrap gap-1 border-b border-slate-800/60 p-2">
+      <div className="flex flex-wrap gap-1 border-b border-[hsl(28,14%,18%)] p-2">
         {TYPE_TABS.map((tab) => (
           <button
             key={tab.label}
@@ -112,8 +112,8 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
             className={cn(
               'rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors',
               typeFilter === tab.value
-                ? 'bg-cyan-500/20 text-cyan-200'
-                : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200',
+                ? 'bg-[hsl(38,92%,56%,0.12)] text-[hsl(38,92%,72%)]'
+                : 'text-[hsl(35,15%,55%)] hover:bg-[hsl(28,14%,14%)] hover:text-[hsl(40,30%,85%)]',
             )}
           >
             {tab.label}
@@ -122,13 +122,13 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
       </div>
 
       {/* Keyword search */}
-      <div className="border-b border-slate-800/60 p-2">
+      <div className="border-b border-[hsl(28,14%,18%)] p-2">
         <input
           type="search"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="搜索资源..."
-          className="w-full rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+          className="w-full rounded-md border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-2 py-1 text-xs text-[hsl(40,30%,92%)] outline-none focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
         />
       </div>
 

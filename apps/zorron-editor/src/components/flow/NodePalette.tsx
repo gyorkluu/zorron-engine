@@ -37,7 +37,7 @@ function PaletteItem({
         e.dataTransfer.effectAllowed = 'move';
       }}
       onClick={() => onCreate?.(type)}
-      className="group flex cursor-grab items-start gap-2 rounded-xl border border-slate-700/50 bg-slate-900/50 p-2.5 transition-all hover:border-slate-500/70 hover:bg-slate-800/60 active:cursor-grabbing"
+      className="group flex cursor-grab items-start gap-2 rounded-xl border border-[hsl(28,14%,18%)] bg-[hsl(22,16%,10%,0.5)] p-2.5 transition-all duration-200 hover:border-[hsl(38,92%,56%,0.3)] hover:bg-[hsl(28,14%,14%,0.6)] active:cursor-grabbing"
     >
       <span
         className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold"
@@ -46,8 +46,8 @@ function PaletteItem({
         {NODE_TYPE_LABELS[type][0]}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-100">{NODE_TYPE_LABELS[type]}</p>
-        <p className="line-clamp-2 text-[11px] text-slate-400">
+        <p className="text-sm font-medium text-[hsl(40,30%,92%)]">{NODE_TYPE_LABELS[type]}</p>
+        <p className="line-clamp-2 text-[11px] text-[hsl(35,15%,55%)]">
           {NODE_TYPE_DESCRIPTIONS[type]}
         </p>
       </div>
@@ -57,8 +57,8 @@ function PaletteItem({
 
 function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
   return (
-    <aside className="flex h-full w-56 flex-col gap-2 overflow-y-auto border-r border-slate-800/60 bg-slate-950/40 p-3 backdrop-blur-sm">
-      <h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
+    <aside className="flex h-full w-56 flex-col gap-2 overflow-y-auto border-r border-[hsl(28,14%,18%)] bg-transparent p-3 backdrop-blur-sm">
+      <h2 className="px-1 font-display text-xs font-semibold uppercase tracking-wider text-[hsl(35,15%,45%)]">
         节点面板
       </h2>
       <div className="flex flex-col gap-2">
@@ -66,7 +66,7 @@ function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
           <PaletteItem key={type} type={type} onCreate={onCreateNode} />
         ))}
       </div>
-      <div className="mt-auto rounded-lg border border-slate-800/60 bg-slate-900/40 p-2 text-[10px] text-slate-500">
+      <div className="mt-auto rounded-lg border border-[hsl(28,14%,18%)] bg-[hsl(22,16%,10%,0.4)] p-2 text-[10px] text-[hsl(35,15%,45%)]">
         拖拽节点到画布，或点击在中心添加。
       </div>
     </aside>

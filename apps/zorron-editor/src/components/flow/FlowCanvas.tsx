@@ -179,14 +179,13 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         isValidConnection={isValidConnection}
         fitView
         proOptions={{ hideAttribution: true }}
-        className="bg-slate-950"
+        className="bg-[hsl(20,14%,4%)]"
       >
-        <Background gap={20} size={1} color="#1e293b" />
-        <Controls className="!border-slate-700 !bg-slate-900/80" />
+        <Background gap={20} size={1} color="hsl(28,14%,12%)" />
+        <Controls />
         <MiniMap
           nodeColor={minimapNodeColor}
-          className="!bg-slate-900/80"
-          maskColor="rgba(2,6,23,0.7)"
+          maskColor="rgba(20,14,4,0.7)"
         />
       </ReactFlow>
     </div>

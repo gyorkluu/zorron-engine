@@ -20,11 +20,11 @@ export function Field({
 }) {
   return (
     <label className="block space-y-1">
-      <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+      <span className="text-xs font-medium uppercase tracking-wider text-[hsl(35,15%,55%)]">
         {label}
       </span>
       {children}
-      {hint && <span className="block text-[10px] text-slate-500">{hint}</span>}
+      {hint && <span className="block text-[10px] text-[hsl(35,15%,45%)]">{hint}</span>}
     </label>
   );
 }
@@ -45,7 +45,7 @@ export function TextField({
       value={value ?? ''}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+      className="w-full rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-sm text-[hsl(40,30%,92%)] outline-none transition-colors focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
     />
   );
 }
@@ -68,7 +68,7 @@ export function TextAreaField({
       placeholder={placeholder}
       rows={rows}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full resize-y rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+      className="w-full resize-y rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-sm text-[hsl(40,30%,92%)] outline-none transition-colors focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
     />
   );
 }
@@ -105,10 +105,10 @@ export function UrlField({
         value={value ?? ''}
         placeholder={placeholder ?? 'https://...'}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+        className="w-full rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-sm text-[hsl(40,30%,92%)] outline-none transition-colors focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
       />
       {value && (
-        <span className="flex-shrink-0 text-[10px] text-emerald-400">已设置</span>
+        <span className="flex-shrink-0 text-[10px] text-[hsl(38,92%,66%)]">已设置</span>
       )}
     </div>
   );
@@ -136,7 +136,7 @@ export function NumberField({
       min={min}
       max={max}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+      className="w-full rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-sm text-[hsl(40,30%,92%)] outline-none transition-colors focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
     />
   );
 }
@@ -155,7 +155,7 @@ export function SelectField<T extends string>({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
-      className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
+      className="w-full rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-1.5 text-sm text-[hsl(40,30%,92%)] outline-none transition-colors focus:border-[hsl(38,92%,56%,0.5)] focus:ring-1 focus:ring-[hsl(38,92%,56%,0.2)]"
     >
       {options.map((opt) => (
         <option key={opt.value} value={opt.value}>
@@ -180,13 +180,13 @@ export function SwitchField({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200"
+      className="flex w-full items-center justify-between rounded-lg border border-[hsl(28,14%,20%)] bg-[hsl(22,16%,10%,0.6)] px-3 py-2 text-sm text-[hsl(40,30%,85%)]"
     >
       <span>{label}</span>
       <span
         className={cn(
           'relative h-5 w-9 rounded-full transition-colors',
-          checked ? 'bg-cyan-500' : 'bg-slate-600',
+          checked ? 'bg-[hsl(38,92%,56%)]' : 'bg-[hsl(28,14%,28%)]',
         )}
       >
         <span

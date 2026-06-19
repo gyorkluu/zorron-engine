@@ -1,28 +1,49 @@
 @import "tailwindcss";
 
+/* ── 字体引入 ── */
+/* Noto Serif SC: 衬线展示字体（标题/品牌）；Noto Sans SC: 无衬线正文；JetBrains Mono: 等宽（ID/代码） */
+
 @theme {
-  --color-background: 0 0% 100%;
-  --color-foreground: 222.2 84% 4.9%;
-  --color-card: 0 0% 100%;
-  --color-card-foreground: 222.2 84% 4.9%;
-  --color-popover: 0 0% 100%;
-  --color-popover-foreground: 222.2 84% 4.9%;
-  --color-primary: 222.2 47.4% 11.2%;
-  --color-primary-foreground: 210 40% 98%;
-  --color-secondary: 210 40% 96.1%;
-  --color-secondary-foreground: 222.2 47.4% 11.2%;
-  --color-muted: 210 40% 96.1%;
-  --color-muted-foreground: 215.4 16.3% 46.9%;
-  --color-accent: 210 40% 96.1%;
-  --color-accent-foreground: 222.2 47.4% 11.2%;
-  --color-destructive: 0 84.2% 60.2%;
-  --color-destructive-foreground: 210 40% 98%;
-  --color-border: 214.3 31.8% 91.4%;
-  --color-input: 214.3 31.8% 91.4%;
-  --color-ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
+  /* ── 色彩系统：文学暗夜 (Literary Noir) ── */
+  /* 基底：深炭黑带微暖 */
+  --color-background: 20 14% 4%;
+  --color-foreground: 40 30% 92%;
+
+  /* 卡片/面板 */
+  --color-card: 22 16% 7%;
+  --color-card-foreground: 40 30% 92%;
+  --color-popover: 22 16% 7%;
+  --color-popover-foreground: 40 30% 92%;
+
+  /* 主色：琥珀金 */
+  --color-primary: 38 92% 56%;
+  --color-primary-foreground: 20 14% 4%;
+
+  /* 次要色 */
+  --color-secondary: 25 15% 14%;
+  --color-secondary-foreground: 40 30% 92%;
+
+  /* 静音色 */
+  --color-muted: 25 12% 16%;
+  --color-muted-foreground: 35 15% 55%;
+
+  /* 强调色 */
+  --color-accent: 38 92% 56%;
+  --color-accent-foreground: 20 14% 4%;
+
+  /* 危险色 */
+  --color-destructive: 0 72% 56%;
+  --color-destructive-foreground: 40 30% 92%;
+
+  /* 边框/输入/聚焦环 */
+  --color-border: 28 14% 18%;
+  --color-input: 28 14% 18%;
+  --color-ring: 38 92% 56%;
+
+  --radius: 0.625rem;
 }
 
+/* ── 全局基础 ── */
 * {
   border-color: hsl(var(--color-border));
 }
@@ -30,5 +51,102 @@
 body {
   background-color: hsl(var(--color-background));
   color: hsl(var(--color-foreground));
+  font-family: "Noto Sans SC", system-ui, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── 大气背景：微妙的径向渐变 + 噪点 ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, hsl(28 30% 8% / 0.6), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 100%, hsl(20 25% 6% / 0.5), transparent),
+    hsl(var(--color-background));
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ── 衬线展示字体工具类 ── */
+.font-display {
+  font-family: "Noto Serif SC", Georgia, serif;
+}
+
+/* ── 等宽字体工具类 ── */
+.font-mono {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* ── 自定义滚动条 ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(28 14% 22%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(38 30% 30%);
+}
+
+/* ── 选区颜色 ── */
+::selection {
+  background: hsl(38 92% 56% / 0.25);
+  color: hsl(40 30% 95%);
+}
+
+/* ── 动画 ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px -8px hsl(38 92% 56% / 0.3); }
+  50% { box-shadow: 0 0 30px -6px hsl(38 92% 56% / 0.5); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* ── React Flow 深色覆盖 ── */
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__controls-button {
+  background: hsl(22 16% 10%) !important;
+  border-color: hsl(28 14% 18%) !important;
+  color: hsl(40 30% 80%) !important;
+  fill: hsl(40 30% 80%) !important;
+}
+
+.react-flow__controls-button:hover {
+  background: hsl(28 14% 16%) !important;
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
 }
