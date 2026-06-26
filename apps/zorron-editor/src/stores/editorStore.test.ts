@@ -58,7 +58,7 @@ describe('editorStore', () => {
     const id = useEditorStore.getState().addNode('scene', { x: 0, y: 0 });
     useEditorStore.getState().updateNodeData(id, { dialogue: 'Updated' });
     const node = useEditorStore.getState().nodes.find((n) => n.id === id);
-    expect(node?.data).toMatchObject({ label: 'Scene', dialogue: 'Updated' });
+    expect(node?.data).toMatchObject({ label: '场景', dialogue: 'Updated' });
   });
 
   it('undo reverses the last structural change', () => {

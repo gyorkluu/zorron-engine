@@ -13,45 +13,47 @@ import { memo, useCallback } from 'react';
 import { useWorkspaceStore, type SyncStatus } from '@/stores/workspaceStore';
 import { useCloudSync } from '@/hooks/useCloudSync';
 import { featureFlags } from '@/lib/featureFlags';
+import { useT } from '@/i18n/useT';
+import type { TranslationKey } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
 
 /** Visual config per sync status. */
 const STATUS_CONFIG: Record<
   SyncStatus,
-  { label: string; dot: string; text: string; bg: string }
+  { labelKey: TranslationKey; dot: string; text: string; bg: string }
 > = {
   idle: {
-    label: 'Idle',
+    labelKey: 'sync.idle',
     dot: 'bg-slate-400',
     text: 'text-slate-300',
     bg: 'bg-slate-500/10',
   },
   syncing: {
-    label: 'Syncing',
+    labelKey: 'sync.syncing',
     dot: 'bg-amber-400 animate-pulse',
     text: 'text-amber-200',
     bg: 'bg-amber-500/10',
   },
   synced: {
-    label: 'Synced',
+    labelKey: 'sync.synced',
     dot: 'bg-emerald-400',
     text: 'text-emerald-200',
     bg: 'bg-emerald-500/10',
   },
   offline: {
-    label: 'Offline',
+    labelKey: 'sync.offline',
     dot: 'bg-slate-500',
     text: 'text-slate-400',
     bg: 'bg-slate-500/10',
   },
   conflict: {
-    label: 'Conflict',
+    labelKey: 'sync.conflict',
     dot: 'bg-rose-400',
     text: 'text-rose-200',
     bg: 'bg-rose-500/10',
   },
   error: {
-    label: 'Error',
+    labelKey: 'sync.error',
     dot: 'bg-rose-500',
     text: 'text-rose-200',
     bg: 'bg-rose-500/10',
@@ -64,6 +66,7 @@ export interface SyncStatusIndicatorProps {
 }
 
 function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
+  const { t } = useT();
   const mode = useWorkspaceStore((s) => s.mode);
   const syncStatus = useWorkspaceStore((s) => s.syncStatus);
   const lastSyncedAt = useWorkspaceStore((s) => s.lastSyncedAt);
@@ -89,10 +92,10 @@ function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
           className,
         )}
         data-testid="sync-status-local"
-        title="Working in local mode — changes save to your device."
+        title={t('sync.local.tip')}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-        Local
+        {t('sync.local')}
       </span>
     );
   }
@@ -101,8 +104,8 @@ function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
   const tooltip = error
     ? error
     : lastSyncedAt
-      ? `Last synced: ${new Date(lastSyncedAt).toLocaleString()}`
-      : config.label;
+      ? t('sync.lastSync', { date: new Date(lastSyncedAt).toLocaleString() })
+      : t(config.labelKey);
 
   return (
     <button
@@ -121,7 +124,7 @@ function SyncStatusIndicatorImpl({ className }: SyncStatusIndicatorProps) {
       data-testid="sync-status-indicator"
     >
       <span className={cn('h-1.5 w-1.5 rounded-full', config.dot)} />
-      {config.label}
+      {t(config.labelKey)}
       {pendingCount > 0 && (
         <span className="ml-0.5 rounded-full bg-slate-700/60 px-1 text-[9px]">
           {pendingCount}

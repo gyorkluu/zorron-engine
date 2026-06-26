@@ -23,9 +23,31 @@ import type {
 } from '@/types/project';
 import * as projectService from '@/services/project.service';
 import { AppError } from '@/lib/errors';
+import { useEditorStore } from '@/stores/editorStore';
 
 /** Save lifecycle status shown in the toolbar. */
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
+/** Maximum number of version snapshots retained in history. */
+const MAX_HISTORY_SNAPSHOTS = 20;
+
+/**
+ * A version history snapshot of the full FlowData.
+ *
+ * Snapshots are pushed automatically on save and can be restored to roll the
+ * canvas (nodes/edges) and project metadata (variables/settings) back to a
+ * previous state.
+ */
+export interface VersionSnapshot {
+  /** Unique snapshot id (e.g. `snap_<timestamp>`). */
+  id: string;
+  /** Full FlowData captured at save time. */
+  flowData: FlowData;
+  /** ISO timestamp when the snapshot was created. */
+  createdAt: string;
+  /** Human-readable label shown in the history panel. */
+  label: string;
+}
 
 /** Project store state shape. */
 interface ProjectState {
@@ -45,6 +67,9 @@ interface ProjectState {
   lastSavedAt: string | null;
   saveStatus: SaveStatus;
   error: string | null;
+
+  /** Version history snapshots (max 20). */
+  history: VersionSnapshot[];
 
   /** Project list (for the dashboard). */
   list: ProjectListItem[];
@@ -68,6 +93,14 @@ interface ProjectState {
   setSavedSnapshot: (flowData: FlowData) => void;
   isDirty: (flowData: FlowData) => boolean;
   reset: () => void;
+
+  // Version history
+  /** Push current flow data as a snapshot. Called on save. */
+  pushSnapshot: (flowData: FlowData, label?: string) => void;
+  /** Restore a snapshot by id (loads nodes/edges into editorStore). */
+  restoreSnapshot: (id: string) => void;
+  /** Clear all snapshots. */
+  clearHistory: () => void;
 }
 
 /** Build a FlowData snapshot from the project store + canvas nodes/edges. */
@@ -101,6 +134,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   lastSavedAt: null,
   saveStatus: 'saved',
   error: null,
+  history: [],
   list: [],
   listLoading: false,
 
@@ -165,6 +199,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         lastSavedAt: new Date().toISOString(),
         saveStatus: 'saved',
       });
+      get().pushSnapshot(flowData);
       return;
     }
     set({ saveStatus: 'saving', error: null });
@@ -175,6 +210,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         lastSavedAt: detail.updatedAt,
         saveStatus: 'saved',
       });
+      get().pushSnapshot(detail.data);
     } catch (err) {
       const message = err instanceof AppError ? err.message : 'Failed to save project';
       set({ saveStatus: 'error', error: message });
@@ -244,14 +280,49 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setVariables: (variables) => set({ variables, saveStatus: 'unsaved' }),
   setSettings: (settings) => set({ settings, saveStatus: 'unsaved' }),
 
-  setSavedSnapshot: (flowData) =>
-    set({ lastSavedSnapshot: flowData, lastSavedAt: new Date().toISOString(), saveStatus: 'saved' }),
+  setSavedSnapshot: (flowData) => {
+    set({ lastSavedSnapshot: flowData, lastSavedAt: new Date().toISOString(), saveStatus: 'saved' });
+    get().pushSnapshot(flowData);
+  },
 
   isDirty: (flowData) => {
     const { lastSavedSnapshot } = get();
     if (!lastSavedSnapshot) return true;
     return !isEqual(lastSavedSnapshot, flowData);
   },
+
+  pushSnapshot: (flowData, label) => {
+    const { history } = get();
+    const snapshot: VersionSnapshot = {
+      id: `snap_${Date.now()}`,
+      flowData,
+      createdAt: new Date().toISOString(),
+      label: label ?? `Snapshot ${history.length + 1}`,
+    };
+    // Newest first; cap at MAX_HISTORY_SNAPSHOTS.
+    set({ history: [snapshot, ...history].slice(0, MAX_HISTORY_SNAPSHOTS) });
+  },
+
+  restoreSnapshot: (id) => {
+    const { history } = get();
+    const snapshot = history.find((s) => s.id === id);
+    if (!snapshot) return;
+    const { flowData } = snapshot;
+    // Load nodes/edges into the editor store (resets undo/redo history).
+    useEditorStore.getState().loadFlow(
+      flowData.nodes as FlowNode[],
+      flowData.edges as FlowEdge[],
+    );
+    // Restore project metadata.
+    set({
+      variables: flowData.variables ?? {},
+      settings: flowData.settings ?? createEmptyFlowData().settings,
+      version: flowData.version ?? get().version,
+      saveStatus: 'unsaved',
+    });
+  },
+
+  clearHistory: () => set({ history: [] }),
 
   reset: () =>
     set({
@@ -267,5 +338,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       lastSavedAt: null,
       saveStatus: 'saved',
       error: null,
+      history: [],
     }),
 }));

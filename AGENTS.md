@@ -104,3 +104,19 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `test:` - tests only
 
 Example: `feat(mig-001): initialize pnpm workspace and editor/server skeleton`
+
+## CI/CD
+
+项目使用 GitHub Actions 进行持续集成：
+
+- `.github/workflows/ci.yml`：主 CI 流水线（lint → typecheck → test → build）
+- `.github/workflows/e2e.yml`：Playwright E2E 测试
+- `.github/workflows/docker.yml`：Docker 镜像构建与推送
+
+本地验证命令：
+
+```bash
+pnpm -r run lint       # 运行所有 lint
+pnpm -r run typecheck  # 运行所有类型检查
+pnpm -r run test       # 运行所有测试
+```

@@ -56,6 +56,7 @@ function sanitizeFileName(name: string): string {
   // Take only the basename (strip any directory components).
   const base = name.split(/[/\\]/).pop() ?? name;
   // Remove `..` sequences and null/control chars.
+  // eslint-disable-next-line no-control-regex
   const cleaned = base.replace(/\.\./g, '').replace(/[\x00-\x1f]/g, '');
   // Limit length to keep storage keys manageable.
   return cleaned.slice(-128) || 'file';

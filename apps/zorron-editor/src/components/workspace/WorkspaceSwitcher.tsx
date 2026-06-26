@@ -22,6 +22,7 @@ import {
   type WorkspaceMode,
 } from '@/services/workspace.service';
 import { featureFlags } from '@/lib/featureFlags';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Props for the WorkspaceSwitcher. */
@@ -30,6 +31,7 @@ export interface WorkspaceSwitcherProps {
 }
 
 function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
+  const { t } = useT();
   const mode = useWorkspaceStore((s) => s.mode);
   const setMode = useWorkspaceStore((s) => s.setMode);
   const directoryHandle = useWorkspaceStore((s) => s.directoryHandle);
@@ -46,7 +48,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
 
       if (next === 'cloud') {
         if (!isAuthenticated) {
-          setError('Please sign in to use cloud mode.');
+          setError(t('ws.cloud.signin'));
           return;
         }
         setMode('cloud');
@@ -78,7 +80,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
         if (err instanceof DOMException && err.name === 'AbortError') {
           // Silent: user cancelled.
         } else {
-          setError(err instanceof Error ? err.message : 'Failed to switch to local mode.');
+          setError(err instanceof Error ? err.message : t('ws.local.fail'));
         }
       } finally {
         setPicking(false);
@@ -91,6 +93,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
       mode,
       setDirectoryHandle,
       setMode,
+      t,
     ],
   );
 
@@ -111,10 +114,10 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
               : 'text-slate-400 hover:text-slate-200',
             !isAuthenticated && 'cursor-not-allowed opacity-50',
           )}
-          title={isAuthenticated ? 'Cloud workspace' : 'Sign in to use cloud mode'}
+          title={isAuthenticated ? t('ws.cloud.title') : t('ws.cloud.disabled')}
           data-testid="workspace-mode-cloud"
         >
-          Cloud
+          {t('ws.cloud')}
         </button>
         <button
           type="button"
@@ -126,15 +129,15 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
               ? 'bg-emerald-600/30 text-emerald-100'
               : 'text-slate-400 hover:text-slate-200',
           )}
-          title="Local workspace (files saved to your device)"
+          title={t('ws.local.title')}
           data-testid="workspace-mode-local"
         >
-          Local
+          {t('ws.local')}
         </button>
       </div>
       {mode === 'local' && !fileSystemAccessSupported && (
         <span className="text-[10px] text-amber-300/80">
-          Using browser storage (IndexedDB) — File System Access API not available.
+          {t('ws.local.idb')}
         </span>
       )}
       {mode === 'local' && directoryHandle && (

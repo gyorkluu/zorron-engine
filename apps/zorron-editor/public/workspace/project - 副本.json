@@ -1,0 +1,2453 @@
+{
+  "nodes": [
+    {
+      "id": "start_001",
+      "type": "start",
+      "initialized": false,
+      "position": {
+        "x": 23.47496008606805,
+        "y": -163.54954686544048
+      },
+      "data": {
+        "label": "开始测试",
+        "title": "奉天证道：剑网3门派人格测试",
+        "background": "/assets/background.jpg"
+      }
+    },
+    {
+      "id": "scene_001",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "data": {
+        "label": "Q1 陨星初坠",
+        "dialogue": "长安地陷，大唐国运崩裂。衍天宗密使告知你四地遭袭，而此刻废墟中传来微弱呼救，远方烽烟已起。面对这开局的混乱，你的第一反应是：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q1_opt1",
+            "text": "A. 协助密使稳住阵脚，优先确认受灾情报与卷轴安全",
+            "vector": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q1_opt2",
+            "text": "B. 闭目调息，在天地巨变中守住灵台清明，不因乱象动摇",
+            "vector": {
+              "x": -5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q1_opt3",
+            "text": "C. 哪还顾得上那么多！冲进废墟深处，誓要救出每一个被埋的人",
+            "vector": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_scroll"
+          },
+          {
+            "id": "q1_opt4",
+            "text": "D. 退至高处观察烽烟走向，试图从乱象中找出幕后黑手的轨迹",
+            "vector": {
+              "x": -2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_scroll"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "https://cdn.jx3box.com/upload/post/2026/2/17/1716_4952333.png",
+        "sfx": "/workspace/audios/flame_sfx.mp3",
+        "bgm": "",
+        "isBackgroundRemote": true
+      }
+    },
+    {
+      "id": "calc_001",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 46,
+        "y": 620
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q1 陨星初坠 向量"
+      }
+    },
+    {
+      "id": "scene_002",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 450,
+        "y": -194
+      },
+      "data": {
+        "label": "Q2 乱局传承",
+        "dialogue": "武林传承面临断代之危，乱军肆虐，如果只能带走一样东西，你下意识的抉择是：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q2_opt1",
+            "text": "A. 带走无辜的妇孺，人的生命才是文明存在的意义",
+            "vector": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q2_opt2",
+            "text": "B. 哪怕背负万难，也要保全门派典籍与火种，绝不让文明熄灭",
+            "vector": {
+              "x": 0,
+              "y": 5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q2_opt3",
+            "text": "C. 趁乱寻得一线生机，带大家隐世避祸，活下去才有未来",
+            "vector": {
+              "x": 0,
+              "y": -5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q2_opt4",
+            "text": "D. 优先保全核心机密与布防图，为日后反攻留存资本",
+            "vector": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G2.png",
+        "sfx": "/workspace/audios/flame_sfx.mp3"
+      }
+    },
+    {
+      "id": "calc_002",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 818,
+        "y": -56
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q2 乱局传承 向量"
+      }
+    },
+    {
+      "id": "scene_003",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 442,
+        "y": 200
+      },
+      "data": {
+        "label": "Q3 西行孤影",
+        "dialogue": "偶遇莫雨、穆玄英一行人西行追查。看着他们逆行的背影，你决定：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q3_opt1",
+            "text": "A. 保持冷峻，各自有各自的使命，互不干涉才是乱世常态",
+            "vector": {
+              "x": -5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q3_opt2",
+            "text": "B. 上前叫住他们，毫无保留地共享长安情报，叮嘱万加小心",
+            "vector": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q3_opt3",
+            "text": "C. 托人送去一壶'浮生醉'，遥敬这段未知的归途",
+            "vector": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_wine"
+          },
+          {
+            "id": "q3_opt4",
+            "text": "D. 隐于暗处观察片刻，记录下他们的行进路线作为参考",
+            "vector": {
+              "x": -2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G15.png",
+        "sfx": "/workspace/audios/%E9%A9%AC%E8%B9%84.mp3"
+      }
+    },
+    {
+      "id": "calc_003",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 824,
+        "y": 276
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q3 西行孤影 向量"
+      }
+    },
+    {
+      "id": "scene_004",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 444,
+        "y": 610
+      },
+      "data": {
+        "label": "Q4 号牌骚乱",
+        "dialogue": "万花谷口病患如潮，有人因排队失控试图冲击医者。一边是即将崩溃的秩序，一边是倒地不起的老人，你会：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q4_opt1",
+            "text": "A. 这种时候管什么排队！直接冲过去先救倒地的老人",
+            "vector": {
+              "x": 0,
+              "y": -5,
+              "z": 0
+            },
+            "dropFragmentId": "frag_needle"
+          },
+          {
+            "id": "q4_opt2",
+            "text": "B. 协助阿麻吕强行隔离闹事者，必须维护队列，否则谁也救不了",
+            "vector": {
+              "x": 0,
+              "y": 5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q4_opt3",
+            "text": "C. 冷眼旁观，在混乱中寻找可能趁乱滋事的异族探子",
+            "vector": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q4_opt4",
+            "text": "D. 挡在医者身前制止攻击，并在事后耐心听取家属苦衷",
+            "vector": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "dropFragmentId": "frag_needle"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G3.png",
+        "sfx": "/workspace/audios/%E4%BA%BA%E7%BE%A4.mp3"
+      }
+    },
+    {
+      "id": "calc_004",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 840,
+        "y": 664
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q4 号牌骚乱 向量"
+      }
+    },
+    {
+      "id": "scene_005",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 434.0000000000002,
+        "y": 1056
+      },
+      "data": {
+        "label": "Q5 药王遗烬",
+        "dialogue": "孙思邈圆寂，裴元托付给你一名幼童。面对这个或许是‘最后救赎’的孩子，你对他说的第一句话是：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q5_opt1",
+            "text": "A. 别怕，我会带你去看一眼谷外未被遮蔽的天空。",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -5
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q5_opt2",
+            "text": "B. 跟紧我。这也是任务的一部分。",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "dropFragmentId": "frag_note"
+          },
+          {
+            "id": "q5_opt3",
+            "text": "C. 把手给我，我发誓会把你安全带出去。",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -2
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q5_opt4",
+            "text": "D. 告诉我你现在的身体感受，我们需要制定最优撤离方案。",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "dropFragmentId": "frag_note"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G4.png",
+        "sfx": "/workspace/audios/%E7%A5%9E%E5%9C%A3_.mp3"
+      }
+    },
+    {
+      "id": "calc_005",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 840.0000000000002,
+        "y": 1150
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q5 药王遗烬 向量"
+      }
+    },
+    {
+      "id": "scene_006",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1150,
+        "y": -204
+      },
+      "data": {
+        "label": "Q6 三星崩塌",
+        "dialogue": "三星望月被炸，苏凤棠在火海中抢救典籍，另一边难民在哭喊。火光映照下，你的抉择是：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q6_opt1",
+            "text": "A. 优先引导难民撤离，书没了可以再写，人死了无法复生",
+            "vector": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q6_opt2",
+            "text": "B. 冲入火海协助抢救典籍，这是文明的根基，不容有失",
+            "vector": {
+              "x": 0,
+              "y": 5,
+              "z": 0
+            },
+            "dropFragmentId": "frag_secret"
+          },
+          {
+            "id": "q6_opt3",
+            "text": "C. 护紧怀中遗孤，顺着密道离开，绝不偏离原本的使命",
+            "vector": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q6_opt4",
+            "text": "D. 逆着人流寻找潜伏的爆破手，必须让他付出代价",
+            "vector": {
+              "x": 0,
+              "y": -5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G6.png",
+        "sfx": "/workspace/audios/%E7%88%86%E7%82%B8_.mp3"
+      }
+    },
+    {
+      "id": "calc_006",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 1560,
+        "y": -70
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q6 三星崩塌 向量"
+      }
+    },
+    {
+      "id": "scene_007",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1158,
+        "y": 222
+      },
+      "data": {
+        "label": "Q7 听香坊",
+        "dialogue": "高绛婷陷入狂暴，无差别攻击周围。面对这位昔日的琴魔，你决定：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q7_opt1",
+            "text": "A. 结成剑阵，正面压制！为了大局，必须先让她失去行动能力",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "dropFragmentId": "frag_move"
+          },
+          {
+            "id": "q7_opt2",
+            "text": "B. 护住身后的孩子，哪怕受伤也要大声呼喊，试图唤醒她的神智",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -5
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q7_opt3",
+            "text": "C. 寻找并灭掉周围的迷香陷阱，从源头上削弱幻境影响",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "dropFragmentId": "frag_move"
+          },
+          {
+            "id": "q7_opt4",
+            "text": "D. 擒贼先擒王，直接截杀控制她的水贼头目",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -2
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G7.png",
+        "sfx": "/workspace/audios/%E5%8F%A4%E7%90%B4_.mp3"
+      }
+    },
+    {
+      "id": "calc_007",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 1570,
+        "y": 248
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q7 听香坊 向量"
+      }
+    },
+    {
+      "id": "scene_008",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1146,
+        "y": 626
+      },
+      "data": {
+        "label": "Q8 忆盈楼",
+        "dialogue": "唐怀仁布下火雷，木楼将塌。公孙二娘去追敌，燕燕被困。千钧一发之际：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q8_opt1",
+            "text": "A. 追杀唐怀仁！比起救一人，斩草除根才能永绝后患",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q8_opt2",
+            "text": "B. 护住燕燕和受伤弟子撤往水边，用身体为她们挡住气浪",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -5
+            },
+            "dropFragmentId": "frag_drum"
+          },
+          {
+            "id": "q8_opt3",
+            "text": "C. 观察爆炸间隙，冷静计算出一条最优的生路",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "dropFragmentId": "frag_drum"
+          },
+          {
+            "id": "q8_opt4",
+            "text": "D. 随二娘冲锋，哪怕只有一线机会也要阻止暗器发动",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -2
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G8.png",
+        "sfx": "/workspace/audios/%E5%96%B7%E7%81%AB_.mp3"
+      }
+    },
+    {
+      "id": "calc_008",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 1568,
+        "y": 660
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q8 忆盈楼 向量"
+      }
+    },
+    {
+      "id": "scene_009",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1152,
+        "y": 1068
+      },
+      "data": {
+        "label": "Q9 秀坊合一",
+        "dialogue": "大战方歇，作为见证者，在前往下一个目的地前，你会：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q9_opt1",
+            "text": "A. 迅速整理情报，马不停蹄动身前往藏剑，那里更需要我",
+            "vector": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q9_opt2",
+            "text": "B. 独自去水边祭奠死者，在喧嚣后寻求片刻的孤独与反思",
+            "vector": {
+              "x": -5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q9_opt3",
+            "text": "C. 留下来安顿伤员，至少在离开前多做一点是一点",
+            "vector": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q9_opt4",
+            "text": "D. 清理残骸，研究火雷阵留下的碎瓷，分析敌人的技术特征",
+            "vector": {
+              "x": -2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_porcelain"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G9.png",
+        "sfx": "/workspace/audios/%E5%BA%9F%E5%A2%9F.mp3"
+      }
+    },
+    {
+      "id": "calc_009",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 1554,
+        "y": 1144
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q9 秀坊合一 向量"
+      }
+    },
+    {
+      "id": "scene_010",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1940,
+        "y": -222
+      },
+      "data": {
+        "label": "Q10 麒麟战殇",
+        "dialogue": "叶蒙血战殉庄，临终前命死守后院。此刻海寇攻势疯狂，看着将军的遗体，你咬牙决定：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q10_opt1",
+            "text": "A. 杀回去！拼死也要夺回叶蒙将军的遗体，不容英雄受辱！",
+            "vector": {
+              "x": 0,
+              "y": -5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q10_opt2",
+            "text": "B. 强忍悲痛，死守后院防线，军令如山，不得不从",
+            "vector": {
+              "x": 0,
+              "y": 5,
+              "z": 0
+            },
+            "dropFragmentId": "frag_rumor"
+          },
+          {
+            "id": "q10_opt3",
+            "text": "C. 追踪暗处指挥的军师踪迹，这笔账要算在源头上",
+            "vector": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q10_opt4",
+            "text": "D. 协助转移神兵麒天、麟战，保住传承才是对逝者最大的告慰",
+            "vector": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "dropFragmentId": "frag_rumor"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G10.png",
+        "sfx": "/workspace/audios/%E5%89%91%E6%88%98%E6%AD%BB.mp3"
+      }
+    },
+    {
+      "id": "calc_010",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 2308,
+        "y": -86
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q10 麒麟战殇 向量"
+      }
+    },
+    {
+      "id": "scene_011",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1936.968566866979,
+        "y": 171.4970698716673
+      },
+      "data": {
+        "label": "Q11 武库死战",
+        "dialogue": "武库即将失控，叶英重伤谢采。此刻乱兵涌入，年幼的叶麟身陷险境。你会：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q11_opt1",
+            "text": "A. 毫不犹豫冲向叶麟，用身体替他挡下那致命一刀",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -5
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q11_opt2",
+            "text": "B. 冷静记录谢采的功法破绽，这是千载难逢的情报机会",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "dropFragmentId": "frag_sword_intent"
+          },
+          {
+            "id": "q11_opt3",
+            "text": "C. 守在叶英身侧，协助他抵御乱兵，稳住局面",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -2
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q11_opt4",
+            "text": "D. 优先破坏地鼠门洞口，从根源上截断敌军增援",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "dropFragmentId": "frag_sword_intent"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G11.png",
+        "sfx": "/workspace/audios/%E5%BE%A1%E5%89%91.mp3"
+      }
+    },
+    {
+      "id": "calc_011",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 2314,
+        "y": 244
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q11 武库死战 向量"
+      }
+    },
+    {
+      "id": "scene_012",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1939.4528503004685,
+        "y": 614.5471496995311
+      },
+      "data": {
+        "label": "Q12 剑冢迷阵",
+        "dialogue": "剑冢大门前，需要有人担任最危险的阵眼守卫，抵挡死士破阵。你擦了擦剑上的血：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q12_opt1",
+            "text": "A. 默默站在最前方，准备在破阵瞬间第一个杀入",
+            "vector": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_rumor"
+          },
+          {
+            "id": "q12_opt2",
+            "text": "B. 在旁辅助救治伤员，做好后勤支援",
+            "vector": {
+              "x": -2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q12_opt3",
+            "text": "C. 询问谢采行踪，试图摸清这整局阴谋的逻辑",
+            "vector": {
+              "x": -5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": "frag_rumor"
+          },
+          {
+            "id": "q12_opt4",
+            "text": "D. 主动担任阵眼守卫，将后背交给伙伴",
+            "vector": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G12.png",
+        "sfx": "/workspace/audios/%E7%BB%93%E9%98%B5.mp3"
+      }
+    },
+    {
+      "id": "calc_012",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 2306,
+        "y": 664
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q12 剑冢迷阵 向量"
+      }
+    },
+    {
+      "id": "scene_013",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 1946,
+        "y": 1046
+      },
+      "data": {
+        "label": "Q13 宝殿对峙",
+        "dialogue": "少林被围，澄正拼死送你突围，嘱托你去后山请援。但途中你看到小沙弥被困，你会：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q13_opt1",
+            "text": "A. 顺路偷出特制药水，即便此刻违规，也要为破局留一手",
+            "vector": {
+              "x": 0,
+              "y": -5,
+              "z": 0
+            },
+            "dropFragmentId": "frag_breath_1"
+          },
+          {
+            "id": "q13_opt2",
+            "text": "B. 强忍悲愤，严格遵循嘱托直奔后山，大局为重",
+            "vector": {
+              "x": 0,
+              "y": 5,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q13_opt3",
+            "text": "C. 顺手救下被盘查的康宴别，掩护小沙弥撤离",
+            "vector": {
+              "x": 0,
+              "y": -2,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q13_opt4",
+            "text": "D. 潜伏观察月泉淮的阵法，推算其回气间隙",
+            "vector": {
+              "x": 0,
+              "y": 2,
+              "z": 0
+            },
+            "dropFragmentId": "frag_breath_1"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G13.png",
+        "sfx": "/workspace/audios/flame_sfx.mp3"
+      }
+    },
+    {
+      "id": "calc_013",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 2318,
+        "y": 1158
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q13 宝殿对峙 向量"
+      }
+    },
+    {
+      "id": "scene_014",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 2686,
+        "y": 174
+      },
+      "data": {
+        "label": "Q14 莲池救赎",
+        "dialogue": "幻境即将崩塌，清梵陷入癫狂，马十八在摇铃。面对这混乱的局面：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q14_opt1",
+            "text": "A. 击杀马十八！物理破除眠术，这是最快最有效的方法",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 5
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q14_opt2",
+            "text": "B. 诵念神咒，哪怕希望渺茫，也要试图唤回他的神智",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -5
+            },
+            "dropFragmentId": "frag_breath_2"
+          },
+          {
+            "id": "q14_opt3",
+            "text": "C. 观察并记录'眠术规律'，寻找破解之道",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": 2
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q14_opt4",
+            "text": "D. 抱住受惊的小沙弥，用身体挡住乱石，静候支援",
+            "vector": {
+              "x": 0,
+              "y": 0,
+              "z": -2
+            },
+            "dropFragmentId": "frag_breath_2"
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G16.png",
+        "sfx": "/workspace/audios/%E9%93%83%E9%93%9B.mp3"
+      }
+    },
+    {
+      "id": "calc_014",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 3052,
+        "y": 314
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q14 莲池救赎 向量"
+      }
+    },
+    {
+      "id": "scene_015",
+      "type": "scene",
+      "initialized": false,
+      "position": {
+        "x": 2675,
+        "y": 638
+      },
+      "data": {
+        "label": "Q15 最终归宿",
+        "dialogue": "护送任务结束，地宫大门缓缓合拢。在这一刻，你最后的动作是：",
+        "speaker": "系统",
+        "interactionType": "tap",
+        "choices": [
+          {
+            "id": "q15_opt1",
+            "text": "A. 弃剑转身，孤独离去，这场长达万里的押运终成往事",
+            "vector": {
+              "x": -5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q15_opt2",
+            "text": "B. 望向伊丽川方向，心系战局，随时准备奔赴下一个战场",
+            "vector": {
+              "x": 5,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q15_opt3",
+            "text": "C. 长揖到地，感谢这一路上的侠义温情",
+            "vector": {
+              "x": -2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          },
+          {
+            "id": "q15_opt4",
+            "text": "D. 仔细检查遗物是否带到，确认因果已了",
+            "vector": {
+              "x": 2,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": null
+          }
+        ],
+        "stageWeight": 1,
+        "background": "/workspace/bg/G14.png",
+        "sfx": "/workspace/audios/%E5%A4%A7%E9%97%A8.mp3"
+      }
+    },
+    {
+      "id": "calc_015",
+      "type": "calculator",
+      "initialized": false,
+      "position": {
+        "x": 3046.75,
+        "y": 755
+      },
+      "data": {
+        "label": "计算",
+        "description": "应用 Q15 最终归宿 向量"
+      }
+    },
+    {
+      "id": "settle_1771163814695",
+      "type": "settlement",
+      "initialized": false,
+      "position": {
+        "x": 2923.9593645160603,
+        "y": 1143.8267374770357
+      },
+      "data": {
+        "label": "最终审判",
+        "modifiers": [],
+        "archetypes": []
+      }
+    },
+    {
+      "id": "video_1771211221457",
+      "type": "video",
+      "initialized": false,
+      "position": {
+        "x": 3321.5259604515895,
+        "y": 1395.522241502862
+      },
+      "data": {
+        "label": "视频播放",
+        "videoSrc": "https://cdn.jx3box.com/upload/post/2026/2/16/1716_8903159.mp4",
+        "poster": "",
+        "autoplay": true,
+        "loop": true,
+        "muted": false,
+        "skipable": false,
+        "skipAfter": 3,
+        "isRemote": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_to_scene_001",
+      "type": "default",
+      "source": "start_001",
+      "target": "scene_001",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 125.47496008606805,
+      "sourceY": 26.450453134559524,
+      "targetX": 121,
+      "targetY": 193
+    },
+    {
+      "id": "e_q1_opt1",
+      "type": "default",
+      "source": "scene_001",
+      "target": "calc_001",
+      "sourceHandle": "q1_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 247,
+      "sourceY": 404.296875,
+      "targetX": 128,
+      "targetY": 613
+    },
+    {
+      "id": "e_q1_opt2",
+      "type": "default",
+      "source": "scene_001",
+      "target": "calc_001",
+      "sourceHandle": "q1_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 247,
+      "sourceY": 427.296875,
+      "targetX": 128,
+      "targetY": 613
+    },
+    {
+      "id": "e_q1_opt3",
+      "type": "default",
+      "source": "scene_001",
+      "target": "calc_001",
+      "sourceHandle": "q1_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 247,
+      "sourceY": 450.296875,
+      "targetX": 128,
+      "targetY": 613
+    },
+    {
+      "id": "e_q1_opt4",
+      "type": "default",
+      "source": "scene_001",
+      "target": "calc_001",
+      "sourceHandle": "q1_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 247,
+      "sourceY": 473.296875,
+      "targetX": 128,
+      "targetY": 613
+    },
+    {
+      "id": "e_q2_opt1",
+      "type": "default",
+      "source": "scene_002",
+      "target": "calc_002",
+      "sourceHandle": "q2_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 697,
+      "sourceY": 10.296875,
+      "targetX": 900,
+      "targetY": -63
+    },
+    {
+      "id": "e_q2_opt2",
+      "type": "default",
+      "source": "scene_002",
+      "target": "calc_002",
+      "sourceHandle": "q2_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 697,
+      "sourceY": 33.296875,
+      "targetX": 900,
+      "targetY": -63
+    },
+    {
+      "id": "e_q2_opt3",
+      "type": "default",
+      "source": "scene_002",
+      "target": "calc_002",
+      "sourceHandle": "q2_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 697,
+      "sourceY": 56.296875,
+      "targetX": 900,
+      "targetY": -63
+    },
+    {
+      "id": "e_q2_opt4",
+      "type": "default",
+      "source": "scene_002",
+      "target": "calc_002",
+      "sourceHandle": "q2_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 697,
+      "sourceY": 79.296875,
+      "targetX": 900,
+      "targetY": -63
+    },
+    {
+      "id": "e_to_scene_003",
+      "type": "default",
+      "source": "calc_002",
+      "target": "scene_003",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 900,
+      "sourceY": 73,
+      "targetX": 563,
+      "targetY": 193
+    },
+    {
+      "id": "e_q3_opt1",
+      "type": "default",
+      "source": "scene_003",
+      "target": "calc_003",
+      "sourceHandle": "q3_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 689,
+      "sourceY": 404.296875,
+      "targetX": 906,
+      "targetY": 269
+    },
+    {
+      "id": "e_q3_opt2",
+      "type": "default",
+      "source": "scene_003",
+      "target": "calc_003",
+      "sourceHandle": "q3_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 689,
+      "sourceY": 427.296875,
+      "targetX": 906,
+      "targetY": 269
+    },
+    {
+      "id": "e_q3_opt3",
+      "type": "default",
+      "source": "scene_003",
+      "target": "calc_003",
+      "sourceHandle": "q3_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 689,
+      "sourceY": 450.296875,
+      "targetX": 906,
+      "targetY": 269
+    },
+    {
+      "id": "e_q3_opt4",
+      "type": "default",
+      "source": "scene_003",
+      "target": "calc_003",
+      "sourceHandle": "q3_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 689,
+      "sourceY": 473.296875,
+      "targetX": 906,
+      "targetY": 269
+    },
+    {
+      "id": "e_to_scene_004",
+      "type": "default",
+      "source": "calc_003",
+      "target": "scene_004",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 906,
+      "sourceY": 405,
+      "targetX": 565,
+      "targetY": 603
+    },
+    {
+      "id": "e_q4_opt1",
+      "type": "default",
+      "source": "scene_004",
+      "target": "calc_004",
+      "sourceHandle": "q4_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 691,
+      "sourceY": 814.296875,
+      "targetX": 922,
+      "targetY": 657
+    },
+    {
+      "id": "e_q4_opt2",
+      "type": "default",
+      "source": "scene_004",
+      "target": "calc_004",
+      "sourceHandle": "q4_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 691,
+      "sourceY": 837.296875,
+      "targetX": 922,
+      "targetY": 657
+    },
+    {
+      "id": "e_q4_opt3",
+      "type": "default",
+      "source": "scene_004",
+      "target": "calc_004",
+      "sourceHandle": "q4_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 691,
+      "sourceY": 860.296875,
+      "targetX": 922,
+      "targetY": 657
+    },
+    {
+      "id": "e_q4_opt4",
+      "type": "default",
+      "source": "scene_004",
+      "target": "calc_004",
+      "sourceHandle": "q4_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 691,
+      "sourceY": 883.296875,
+      "targetX": 922,
+      "targetY": 657
+    },
+    {
+      "id": "e_to_scene_005",
+      "type": "default",
+      "source": "calc_004",
+      "target": "scene_005",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 922,
+      "sourceY": 793,
+      "targetX": 555.0000000000002,
+      "targetY": 1049
+    },
+    {
+      "id": "e_q5_opt1",
+      "type": "default",
+      "source": "scene_005",
+      "target": "calc_005",
+      "sourceHandle": "q5_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 681.0000000000002,
+      "sourceY": 1260.296875,
+      "targetX": 922.0000000000002,
+      "targetY": 1143
+    },
+    {
+      "id": "e_q5_opt2",
+      "type": "default",
+      "source": "scene_005",
+      "target": "calc_005",
+      "sourceHandle": "q5_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 681.0000000000002,
+      "sourceY": 1283.296875,
+      "targetX": 922.0000000000002,
+      "targetY": 1143
+    },
+    {
+      "id": "e_q5_opt3",
+      "type": "default",
+      "source": "scene_005",
+      "target": "calc_005",
+      "sourceHandle": "q5_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 681.0000000000002,
+      "sourceY": 1306.296875,
+      "targetX": 922.0000000000002,
+      "targetY": 1143
+    },
+    {
+      "id": "e_q5_opt4",
+      "type": "default",
+      "source": "scene_005",
+      "target": "calc_005",
+      "sourceHandle": "q5_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 681.0000000000002,
+      "sourceY": 1329.296875,
+      "targetX": 922.0000000000002,
+      "targetY": 1143
+    },
+    {
+      "id": "e_to_scene_006",
+      "type": "default",
+      "source": "calc_005",
+      "target": "scene_006",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 922.0000000000002,
+      "sourceY": 1279,
+      "targetX": 1271,
+      "targetY": -211
+    },
+    {
+      "id": "e_q6_opt1",
+      "type": "default",
+      "source": "scene_006",
+      "target": "calc_006",
+      "sourceHandle": "q6_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 1397,
+      "sourceY": 0.296875,
+      "targetX": 1642,
+      "targetY": -77
+    },
+    {
+      "id": "e_q6_opt2",
+      "type": "default",
+      "source": "scene_006",
+      "target": "calc_006",
+      "sourceHandle": "q6_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 1397,
+      "sourceY": 23.296875,
+      "targetX": 1642,
+      "targetY": -77
+    },
+    {
+      "id": "e_q6_opt3",
+      "type": "default",
+      "source": "scene_006",
+      "target": "calc_006",
+      "sourceHandle": "q6_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 1397,
+      "sourceY": 46.296875,
+      "targetX": 1642,
+      "targetY": -77
+    },
+    {
+      "id": "e_q6_opt4",
+      "type": "default",
+      "source": "scene_006",
+      "target": "calc_006",
+      "sourceHandle": "q6_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 1397,
+      "sourceY": 69.296875,
+      "targetX": 1642,
+      "targetY": -77
+    },
+    {
+      "id": "e_to_scene_007",
+      "type": "default",
+      "source": "calc_006",
+      "target": "scene_007",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 1642,
+      "sourceY": 59,
+      "targetX": 1279,
+      "targetY": 215
+    },
+    {
+      "id": "e_q7_opt1",
+      "type": "default",
+      "source": "scene_007",
+      "target": "calc_007",
+      "sourceHandle": "q7_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 1405,
+      "sourceY": 426.296875,
+      "targetX": 1652,
+      "targetY": 241
+    },
+    {
+      "id": "e_q7_opt2",
+      "type": "default",
+      "source": "scene_007",
+      "target": "calc_007",
+      "sourceHandle": "q7_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 1405,
+      "sourceY": 449.296875,
+      "targetX": 1652,
+      "targetY": 241
+    },
+    {
+      "id": "e_q7_opt3",
+      "type": "default",
+      "source": "scene_007",
+      "target": "calc_007",
+      "sourceHandle": "q7_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 1405,
+      "sourceY": 472.296875,
+      "targetX": 1652,
+      "targetY": 241
+    },
+    {
+      "id": "e_q7_opt4",
+      "type": "default",
+      "source": "scene_007",
+      "target": "calc_007",
+      "sourceHandle": "q7_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 1405,
+      "sourceY": 495.296875,
+      "targetX": 1652,
+      "targetY": 241
+    },
+    {
+      "id": "e_to_scene_008",
+      "type": "default",
+      "source": "calc_007",
+      "target": "scene_008",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 1652,
+      "sourceY": 377,
+      "targetX": 1267,
+      "targetY": 619
+    },
+    {
+      "id": "e_q8_opt1",
+      "type": "default",
+      "source": "scene_008",
+      "target": "calc_008",
+      "sourceHandle": "q8_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 1393,
+      "sourceY": 830.296875,
+      "targetX": 1650,
+      "targetY": 653
+    },
+    {
+      "id": "e_q8_opt2",
+      "type": "default",
+      "source": "scene_008",
+      "target": "calc_008",
+      "sourceHandle": "q8_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 1393,
+      "sourceY": 853.296875,
+      "targetX": 1650,
+      "targetY": 653
+    },
+    {
+      "id": "e_q8_opt3",
+      "type": "default",
+      "source": "scene_008",
+      "target": "calc_008",
+      "sourceHandle": "q8_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 1393,
+      "sourceY": 876.296875,
+      "targetX": 1650,
+      "targetY": 653
+    },
+    {
+      "id": "e_q8_opt4",
+      "type": "default",
+      "source": "scene_008",
+      "target": "calc_008",
+      "sourceHandle": "q8_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 1393,
+      "sourceY": 899.296875,
+      "targetX": 1650,
+      "targetY": 653
+    },
+    {
+      "id": "e_to_scene_009",
+      "type": "default",
+      "source": "calc_008",
+      "target": "scene_009",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 1650,
+      "sourceY": 789,
+      "targetX": 1273,
+      "targetY": 1061
+    },
+    {
+      "id": "e_q9_opt1",
+      "type": "default",
+      "source": "scene_009",
+      "target": "calc_009",
+      "sourceHandle": "q9_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 1399,
+      "sourceY": 1272.296875,
+      "targetX": 1636,
+      "targetY": 1137
+    },
+    {
+      "id": "e_q9_opt2",
+      "type": "default",
+      "source": "scene_009",
+      "target": "calc_009",
+      "sourceHandle": "q9_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 1399,
+      "sourceY": 1295.296875,
+      "targetX": 1636,
+      "targetY": 1137
+    },
+    {
+      "id": "e_q9_opt3",
+      "type": "default",
+      "source": "scene_009",
+      "target": "calc_009",
+      "sourceHandle": "q9_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 1399,
+      "sourceY": 1318.296875,
+      "targetX": 1636,
+      "targetY": 1137
+    },
+    {
+      "id": "e_q9_opt4",
+      "type": "default",
+      "source": "scene_009",
+      "target": "calc_009",
+      "sourceHandle": "q9_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 1399,
+      "sourceY": 1341.296875,
+      "targetX": 1636,
+      "targetY": 1137
+    },
+    {
+      "id": "e_to_scene_010",
+      "type": "default",
+      "source": "calc_009",
+      "target": "scene_010",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 1636,
+      "sourceY": 1273,
+      "targetX": 2061,
+      "targetY": -229
+    },
+    {
+      "id": "e_q10_opt1",
+      "type": "default",
+      "source": "scene_010",
+      "target": "calc_010",
+      "sourceHandle": "q10_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2187,
+      "sourceY": -17.703125,
+      "targetX": 2390,
+      "targetY": -93
+    },
+    {
+      "id": "e_q10_opt2",
+      "type": "default",
+      "source": "scene_010",
+      "target": "calc_010",
+      "sourceHandle": "q10_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2187,
+      "sourceY": 5.296875,
+      "targetX": 2390,
+      "targetY": -93
+    },
+    {
+      "id": "e_q10_opt3",
+      "type": "default",
+      "source": "scene_010",
+      "target": "calc_010",
+      "sourceHandle": "q10_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2187,
+      "sourceY": 28.296875,
+      "targetX": 2390,
+      "targetY": -93
+    },
+    {
+      "id": "e_q10_opt4",
+      "type": "default",
+      "source": "scene_010",
+      "target": "calc_010",
+      "sourceHandle": "q10_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2187,
+      "sourceY": 51.296875,
+      "targetX": 2390,
+      "targetY": -93
+    },
+    {
+      "id": "e_to_scene_011",
+      "type": "default",
+      "source": "calc_010",
+      "target": "scene_011",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 2390,
+      "sourceY": 43,
+      "targetX": 2057.968566866979,
+      "targetY": 164.4970698716673
+    },
+    {
+      "id": "e_q11_opt1",
+      "type": "default",
+      "source": "scene_011",
+      "target": "calc_011",
+      "sourceHandle": "q11_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2183.968566866979,
+      "sourceY": 375.7939448716673,
+      "targetX": 2396,
+      "targetY": 237
+    },
+    {
+      "id": "e_q11_opt2",
+      "type": "default",
+      "source": "scene_011",
+      "target": "calc_011",
+      "sourceHandle": "q11_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2183.968566866979,
+      "sourceY": 398.7939448716673,
+      "targetX": 2396,
+      "targetY": 237
+    },
+    {
+      "id": "e_q11_opt3",
+      "type": "default",
+      "source": "scene_011",
+      "target": "calc_011",
+      "sourceHandle": "q11_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2183.968566866979,
+      "sourceY": 421.7939448716673,
+      "targetX": 2396,
+      "targetY": 237
+    },
+    {
+      "id": "e_q11_opt4",
+      "type": "default",
+      "source": "scene_011",
+      "target": "calc_011",
+      "sourceHandle": "q11_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2183.968566866979,
+      "sourceY": 444.7939448716673,
+      "targetX": 2396,
+      "targetY": 237
+    },
+    {
+      "id": "e_to_scene_012",
+      "type": "default",
+      "source": "calc_011",
+      "target": "scene_012",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 2396,
+      "sourceY": 373,
+      "targetX": 2060.4528503004685,
+      "targetY": 607.5471496995311
+    },
+    {
+      "id": "e_q12_opt1",
+      "type": "default",
+      "source": "scene_012",
+      "target": "calc_012",
+      "sourceHandle": "q12_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2186.4528503004685,
+      "sourceY": 818.8440246995311,
+      "targetX": 2388,
+      "targetY": 657
+    },
+    {
+      "id": "e_q12_opt2",
+      "type": "default",
+      "source": "scene_012",
+      "target": "calc_012",
+      "sourceHandle": "q12_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2186.4528503004685,
+      "sourceY": 841.8440246995311,
+      "targetX": 2388,
+      "targetY": 657
+    },
+    {
+      "id": "e_q12_opt3",
+      "type": "default",
+      "source": "scene_012",
+      "target": "calc_012",
+      "sourceHandle": "q12_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2186.4528503004685,
+      "sourceY": 864.8440246995311,
+      "targetX": 2388,
+      "targetY": 657
+    },
+    {
+      "id": "e_q12_opt4",
+      "type": "default",
+      "source": "scene_012",
+      "target": "calc_012",
+      "sourceHandle": "q12_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2186.4528503004685,
+      "sourceY": 887.8440246995311,
+      "targetX": 2388,
+      "targetY": 657
+    },
+    {
+      "id": "e_to_scene_013",
+      "type": "default",
+      "source": "calc_012",
+      "target": "scene_013",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 2388,
+      "sourceY": 793,
+      "targetX": 2067,
+      "targetY": 1039
+    },
+    {
+      "id": "e_q13_opt1",
+      "type": "default",
+      "source": "scene_013",
+      "target": "calc_013",
+      "sourceHandle": "q13_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2193,
+      "sourceY": 1250.296875,
+      "targetX": 2400,
+      "targetY": 1151
+    },
+    {
+      "id": "e_q13_opt2",
+      "type": "default",
+      "source": "scene_013",
+      "target": "calc_013",
+      "sourceHandle": "q13_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2193,
+      "sourceY": 1273.296875,
+      "targetX": 2400,
+      "targetY": 1151
+    },
+    {
+      "id": "e_q13_opt3",
+      "type": "default",
+      "source": "scene_013",
+      "target": "calc_013",
+      "sourceHandle": "q13_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2193,
+      "sourceY": 1296.296875,
+      "targetX": 2400,
+      "targetY": 1151
+    },
+    {
+      "id": "e_q13_opt4",
+      "type": "default",
+      "source": "scene_013",
+      "target": "calc_013",
+      "sourceHandle": "q13_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2193,
+      "sourceY": 1319.296875,
+      "targetX": 2400,
+      "targetY": 1151
+    },
+    {
+      "id": "e_to_scene_014",
+      "type": "default",
+      "source": "calc_013",
+      "target": "scene_014",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 2400,
+      "sourceY": 1287,
+      "targetX": 2807,
+      "targetY": 167
+    },
+    {
+      "id": "e_q14_opt1",
+      "type": "default",
+      "source": "scene_014",
+      "target": "calc_014",
+      "sourceHandle": "q14_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2933,
+      "sourceY": 378.296875,
+      "targetX": 3134,
+      "targetY": 307
+    },
+    {
+      "id": "e_q14_opt2",
+      "type": "default",
+      "source": "scene_014",
+      "target": "calc_014",
+      "sourceHandle": "q14_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2933,
+      "sourceY": 401.296875,
+      "targetX": 3134,
+      "targetY": 307
+    },
+    {
+      "id": "e_q14_opt3",
+      "type": "default",
+      "source": "scene_014",
+      "target": "calc_014",
+      "sourceHandle": "q14_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2933,
+      "sourceY": 424.296875,
+      "targetX": 3134,
+      "targetY": 307
+    },
+    {
+      "id": "e_q14_opt4",
+      "type": "default",
+      "source": "scene_014",
+      "target": "calc_014",
+      "sourceHandle": "q14_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2933,
+      "sourceY": 447.296875,
+      "targetX": 3134,
+      "targetY": 307
+    },
+    {
+      "id": "e_to_scene_015",
+      "type": "default",
+      "source": "calc_014",
+      "target": "scene_015",
+      "sourceHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 3134,
+      "sourceY": 443,
+      "targetX": 2796,
+      "targetY": 631
+    },
+    {
+      "id": "e_q15_opt1",
+      "type": "default",
+      "source": "scene_015",
+      "target": "calc_015",
+      "sourceHandle": "q15_opt1",
+      "data": {},
+      "label": "",
+      "sourceX": 2922,
+      "sourceY": 842.296875,
+      "targetX": 3128.75,
+      "targetY": 748
+    },
+    {
+      "id": "e_q15_opt2",
+      "type": "default",
+      "source": "scene_015",
+      "target": "calc_015",
+      "sourceHandle": "q15_opt2",
+      "data": {},
+      "label": "",
+      "sourceX": 2922,
+      "sourceY": 865.296875,
+      "targetX": 3128.75,
+      "targetY": 748
+    },
+    {
+      "id": "e_q15_opt3",
+      "type": "default",
+      "source": "scene_015",
+      "target": "calc_015",
+      "sourceHandle": "q15_opt3",
+      "data": {},
+      "label": "",
+      "sourceX": 2922,
+      "sourceY": 888.296875,
+      "targetX": 3128.75,
+      "targetY": 748
+    },
+    {
+      "id": "e_q15_opt4",
+      "type": "default",
+      "source": "scene_015",
+      "target": "calc_015",
+      "sourceHandle": "q15_opt4",
+      "data": {},
+      "label": "",
+      "sourceX": 2922,
+      "sourceY": 911.296875,
+      "targetX": 3128.75,
+      "targetY": 748
+    },
+    {
+      "id": "e-settle_1771163814695-video_1771211221457-1771213663181",
+      "type": "default",
+      "source": "settle_1771163814695",
+      "target": "video_1771211221457",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 3025.9593645160603,
+      "sourceY": 1329.8267374770357,
+      "targetX": 3431.5259604515895,
+      "targetY": 1388.522241502862
+    },
+    {
+      "id": "e-calc_015-settle_1771163814695-1771214295782",
+      "type": "default",
+      "source": "calc_015",
+      "target": "settle_1771163814695",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 3128.75,
+      "sourceY": 884,
+      "targetX": 3025.9593645160603,
+      "targetY": 1135.8267374770357
+    },
+    {
+      "id": "e-calc_001-scene_002-1771214300104",
+      "type": "default",
+      "source": "calc_001",
+      "target": "scene_002",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {},
+      "label": "",
+      "sourceX": 128,
+      "sourceY": 749,
+      "targetX": 571,
+      "targetY": -201
+    }
+  ],
+  "position": [
+    0,
+    0
+  ],
+  "zoom": 1,
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  },
+  "meta": {
+    "title": "剑网3奉天证道：大唐20人格测试",
+    "author": "Zorron Engine",
+    "version": "1.4.0 (5-5-5 Orthogonal)"
+  },
+  "globalVariables": [
+    {
+      "name": "x",
+      "initialValue": 0
+    },
+    {
+      "name": "y",
+      "initialValue": 0
+    },
+    {
+      "name": "z",
+      "initialValue": 0
+    },
+    {
+      "name": "user_sect",
+      "initialValue": 0
+    }
+  ],
+  "globalBgm": "/workspace/audios/bgm.mp3",
+  "fragments": [],
+  "sectAnchors": [
+    {
+      "id": "tiance",
+      "name": "天策",
+      "anchor": {
+        "x": 12,
+        "y": 12,
+        "z": 12
+      },
+      "resultTexts": {
+        "layerA": "【家国守护】长枪独守大唐魂",
+        "layerB": "绝对的正统与责任"
+      }
+    },
+    {
+      "id": "lingxue",
+      "name": "凌雪阁",
+      "anchor": {
+        "x": 14,
+        "y": 10,
+        "z": 16
+      },
+      "resultTexts": {
+        "layerA": "【绝对利刃】未悔补天裂",
+        "layerB": "抹去情感的帝王工具"
+      }
+    },
+    {
+      "id": "duanshi",
+      "name": "段氏",
+      "anchor": {
+        "x": 10,
+        "y": 14,
+        "z": 8
+      },
+      "resultTexts": {
+        "layerA": "【世家风范】世第含章",
+        "layerB": "家族规则与掌控力"
+      }
+    },
+    {
+      "id": "cangyun",
+      "name": "苍云",
+      "anchor": {
+        "x": 10,
+        "y": 10,
+        "z": -10
+      },
+      "resultTexts": {
+        "layerA": "【悲情守望】誓言为盾",
+        "layerB": "铁骨下的深沉痛楚"
+      }
+    },
+    {
+      "id": "badao",
+      "name": "霸刀",
+      "anchor": {
+        "x": 14,
+        "y": 6,
+        "z": -14
+      },
+      "resultTexts": {
+        "layerA": "【傲骨家族】誓将浮名敬死生",
+        "layerB": "重情重义的北方汉子"
+      }
+    },
+    {
+      "id": "cangjian",
+      "name": "藏剑",
+      "anchor": {
+        "x": 8,
+        "y": 8,
+        "z": -12
+      },
+      "resultTexts": {
+        "layerA": "【君子如风】心剑逍遥",
+        "layerB": "虽守礼法，更重情怀"
+      }
+    },
+    {
+      "id": "tangmen",
+      "name": "唐门",
+      "anchor": {
+        "x": 12,
+        "y": -10,
+        "z": 14
+      },
+      "resultTexts": {
+        "layerA": "【精密算计】暴雨飞星",
+        "layerB": "虽身在江湖，行事却诡秘莫测"
+      }
+    },
+    {
+      "id": "yaozong",
+      "name": "药宗",
+      "anchor": {
+        "x": 10,
+        "y": -12,
+        "z": 8
+      },
+      "resultTexts": {
+        "layerA": "【敢试生死】医者仁心",
+        "layerB": "打破常规的实用主义救赎"
+      }
+    },
+    {
+      "id": "gaibang",
+      "name": "丐帮",
+      "anchor": {
+        "x": 14,
+        "y": -14,
+        "z": -10
+      },
+      "resultTexts": {
+        "layerA": "【豪迈乐天】醉卧江湖",
+        "layerB": "极致的自由与兄弟情"
+      }
+    },
+    {
+      "id": "mingjiao",
+      "name": "明教",
+      "anchor": {
+        "x": 10,
+        "y": -10,
+        "z": -14
+      },
+      "resultTexts": {
+        "layerA": "【圣火信仰】爱恨分明",
+        "layerB": "极端的善恶观与宗教热情"
+      }
+    },
+    {
+      "id": "qixiu",
+      "name": "七秀",
+      "anchor": {
+        "x": 8,
+        "y": -6,
+        "z": -16
+      },
+      "resultTexts": {
+        "layerA": "【至情至性】一舞剑器",
+        "layerB": "以情入道，刚烈不屈"
+      }
+    },
+    {
+      "id": "yantian",
+      "name": "衍天宗",
+      "anchor": {
+        "x": -14,
+        "y": 12,
+        "z": 12
+      },
+      "resultTexts": {
+        "layerA": "【天道观测】星占太乙",
+        "layerB": "绝对的旁观者视角"
+      }
+    },
+    {
+      "id": "chunyang",
+      "name": "纯阳",
+      "anchor": {
+        "x": -10,
+        "y": 10,
+        "z": 14
+      },
+      "resultTexts": {
+        "layerA": "【清冷问道】坐忘无我",
+        "layerB": "道法自然的逻辑秩序"
+      }
+    },
+    {
+      "id": "shaolin",
+      "name": "少林",
+      "anchor": {
+        "x": -8,
+        "y": 16,
+        "z": 6
+      },
+      "resultTexts": {
+        "layerA": "【佛门清规】晨钟暮鼓",
+        "layerB": "虽怀慈悲，更守戒律"
+      }
+    },
+    {
+      "id": "wanhua",
+      "name": "万花",
+      "anchor": {
+        "x": -12,
+        "y": 8,
+        "z": -12
+      },
+      "resultTexts": {
+        "layerA": "【避世理想】只笑桃源",
+        "layerB": "不愿同流合污的艺术洁癖"
+      }
+    },
+    {
+      "id": "changge",
+      "name": "长歌",
+      "anchor": {
+        "x": -8,
+        "y": 14,
+        "z": -8
+      },
+      "resultTexts": {
+        "layerA": "【儒门风骨】相知莫问",
+        "layerB": "居庙堂之高的文人情怀"
+      }
+    },
+    {
+      "id": "daozong",
+      "name": "刀宗",
+      "anchor": {
+        "x": -12,
+        "y": -10,
+        "z": 14
+      },
+      "resultTexts": {
+        "layerA": "【孤绝求败】断雨残云",
+        "layerB": "只求武道极致，不问世俗对错"
+      }
+    },
+    {
+      "id": "penglai",
+      "name": "蓬莱",
+      "anchor": {
+        "x": -16,
+        "y": -8,
+        "z": 6
+      },
+      "resultTexts": {
+        "layerA": "【云端逍遥】方外之仙",
+        "layerB": "疏离冷淡，不受拘束"
+      }
+    },
+    {
+      "id": "wudu",
+      "name": "五毒",
+      "anchor": {
+        "x": -12,
+        "y": -14,
+        "z": -12
+      },
+      "resultTexts": {
+        "layerA": "【深情执念】敢爱敢恨",
+        "layerB": "不通教化，唯爱至上"
+      }
+    },
+    {
+      "id": "wanling",
+      "name": "万灵",
+      "anchor": {
+        "x": -8,
+        "y": -10,
+        "z": -16
+      },
+      "resultTexts": {
+        "layerA": "【山海稚心】与兽同游",
+        "layerB": "纯真直觉，原始野性"
+      }
+    }
+  ],
+  "savedAt": "2026-02-16T20:52:54.908Z"
+}

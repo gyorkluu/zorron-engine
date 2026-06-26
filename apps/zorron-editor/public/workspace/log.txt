@@ -1,0 +1,394 @@
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">B. 所谓的传承，其实就是护住那些在乱世中挣扎的弱小生命</span>', …}
+content.bundle.js:1 Event data sent to background.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+Unchecked runtime.lastError: The message port closed before a response was received.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q2_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 所谓的传承，其实就是护住那些在乱世中挣扎的弱小生命"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 0, Y: 0, Z: -2)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 0.00, Y: 0.00, Z: -2.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 1.00, Y: 2.00, Z: 1.00)
+GameEngine.ts:346    应用值: (X: 0.00, Y: 0.00, Z: -2.00)
+GameEngine.ts:347    应用后: (X: 1.00, Y: 2.00, Z: -1.00)
+GameEngine.ts:348    权重: 1 → 2
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.5000, Y: 1.0000, Z: -0.5000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">C. 上前共享长安城内的最新灾情，以此提醒莫雨一行人多加小心</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q3_c
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "C. 上前共享长安城内的最新灾情，以此提醒莫雨一行人多加小心"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: 0, Z: -1)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: 0.00, Z: -1.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 1.00, Y: 2.00, Z: -1.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: 0.00, Z: -1.00)
+GameEngine.ts:347    应用后: (X: 3.00, Y: 2.00, Z: -2.00)
+GameEngine.ts:348    权重: 2 → 3
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 1.0000, Y: 0.6667, Z: -0.6667)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">D. 保持冷观，警惕人群中是否有趁乱滋事的异族探子，寻找此病的蹊跷源头</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q4_d
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "D. 保持冷观，警惕人群中是否有趁乱滋事的异族探子，寻找此病的蹊跷源头"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: -1, Y: 1, Z: 3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: -1.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 3.00, Y: 2.00, Z: -2.00)
+GameEngine.ts:346    应用值: (X: -1.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:347    应用后: (X: 2.00, Y: 3.00, Z: 1.00)
+GameEngine.ts:348    权重: 3 → 4
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.5000, Y: 0.7500, Z: 0.2500)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">D. 环顾四周正在好转的病患，认为护送孩子只是“归藏”任务的一部分，无需过分动情</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q5_d
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "D. 环顾四周正在好转的病患，认为护送孩子只是“归藏”任务的一部分，无需过分动情"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: -1, Y: 2, Z: 2)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: -1.00, Y: 2.00, Z: 2.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:513 💎 获得碎片: frag_q2
+GameEngine.ts:514    当前碎片数: 1
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 2.00, Y: 3.00, Z: 1.00)
+GameEngine.ts:346    应用值: (X: -1.00, Y: 2.00, Z: 2.00)
+GameEngine.ts:347    应用后: (X: 1.00, Y: 5.00, Z: 3.00)
+GameEngine.ts:348    权重: 4 → 5
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.2000, Y: 1.0000, Z: 0.6000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">A. 冲入火海协助苏凤棠，抢救那些不可再生的武林孤本与典籍</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q6_a
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "A. 冲入火海协助苏凤棠，抢救那些不可再生的武林孤本与典籍"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 1, Y: 2, Z: 1)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 1.00, Y: 2.00, Z: 1.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:513 💎 获得碎片: frag_q3
+GameEngine.ts:514    当前碎片数: 2
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 1.00, Y: 5.00, Z: 3.00)
+GameEngine.ts:346    应用值: (X: 1.00, Y: 2.00, Z: 1.00)
+GameEngine.ts:347    应用后: (X: 2.00, Y: 7.00, Z: 4.00)
+GameEngine.ts:348    权重: 5 → 6
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.3333, Y: 1.1667, Z: 0.6667)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">D. 顺着水贼撤退的方向截杀其头目，以此分散敌人对药坊的注意力</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q7_d
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "D. 顺着水贼撤退的方向截杀其头目，以此分散敌人对药坊的注意力"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: 1, Z: 3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 2.00, Y: 7.00, Z: 4.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:347    应用后: (X: 4.00, Y: 8.00, Z: 7.00)
+GameEngine.ts:348    权重: 6 → 7
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.5714, Y: 1.1429, Z: 1.0000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'BUTTON', elementId: 'N/A', elementValue: '', exactElementHTML: '<button data-v-aefab004=""><span></span><span>A. 观…光间隙，尝试寻找一条能安全带走燕燕的生路</span><span></span></button>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q8_a
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "A. 观察火雷爆炸的火光间隙，尝试寻找一条能安全带走燕燕的生路"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 0, Y: 0, Z: 2)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 0.00, Y: 0.00, Z: 2.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:513 💎 获得碎片: frag_q4
+GameEngine.ts:514    当前碎片数: 3
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 4.00, Y: 8.00, Z: 7.00)
+GameEngine.ts:346    应用值: (X: 0.00, Y: 0.00, Z: 2.00)
+GameEngine.ts:347    应用后: (X: 4.00, Y: 8.00, Z: 9.00)
+GameEngine.ts:348    权重: 7 → 8
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.5000, Y: 1.0000, Z: 1.1250)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'BUTTON', elementId: 'N/A', elementValue: '', exactElementHTML: '<button data-v-aefab004=""><span></span><span>B. 迅…的情报，准备动身前往下一个受灾点藏剑山庄</span><span></span></button>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q9_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 迅速整理探查所得的情报，准备动身前往下一个受灾点藏剑山庄"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: 2, Z: 1)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: 2.00, Z: 1.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 4.00, Y: 8.00, Z: 9.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: 2.00, Z: 1.00)
+GameEngine.ts:347    应用后: (X: 6.00, Y: 10.00, Z: 10.00)
+GameEngine.ts:348    权重: 8 → 9
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.6667, Y: 1.1111, Z: 1.1111)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'BUTTON', elementId: 'N/A', elementValue: '', exactElementHTML: '<button data-v-aefab004=""><span></span><span>B. 杀…蒙将军的遗体，绝不容许英雄之躯受海寇玷污</span><span></span></button>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q10_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 杀入敌阵尝试夺回叶蒙将军的遗体，绝不容许英雄之躯受海寇玷污"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: -1, Z: -3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: -1.00, Z: -3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 6.00, Y: 10.00, Z: 10.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: -1.00, Z: -3.00)
+GameEngine.ts:347    应用后: (X: 8.00, Y: 9.00, Z: 7.00)
+GameEngine.ts:348    权重: 9 → 10
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.8000, Y: 0.9000, Z: 0.7000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">B. 冲向被围困的叶麟，替这个年幼的继承者挡下致命的一刀</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q11_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 冲向被围困的叶麟，替这个年幼的继承者挡下致命的一刀"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: 1, Z: -4)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: 1.00, Z: -4.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 8.00, Y: 9.00, Z: 7.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: 1.00, Z: -4.00)
+GameEngine.ts:347    应用后: (X: 10.00, Y: 10.00, Z: 3.00)
+GameEngine.ts:348    权重: 10 → 11
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.9091, Y: 0.9091, Z: 0.2727)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'BUTTON', elementId: 'N/A', elementValue: '', exactElementHTML: '<button data-v-aefab004=""><span></span><span>B. 仔…采在东海的行踪，试图摸清这整局阴谋的逻辑</span><span></span></button>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q12_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 仔细询问方子游关于谢采在东海的行踪，试图摸清这整局阴谋的逻辑"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 1, Y: 1, Z: 3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 1.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:513 💎 获得碎片: frag_q6_b
+GameEngine.ts:514    当前碎片数: 4
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 10.00, Y: 10.00, Z: 3.00)
+GameEngine.ts:346    应用值: (X: 1.00, Y: 1.00, Z: 3.00)
+GameEngine.ts:347    应用后: (X: 11.00, Y: 11.00, Z: 6.00)
+GameEngine.ts:348    权重: 11 → 12
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.9167, Y: 0.9167, Z: 0.5000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">C. 潜伏在房顶观察月泉淮与新月卫的阵法，试图推算出其功法在频繁出招后的回气间隙</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q13_c
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "C. 潜伏在房顶观察月泉淮与新月卫的阵法，试图推算出其功法在频繁出招后的回气间隙"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 0, Y: 2, Z: 3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 0.00, Y: 2.00, Z: 3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:513 💎 获得碎片: frag_q11
+GameEngine.ts:514    当前碎片数: 5
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 11.00, Y: 11.00, Z: 6.00)
+GameEngine.ts:346    应用值: (X: 0.00, Y: 2.00, Z: 3.00)
+GameEngine.ts:347    应用后: (X: 11.00, Y: 13.00, Z: 9.00)
+GameEngine.ts:348    权重: 12 → 13
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.8462, Y: 1.0000, Z: 0.6923)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'BUTTON', elementId: 'N/A', elementValue: '', exactElementHTML: '<button data-v-aefab004=""><span></span><span>B. 冷…利用虚空制造的机会一击毙命，强行破除眠术</span><span></span></button>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q14_b
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "B. 冷静寻找幻境中一直摇铃的马十八，利用虚空制造的机会一击毙命，强行破除眠术"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 2, Y: -1, Z: 3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 2.00, Y: -1.00, Z: 3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 11.00, Y: 13.00, Z: 9.00)
+GameEngine.ts:346    应用值: (X: 2.00, Y: -1.00, Z: 3.00)
+GameEngine.ts:347    应用后: (X: 13.00, Y: 12.00, Z: 12.00)
+GameEngine.ts:348    权重: 13 → 14
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.9286, Y: 0.8571, Z: 0.8571)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+content.bundle.js:1 Event captured: {eventType: 'Click', elementTag: 'SPAN', elementId: 'N/A', elementValue: '', exactElementHTML: '<span data-v-aefab004="">A. 对着门后的阴影长揖到地，感谢他们在这场浩劫中带给你的那一点侠义温情</span>', …}
+content.bundle.js:1 Event data sent to background.
+GameEngine.ts:482 ═══════════════════════════════════════════════════════════
+GameEngine.ts:483 🎯 玩家选择选项: q15_a
+GameEngine.ts:484 ───────────────────────────────────────────────────────────
+GameEngine.ts:490 📝 选项内容: "A. 对着门后的阴影长揖到地，感谢他们在这场浩劫中带给你的那一点侠义温情"
+GameEngine.ts:501 📊 向量偏移 (暂存):
+GameEngine.ts:502    本次偏移: (X: 1, Y: 1, Z: -3)
+GameEngine.ts:503    权重系数: 1
+GameEngine.ts:504    暂存累计: (X: 1.00, Y: 1.00, Z: -3.00)
+GameEngine.ts:505    ⏳ 等待 CalculatorNode 应用...
+GameEngine.ts:331 ═══════════════════════════════════════════════════════════
+GameEngine.ts:332 📊 向量应用节点执行
+GameEngine.ts:333 ───────────────────────────────────────────────────────────
+GameEngine.ts:344 📊 向量已应用:
+GameEngine.ts:345    应用前: (X: 13.00, Y: 12.00, Z: 12.00)
+GameEngine.ts:346    应用值: (X: 1.00, Y: 1.00, Z: -3.00)
+GameEngine.ts:347    应用后: (X: 14.00, Y: 13.00, Z: 9.00)
+GameEngine.ts:348    权重: 14 → 15
+GameEngine.ts:351 📍 当前重心 (加权平均):
+GameEngine.ts:352    (X: 0.9333, Y: 0.8667, Z: 0.6000)
+GameEngine.ts:360 ───────────────────────────────────────────────────────────
+GameEngine.ts:375 ═══════════════════════════════════════════════════════════
+GameEngine.ts:376 🎯 最终结算节点执行
+GameEngine.ts:377 ═══════════════════════════════════════════════════════════
+GameEngine.ts:389 📍 步骤1: 计算向量
+GameEngine.ts:390    累计向量: (X: 14.00, Y: 13.00, Z: 9.00)
+GameEngine.ts:391    总权重: 15
+GameEngine.ts:392    重心坐标: (X: 0.9333, Y: 0.8667, Z: 0.6000)
+GameEngine.ts:410 📍 步骤2: 无修正规则，跳过
+GameEngine.ts:418 📍 步骤3: 无碎片或无门派定义，跳过吸附
+GameEngine.ts:422 📍 步骤4: 计算模长
+GameEngine.ts:423    模长 = √(X² + Y² + Z²) = 21.1187
+GameEngine.ts:439 ⚠️ 警告：没有可用的门派锚点数据！
+processSettlementNode @ GameEngine.ts:439
+setCurrentNode @ GameEngine.ts:243
+processCalculatorNode @ GameEngine.ts:365
+setCurrentNode @ GameEngine.ts:239
+choose @ GameEngine.ts:522
+handleChoice @ Player.vue:102
+await in handleChoice
+onClick @ Player.vue:258
+callWithErrorHandling @ chunk-JW6VRERE.js?v=2ab53313:2342
+callWithAsyncErrorHandling @ chunk-JW6VRERE.js?v=2ab53313:2349
+invoker @ chunk-JW6VRERE.js?v=2ab53313:11425
+GameEngine.ts:440    请检查：1) 全局 sectAnchors 是否已配置  2) 节点 archetypes 是否为空数组
+processSettlementNode @ GameEngine.ts:440
+setCurrentNode @ GameEngine.ts:243
+processCalculatorNode @ GameEngine.ts:365
+setCurrentNode @ GameEngine.ts:239
+choose @ GameEngine.ts:522
+handleChoice @ Player.vue:102
+await in handleChoice
+onClick @ Player.vue:258
+callWithErrorHandling @ chunk-JW6VRERE.js?v=2ab53313:2342
+callWithAsyncErrorHandling @ chunk-JW6VRERE.js?v=2ab53313:2349
+invoker @ chunk-JW6VRERE.js?v=2ab53313:11425
+GameEngine.ts:443 📍 步骤5: 距离匹配 (寻找最近门派)
+GameEngine.ts:444    可用门派数: 0
+GameEngine.ts:454 ═══════════════════════════════════════════════════════════
+GameEngine.ts:455 🏆 最终结果
+GameEngine.ts:456 ═══════════════════════════════════════════════════════════
+GameEngine.ts:457    匹配门派: 未知
+GameEngine.ts:458    最近距离: Infinity
+GameEngine.ts:459    向量模长: 21.1187
+GameEngine.ts:460    匹配坐标: (X: 14.0000, Y: 13.0000, Z: 9.0000)
+GameEngine.ts:461 ───────────────────────────────────────────────────────────
+Player.vue:113 🎯 到达结算节点
+ ⏰ 自动保存中...
+ ✅ 项目已保存到硬盘: project.json
+ ❌ 保存失败: 
+saveProjectFile @ workbench.ts?t=1771102974768:192
+await in saveProjectFile
+saveProject @ workbench.ts?t=1771102974768:204
+（匿名） @ workbench.ts?t=1771102974768:216
+idb.js?v=2ab53313:102 Uncaught (in promise) 
+（匿名） @ idb.js?v=2ab53313:102
+method @ idb.js?v=2ab53313:188
+saveProjectBackup @ workspaceDB.ts?t=1771067869764:55
+await in saveProjectBackup
+saveProjectFile @ workbench.ts?t=1771102974768:193
+await in saveProjectFile
+saveProject @ workbench.ts?t=1771102974768:204
+（匿名） @ workbench.ts?t=1771102974768:216

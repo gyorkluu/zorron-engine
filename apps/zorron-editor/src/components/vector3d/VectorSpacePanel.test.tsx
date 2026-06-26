@@ -41,6 +41,44 @@ vi.mock('@/stores/playerStore', () => ({
   usePlayerStore: vi.fn(() => null),
 }));
 
+// Mock i18n: default locale is zh, so tests assert on Chinese strings.
+// This mock returns the key itself for simple lookups, matching the
+// actual translation values used in the components under test.
+vi.mock('@/i18n/useT', () => ({
+  useT: () => ({
+    t: (key: string, params?: Record<string, string | number>) => {
+      const map: Record<string, string> = {
+        'vector3d.enable': '启用三维向量空间',
+        'vector3d.sects.add': '+ 添加门派',
+        'vector3d.sects.del': '删除',
+        'vector3d.sects.title': '门派锚点（{n}）',
+        'vector3d.sects': '{n} 个门派',
+        'vector3d.sects.namePh': '门派名称',
+        'vector3d.sects.titleField': '称号',
+        'vector3d.sects.titlePh': '显示称号',
+        'vector3d.sects.anchor': '锚点向量',
+        'vector3d.sects.anchor.hint': '此门派在三维空间中的位置。',
+        'vector3d.sects.default': '门派 {n}',
+        'vector3d.sects.empty': '暂无门派锚点。添加一个来定义人格原型。',
+        'vector3d.settings': '向量空间',
+        'vector3d.xAxis': 'X 轴',
+        'vector3d.yAxis': 'Y 轴',
+        'vector3d.zAxis': 'Z 轴',
+        'vector3d.title': '三维向量空间',
+        'vector3d.disabled': '向量空间未启用。在项目设置中开启以可视化三维人格空间。',
+      };
+      let str = map[key] ?? key;
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          str = str.replace(`{${k}}`, String(v));
+        }
+      }
+      return str;
+    },
+  }),
+  tt: (key: string) => key,
+}));
+
 describe('VectorSpacePanel', () => {
   beforeEach(() => {
     useProjectStore.getState().reset();
@@ -81,7 +119,7 @@ describe('VectorSpacePanel', () => {
     });
     render(<VectorSpacePanel />);
     expect(screen.getByTestId('vector-space-panel')).toBeInTheDocument();
-    expect(screen.getByText('1 sects')).toBeInTheDocument();
+    expect(screen.getByText('1 个门派')).toBeInTheDocument();
   });
 
   it('uses the player vector when no override is provided', () => {
@@ -128,7 +166,7 @@ describe('VectorSpaceSettings', () => {
 
   it('renders the enable toggle', () => {
     render(<VectorSpaceSettings />);
-    expect(screen.getByText('Enable 3D vector space')).toBeInTheDocument();
+    expect(screen.getByText('启用三维向量空间')).toBeInTheDocument();
   });
 
   it('shows dimension labels and sect editor when enabled', () => {
@@ -143,7 +181,7 @@ describe('VectorSpaceSettings', () => {
     });
     render(<VectorSpaceSettings />);
     expect(screen.getByPlaceholderText('处世')).toBeInTheDocument();
-    expect(screen.getByText('Sect Anchors (0)')).toBeInTheDocument();
+    expect(screen.getByText('门派锚点（0）')).toBeInTheDocument();
   });
 
   it('adds a sect anchor when the add button is clicked', () => {
@@ -157,7 +195,7 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('+ Add Sect'));
+    fireEvent.click(screen.getByText('+ 添加门派'));
     expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(1);
   });
 
@@ -174,13 +212,13 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('Del'));
+    fireEvent.click(screen.getByText('删除'));
     expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(0);
   });
 
   it('toggles the vector space enabled state', () => {
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('Enable 3D vector space'));
+    fireEvent.click(screen.getByText('启用三维向量空间'));
     expect(useProjectStore.getState().settings.vectorSpace.enabled).toBe(true);
   });
 });

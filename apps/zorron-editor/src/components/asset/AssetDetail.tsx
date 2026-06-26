@@ -8,6 +8,7 @@
 import { memo, useState } from 'react';
 import { useAssetStore } from '@/stores/assetStore';
 import { formatFileSize, isLocalAsset } from '@/types/asset';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Props for the AssetDetail. */
@@ -16,6 +17,7 @@ export interface AssetDetailProps {
 }
 
 function AssetDetailImpl({ className }: AssetDetailProps) {
+  const { t } = useT();
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);
   const assets = useAssetStore((s) => s.assets);
   const localAssets = useAssetStore((s) => s.localAssets);
@@ -29,7 +31,7 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
   if (!asset) {
     return (
       <div className={cn('flex items-center justify-center p-4 text-center', className)}>
-        <p className="text-[10px] text-slate-600">Select an asset to view details.</p>
+        <p className="text-[10px] text-slate-600">{t('asset.selectHint')}</p>
       </div>
     );
   }
@@ -56,13 +58,13 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
     <div className={cn('flex flex-col gap-2 border-t border-slate-800/60 p-3', className)}>
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-          Details
+          {t('asset.details')}
         </span>
         <button
           type="button"
           onClick={() => selectAsset(null)}
           className="text-[10px] text-slate-500 hover:text-slate-300"
-          aria-label="Close details"
+          aria-label={t('asset.close')}
         >
           ✕
         </button>
@@ -89,14 +91,14 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
                 local ? 'bg-amber-500/30 text-amber-200' : 'bg-cyan-500/20 text-cyan-200',
               )}
             >
-              {local ? 'local' : 'remote'}
+              {local ? t('asset.local') : t('asset.remote')}
             </span>
           </div>
         </div>
       </div>
 
       <div className="flex items-center justify-between rounded-md border border-slate-800 bg-slate-900/40 px-2 py-1">
-        <span className="text-[10px] text-slate-400">References</span>
+        <span className="text-[10px] text-slate-400">{t('asset.references')}</span>
         <span
           className={cn(
             'text-xs font-semibold',
@@ -108,7 +110,7 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
       </div>
 
       <div className="truncate rounded-md border border-slate-800 bg-slate-900/40 px-2 py-1">
-        <span className="text-[9px] uppercase text-slate-500">URL</span>
+        <span className="text-[9px] uppercase text-slate-500">{t('asset.url')}</span>
         <p className="truncate font-mono text-[10px] text-slate-400">{asset.url}</p>
       </div>
 
@@ -122,7 +124,7 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
             : 'border-rose-700/50 bg-rose-900/20 text-rose-200 hover:bg-rose-900/40',
         )}
       >
-        {confirming ? 'Click again to confirm' : 'Delete asset'}
+        {confirming ? t('asset.confirm') : t('asset.delete')}
       </button>
       {confirming && (
         <button
@@ -130,7 +132,7 @@ function AssetDetailImpl({ className }: AssetDetailProps) {
           onClick={() => setConfirming(false)}
           className="w-full rounded-md border border-slate-700 px-2 py-1 text-[10px] text-slate-300 hover:bg-slate-800"
         >
-          Cancel
+          {t('asset.cancel')}
         </button>
       )}
     </div>

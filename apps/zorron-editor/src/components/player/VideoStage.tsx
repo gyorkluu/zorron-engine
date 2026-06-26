@@ -4,6 +4,7 @@
 
 import { memo, useEffect, useRef } from 'react';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useT } from '@/i18n/useT';
 import type { GameState } from '@/engine/GameEngine';
 
 /** Props for VideoStage. */
@@ -12,6 +13,7 @@ export interface VideoStageProps {
 }
 
 function VideoStageImpl({ state }: VideoStageProps) {
+  const { t } = useT();
   const video = state.video;
   const skipVideo = usePlayerStore((s) => s.skipVideo);
   const ref = useRef<HTMLVideoElement>(null);
@@ -42,7 +44,7 @@ function VideoStageImpl({ state }: VideoStageProps) {
           onClick={skipVideo}
           className="absolute right-4 top-4 rounded-full border border-slate-600 bg-slate-900/70 px-4 py-2 text-sm text-slate-200 backdrop-blur-sm hover:bg-slate-800"
         >
-          Skip
+          {t('player.skip')}
         </button>
       )}
     </div>

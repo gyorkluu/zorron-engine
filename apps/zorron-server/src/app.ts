@@ -1,10 +1,10 @@
 import { Elysia } from 'elysia';
-import cors from '@elysiajs/cors';
 import swagger from '@elysiajs/swagger';
 import { staticPlugin } from '@elysiajs/static';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import { loggerPlugin } from './middleware/logger';
+import { rateLimitPlugin } from './middleware/rateLimit';
 import { authPlugin } from './middleware/auth';
 
 import { healthRoute } from './modules/health/health.route';
@@ -23,13 +23,22 @@ export function createApp() {
       // Global middleware (order matters)
       .use(errorHandler)
       .use(loggerPlugin)
+      .use(rateLimitPlugin())
       .use(authPlugin)
-      .use(
-        cors({
-          origin: env.CORS_ORIGIN,
-          credentials: true,
-        }),
-      )
+      // Custom CORS middleware supporting multiple comma-separated origins.
+      .onRequest(({ request, set }) => {
+        const allowed = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+        const origin = request.headers.get('origin') ?? '';
+        const allowOrigin = allowed.includes(origin) ? origin : allowed[0] ?? '';
+        set.headers['Access-Control-Allow-Origin'] = allowOrigin;
+        set.headers['Access-Control-Allow-Credentials'] = 'true';
+        set.headers['Access-Control-Allow-Methods'] = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
+        set.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, x-request-id';
+        if (request.method === 'OPTIONS') {
+          set.status = 204;
+          return new Response(null, { status: 204 });
+        }
+      })
       .use(
         swagger({
           documentation: {

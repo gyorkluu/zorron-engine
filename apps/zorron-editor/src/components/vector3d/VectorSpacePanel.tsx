@@ -15,6 +15,7 @@ import { memo, useMemo } from 'react';
 import { featureFlags } from '@/lib/featureFlags';
 import { useProjectStore } from '@/stores/projectStore';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useT } from '@/i18n/useT';
 import { VectorScene } from './VectorScene';
 import type { PersonalityVector, SectAnchor } from '@/types/flow';
 import { ZERO_VECTOR } from '@/engine/vectorMath';
@@ -37,6 +38,7 @@ function VectorSpacePanelImpl({
   compact = false,
   className,
 }: VectorSpacePanelProps) {
+  const { t } = useT();
   // Always read the project settings for axis labels and sect anchors.
   const settings = useProjectStore((s) => s.settings);
   // Read the live player vector (if the player is running).
@@ -62,8 +64,7 @@ function VectorSpacePanelImpl({
         className={`rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-center text-xs text-slate-500 ${className ?? ''}`}
         data-testid="vector-space-disabled"
       >
-        Vector space is disabled. Enable it in the project settings to
-        visualize the 3D personality space.
+        {t('vector3d.disabled')}
       </div>
     );
   }
@@ -75,10 +76,10 @@ function VectorSpacePanelImpl({
     >
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          3D Vector Space
+          {t('vector3d.title')}
         </h3>
         <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-medium text-cyan-200">
-          {sects.length} sects
+          {t('vector3d.sects', { n: sects.length })}
         </span>
       </div>
       <VectorScene

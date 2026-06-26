@@ -16,6 +16,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { featureFlags } from '@/lib/featureFlags';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import type { ListProjectsQuery } from '@/types/project';
 
@@ -25,6 +26,7 @@ export interface CloudProjectListProps {
 }
 
 function CloudProjectListImpl({ className }: CloudProjectListProps) {
+  const { t } = useT();
   const navigate = useNavigate();
   const list = useProjectStore((s) => s.list);
   const listLoading = useProjectStore((s) => s.listLoading);
@@ -59,27 +61,27 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
 
   const handleDelete = useCallback(
     async (id: string) => {
-      if (!confirm('Delete this project? This cannot be undone.')) return;
+      if (!confirm(t('cloud.deleteConfirm'))) return;
       try {
         await deleteProject(id);
       } catch {
         // Error is surfaced via the project store.
       }
     },
-    [deleteProject],
+    [deleteProject, t],
   );
 
   const handleCreate = useCallback(async () => {
     setCreating(true);
     try {
-      const detail = await createProject('Untitled Project');
+      const detail = await createProject(t('cloud.untitled'));
       navigate(`/projects/${detail.id}`);
     } catch {
       // Error is surfaced via the project store.
     } finally {
       setCreating(false);
     }
-  }, [createProject, navigate]);
+  }, [createProject, navigate, t]);
 
   const handleSearch = useCallback(() => {
     setPage(1);
@@ -97,10 +99,9 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
         data-testid="cloud-list-unauth"
       >
         <div className="max-w-sm rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-center">
-          <h1 className="mb-2 text-lg font-semibold text-slate-100">Sign in required</h1>
+          <h1 className="mb-2 text-lg font-semibold text-slate-100">{t('cloud.signinTitle')}</h1>
           <p className="mb-4 text-sm text-slate-400">
-            Cloud projects are only available after signing in. Switch to local mode to work
-            without an account.
+            {t('cloud.signinDesc')}
           </p>
           <div className="flex justify-center">
             <WorkspaceSwitcher />
@@ -117,7 +118,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
     >
       {/* Header */}
       <header className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-        <h1 className="text-lg font-bold tracking-tight text-cyan-300">Cloud Projects</h1>
+        <h1 className="text-lg font-bold tracking-tight text-cyan-300">{t('cloud.title')}</h1>
         <div className="flex items-center gap-3">
           <WorkspaceSwitcher />
           <button
@@ -127,7 +128,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
             className="rounded-lg border border-cyan-600/50 bg-cyan-600/20 px-4 py-1.5 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30 disabled:opacity-50"
             data-testid="new-project-button"
           >
-            {creating ? 'Creating...' : 'New Project'}
+            {creating ? t('cloud.creating') : t('cloud.new')}
           </button>
         </div>
       </header>
@@ -141,7 +142,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSearch();
           }}
-          placeholder="Search projects..."
+          placeholder={t('cloud.search')}
           className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
           data-testid="project-search-input"
         />
@@ -150,7 +151,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
           onClick={handleSearch}
           className="rounded-lg border border-slate-700 bg-slate-900/60 px-4 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Search
+          {t('cloud.searchBtn')}
         </button>
       </div>
 
@@ -158,11 +159,11 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
       <div className="px-6 py-4">
         {listLoading && list.length === 0 ? (
           <div className="py-12 text-center text-sm text-slate-500" data-testid="list-loading">
-            Loading projects...
+            {t('cloud.loading')}
           </div>
         ) : list.length === 0 ? (
           <div className="py-12 text-center text-sm text-slate-500" data-testid="list-empty">
-            No projects yet. Click "New Project" to create one.
+            {t('cloud.empty')}
           </div>
         ) : (
           <ul className="space-y-2" data-testid="project-list-items">
@@ -178,13 +179,13 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     </span>
                     {project.isPublished && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-emerald-300">
-                        Published
+                        {t('cloud.published')}
                       </span>
                     )}
                   </div>
                   <div className="mt-0.5 truncate text-xs text-slate-500">
-                    {project.description ?? 'No description'}
-                    {' — Updated '}
+                    {project.description ?? t('cloud.noDesc')}
+                    {` — ${t('cloud.updated')} `}
                     {new Date(project.updatedAt).toLocaleString()}
                   </div>
                 </div>
@@ -195,7 +196,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     className="rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1 text-xs text-slate-200 hover:bg-slate-800"
                     data-testid={`open-project-${project.id}`}
                   >
-                    Open
+                    {t('cloud.open')}
                   </button>
                   <button
                     type="button"
@@ -203,7 +204,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                     className="rounded-md border border-rose-700/50 bg-rose-900/30 px-3 py-1 text-xs text-rose-200 hover:bg-rose-900/50"
                     data-testid={`delete-project-${project.id}`}
                   >
-                    Delete
+                    {t('cloud.delete')}
                   </button>
                 </div>
               </li>
@@ -214,7 +215,7 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
         {/* Pagination */}
         {list.length > 0 && (
           <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-            <span>Page {page}</span>
+            <span>{t('cloud.page', { n: page })}</span>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -222,14 +223,14 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
                 disabled={page <= 1}
                 className="rounded-md border border-slate-700 px-3 py-1 disabled:opacity-30"
               >
-                Prev
+                {t('cloud.prev')}
               </button>
               <button
                 type="button"
                 onClick={() => setPage((p) => p + 1)}
                 className="rounded-md border border-slate-700 px-3 py-1"
               >
-                Next
+                {t('cloud.next')}
               </button>
             </div>
           </div>

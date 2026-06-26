@@ -6,7 +6,7 @@
  * undo/redo/delete keyboard shortcuts.
  */
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -20,6 +20,8 @@ import '@xyflow/react/dist/style.css';
 import { useEditorStore } from '@/stores/editorStore';
 import { nodeTypes } from './nodes';
 import { ZorronEdge } from './edges/ZorronEdge';
+import { ContextMenu, type ContextMenuState } from './ContextMenu';
+import { NodeSearch } from './NodeSearch';
 import type { NodeType } from '@/types/flow';
 
 /** Terminal node types that cannot have outgoing edges. */
@@ -49,6 +51,8 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
 
   /** Connection validation: terminal nodes can't be sources; no duplicates. */
   const isValidConnection: IsValidConnection<Connection & { source: string; target: string }> =
@@ -93,7 +97,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  /** Keyboard shortcuts: undo/redo/delete. */
+  /** Keyboard shortcuts: undo/redo/delete/copy/paste/search. */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -117,6 +121,29 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
       } else if (isMod && e.key.toLowerCase() === 'y') {
         e.preventDefault();
         redo();
+      } else if (isMod && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        setShowSearch(true);
+      } else if (isMod && e.key.toLowerCase() === 'c') {
+        // Copy selected node.
+        const selectedId = useEditorStore.getState().selectedNodeId;
+        if (selectedId) {
+          e.preventDefault();
+          useEditorStore.getState().copyNode(selectedId);
+        }
+      } else if (isMod && e.key.toLowerCase() === 'v') {
+        // Paste near the currently selected node.
+        const selectedId = useEditorStore.getState().selectedNodeId;
+        if (selectedId) {
+          const node = useEditorStore.getState().nodes.find((n) => n.id === selectedId);
+          if (node) {
+            e.preventDefault();
+            useEditorStore.getState().pasteNode({
+              x: (node.position?.x ?? 0) + 40,
+              y: (node.position?.y ?? 0) + 40,
+            });
+          }
+        }
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         const selectedId = useEditorStore.getState().selectedNodeId;
         if (selectedId) {
@@ -141,6 +168,18 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
   const onPaneClick = useCallback(() => {
     selectNode(null);
   }, [selectNode]);
+
+  /** Right-click on a node opens the node context menu. */
+  const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
+  }, []);
+
+  /** Right-click on the pane opens the canvas context menu. */
+  const onPaneContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY, nodeId: null });
+  }, []);
 
   const minimapNodeColor = useCallback((n: Node) => {
     const accents: Record<string, string> = {
@@ -176,6 +215,8 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         onConnect={onConnect}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
+        onNodeContextMenu={onNodeContextMenu}
+        onPaneContextMenu={onPaneContextMenu}
         isValidConnection={isValidConnection}
         fitView
         proOptions={{ hideAttribution: true }}
@@ -189,6 +230,13 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
           maskColor="rgba(2,6,23,0.7)"
         />
       </ReactFlow>
+      {contextMenu ? (
+        <ContextMenu
+          state={contextMenu}
+          onClose={() => setContextMenu(null)}
+        />
+      ) : null}
+      {showSearch ? <NodeSearch onClose={() => setShowSearch(false)} /> : null}
     </div>
   );
 }

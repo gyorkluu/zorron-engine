@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "title": "我的游戏",
+    "author": "作者名",
+    "version": "1.0"
+  },
+  "globalVariables": [
+    {
+      "name": "money",
+      "initialValue": 0
+    },
+    {
+      "name": "hp",
+      "initialValue": 100
+    }
+  ],
+  "fragments": [
+    {
+      "id": "frag_001",
+      "name": "碎片名称",
+      "description": "碎片描述",
+      "relatedSectIds": [
+        "sect_001"
+      ]
+    }
+  ],
+  "sectAnchors": [
+    {
+      "id": "sect_001",
+      "name": "门派名称",
+      "anchor": {
+        "x": 5,
+        "y": 0,
+        "z": 0
+      },
+      "resultTexts": {
+        "layerA": "结果文案A",
+        "layerB": "结果文案B",
+        "layerC": "彩蛋文案（可选）"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "id": "start_001",
+      "type": "start",
+      "position": {
+        "x": 100,
+        "y": 50
+      },
+      "data": {
+        "label": "游戏开始",
+        "title": "游戏标题",
+        "cover": ""
+      }
+    },
+    {
+      "id": "scene_001",
+      "type": "scene",
+      "position": {
+        "x": 100,
+        "y": 200
+      },
+      "data": {
+        "label": "第一幕",
+        "dialogue": "剧情文本...",
+        "speaker": "角色名",
+        "interactionType": "tap",
+        "background": "",
+        "choices": [
+          {
+            "id": "choice_001",
+            "text": "选项文本",
+            "vector": {
+              "x": 1,
+              "y": 0,
+              "z": 0
+            },
+            "dropFragmentId": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "calc_001",
+      "type": "calculator",
+      "position": {
+        "x": 100,
+        "y": 400
+      },
+      "data": {
+        "label": "向量应用",
+        "description": "应用选项的向量偏移"
+      }
+    },
+    {
+      "id": "logic_001",
+      "type": "logic",
+      "position": {
+        "x": 300,
+        "y": 400
+      },
+      "data": {
+        "label": "碎片检测",
+        "checkType": "count",
+        "countThreshold": 3,
+        "operator": ">="
+      }
+    },
+    {
+      "id": "settle_001",
+      "type": "settlement",
+      "position": {
+        "x": 100,
+        "y": 600
+      },
+      "data": {
+        "label": "最终审判",
+        "modifiers": [],
+        "archetypes": []
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_001",
+      "source": "start_001",
+      "target": "scene_001",
+      "sourceHandle": null
+    },
+    {
+      "id": "edge_002",
+      "source": "scene_001",
+      "target": "calc_001",
+      "sourceHandle": "choice_001"
+    }
+  ],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  }
+}

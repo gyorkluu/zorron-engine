@@ -16,6 +16,7 @@ import type { SimulationReport } from '@/engine/simulator';
 import { useEditorStore } from '@/stores/editorStore';
 import { NODE_TYPE_LABELS } from '@/types/flow';
 import { downloadJson } from '@/utils/fileIO';
+import { useT } from '@/i18n/useT';
 
 /** Props for the SimulationReport. */
 export interface SimulationReportProps {
@@ -45,6 +46,7 @@ const BAR_COLORS = [
 ];
 
 function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
+  const { t } = useT();
   const nodes = useEditorStore((s) => s.nodes);
 
   /** Build the settlement distribution bars. */
@@ -108,24 +110,24 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
     >
       {/* Summary */}
       <div className="grid grid-cols-4 gap-2">
-        <StatCard label="Runs" value={report.totalRuns} color="text-cyan-300" />
+        <StatCard label={t('sim.stat.runs')} value={report.totalRuns} color="text-cyan-300" />
         <StatCard
-          label="Settlements"
+          label={t('sim.stat.settlements')}
           value={Object.values(report.settlementHits).reduce((a, b) => a + b, 0)}
           color="text-emerald-300"
         />
-        <StatCard label="Dead ends" value={report.deadEnds} color="text-amber-300" />
-        <StatCard label="Timeouts" value={report.timedOuts} color="text-rose-300" />
+        <StatCard label={t('sim.stat.deadEnds')} value={report.deadEnds} color="text-amber-300" />
+        <StatCard label={t('sim.stat.timeouts')} value={report.timedOuts} color="text-rose-300" />
       </div>
 
       {/* Settlement distribution chart */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Settlement Distribution
+          {t('sim.distribution')}
         </h3>
         {settlementBars.length === 0 ? (
           <p className="py-4 text-center text-xs text-slate-500">
-            No settlement nodes were reached.
+            {t('sim.noSettlements')}
           </p>
         ) : (
           <div className="space-y-2">
@@ -155,18 +157,18 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
       {/* Vector statistics */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Vector Statistics
+          {t('sim.vectorStats')}
         </h3>
         <div className="grid grid-cols-3 gap-2 text-center">
           <VectorStat
-            label="Axis"
-            value="Mean ± StdDev"
+            label={t('sim.axis')}
+            value={t('sim.meanStd')}
             header
           />
           <VectorStat label="X" value="" header />
           <VectorStat label="Y" value="" header />
           <VectorStat
-            label="Mean"
+            label={t('sim.mean')}
             value={report.meanVector.x.toFixed(2)}
           />
           <VectorStat
@@ -178,7 +180,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
             value={report.meanVector.z.toFixed(2)}
           />
           <VectorStat
-            label="StdDev"
+            label={t('sim.stddev')}
             value={report.stdDevVector.x.toFixed(2)}
           />
           <VectorStat
@@ -195,7 +197,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
       {/* Node hit rates */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Node Reachability
+          {t('sim.reachability')}
         </h3>
         <div className="space-y-1">
           {nodeRows.map((row) => {
@@ -224,7 +226,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
           })}
           {nodeRows.length === 0 && (
             <p className="py-2 text-center text-xs text-slate-500">
-              No nodes in the flow.
+              {t('sim.noNodes')}
             </p>
           )}
         </div>
@@ -237,7 +239,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
           onClick={handleExport}
           className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Export Report
+          {t('sim.export')}
         </button>
         {onClose && (
           <button
@@ -245,7 +247,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
             onClick={onClose}
             className="flex-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
           >
-            Close
+            {t('sim.close')}
           </button>
         )}
       </div>

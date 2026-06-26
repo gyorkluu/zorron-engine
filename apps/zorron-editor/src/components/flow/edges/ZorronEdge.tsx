@@ -9,6 +9,7 @@ import {
   getBezierPath,
   type EdgeProps,
 } from '@xyflow/react';
+import { tt } from '@/i18n/useT';
 
 function ZorronEdgeImpl({
   id,
@@ -61,7 +62,7 @@ function ZorronEdgeImpl({
               className="rounded-full px-1.5 py-0.5 text-[9px] font-medium"
               style={{ background: `${color}33`, color }}
             >
-              {sourceHandleId ?? 'flow'}
+              {sourceHandleId ?? tt('nodeFallback.edge')}
             </span>
           )}
         </div>

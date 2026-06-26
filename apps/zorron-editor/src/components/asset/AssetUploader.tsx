@@ -8,6 +8,7 @@
 import { memo, useRef, useState, type DragEvent } from 'react';
 import { useAssetStore } from '@/stores/assetStore';
 import { useProjectStore } from '@/stores/projectStore';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Props for the AssetUploader. */
@@ -17,6 +18,7 @@ export interface AssetUploaderProps {
 }
 
 function AssetUploaderImpl({ className }: AssetUploaderProps) {
+  const { t } = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const upload = useAssetStore((s) => s.uploadAssetWithFallback);
   const isUploading = useAssetStore((s) => s.isUploading);
@@ -84,9 +86,9 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
         <p className="text-xs font-medium text-slate-300">
-          {isUploading ? 'Uploading...' : 'Upload or drop files'}
+          {isUploading ? t('asset.uploading') : t('asset.upload')}
         </p>
-        <p className="text-[10px] text-slate-500">Image / Audio / Video / Font</p>
+        <p className="text-[10px] text-slate-500">{t('asset.uploadHint')}</p>
       </div>
       <input
         ref={inputRef}

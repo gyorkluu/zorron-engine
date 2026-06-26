@@ -44,6 +44,11 @@ const envSchema = z.object({
   FEATURE_VECTOR_3D: z.coerce.boolean().default(false),
   VECTOR_SECT_COUNT: z.coerce.number().default(20),
   FEATURE_CLOUD_SYNC: z.coerce.boolean().default(true),
+
+  // Rate limiting (in-memory sliding window per IP+route bucket).
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
+  RATE_LIMIT_MAX: z.coerce.number().default(100),
+  RATE_LIMIT_AUTH_MAX: z.coerce.number().default(10),
 });
 
 /**

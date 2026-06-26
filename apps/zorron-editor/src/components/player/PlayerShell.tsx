@@ -5,9 +5,11 @@
  * the current node type. Also manages the audio manager lifecycle.
  */
 
-import { useEffect, memo } from 'react';
+import { useEffect, memo, useCallback } from 'react';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useT } from '@/i18n/useT';
 import { getAudioManager } from '@/engine/AudioManager';
+import { resolveMediaUrl } from '@/lib/media';
 import { StartStage } from './StartStage';
 import { SceneStage } from './SceneStage';
 import { VideoStage } from './VideoStage';
@@ -24,11 +26,14 @@ export interface PlayerShellProps {
 }
 
 function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
+  const { t } = useT();
   const state = usePlayerStore((s) => s.state);
   const isRunning = usePlayerStore((s) => s.isRunning);
   const start = usePlayerStore((s) => s.start);
   const restart = usePlayerStore((s) => s.restart);
+  const selectSettlementButton = usePlayerStore((s) => s.selectSettlementButton);
   const stop = usePlayerStore((s) => s.stop);
+  const globalBgmUrl = resolveMediaUrl(flowData.settings?.bgmUrl);
 
   // Boot the engine on mount or when flowData changes.
   useEffect(() => {
@@ -40,29 +45,61 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flowData]);
 
-  // Drive BGM from the current scene.
+  // Unlock audio on first user gesture inside the player shell.
+  const unlockAudio = useCallback(() => {
+    void getAudioManager().unlock();
+  }, []);
+
+  // Drive BGM from the current scene or project settings.
   useEffect(() => {
-    if (state?.scene?.bgm) {
-      getAudioManager().playBgm(state.scene.bgm);
+    const sceneBgm = resolveMediaUrl(
+      state?.scene?.bgm,
+      state?.scene?.isBackgroundRemote,
+    );
+    const url = sceneBgm ?? globalBgmUrl;
+    if (url) {
+      getAudioManager().playBgm(url);
+    } else if (state?.currentNodeType === 'settlement') {
+      getAudioManager().stopAll();
     }
-  }, [state?.scene?.bgm]);
+  }, [state?.scene?.bgm, state?.scene?.isBackgroundRemote, state?.currentNodeType, globalBgmUrl]);
+
+  // Drive one-shot SFX when entering a new scene.
+  useEffect(() => {
+    const sfxUrl = resolveMediaUrl(state?.scene?.sfx);
+    if (sfxUrl) {
+      getAudioManager().playSfx(sfxUrl);
+    }
+  }, [state?.scene?.sfx]);
 
   if (!isRunning || !state) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-slate-950 text-slate-400">
-        Loading...
+        {t('player.loading')}
       </div>
     );
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-slate-950">
+    <div
+      className="relative h-full w-full overflow-hidden bg-slate-950"
+      onClick={unlockAudio}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') unlockAudio();
+      }}
+    >
       {state.currentNodeType === 'start' && <StartStage state={state} />}
       {state.currentNodeType === 'scene' && <SceneStage state={state} />}
       {state.currentNodeType === 'video' && <VideoStage state={state} />}
       {state.currentNodeType === 'link' && <LinkStage state={state} />}
       {state.currentNodeType === 'settlement' && (
-        <SettlementStage state={state} onRestart={restart} />
+        <SettlementStage
+          state={state}
+          onRestart={restart}
+          onSettlementButton={selectSettlementButton}
+        />
       )}
 
       {onExit && (
@@ -71,7 +108,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
           onClick={onExit}
           className="absolute left-4 top-4 z-10 rounded-full border border-slate-600 bg-slate-900/70 px-4 py-2 text-xs text-slate-200 backdrop-blur-sm hover:bg-slate-800"
         >
-          Exit
+          {t('player.exit')}
         </button>
       )}
     </div>

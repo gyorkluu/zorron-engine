@@ -6,22 +6,24 @@
 
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
+import { useT } from '@/i18n/useT';
 import { NodeShell, type ZorronNodeProps } from './NodeShell';
 import type { LogicNodeData } from '@/types/flow';
 
 function LogicNodeImpl({ data, selected }: ZorronNodeProps) {
+  const { t } = useT();
   const d = data as LogicNodeData;
   return (
     <NodeShell
       type="logic"
-      label={d.label ?? 'Logic'}
+      label={d.label ?? t('nodeFallback.logic')}
       selected={selected}
       showSource={false}
       icon="?"
     >
       <div className="space-y-1">
         <p className="text-amber-200/80">
-          {d.checkType ?? 'variable'} check
+          {t('nodeFallback.logicCheck', { type: d.checkType ?? 'variable' })}
         </p>
         {d.varName && (
           <p className="font-mono text-[11px] text-slate-400">

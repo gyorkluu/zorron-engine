@@ -1,0 +1,381 @@
+{
+  "_说明": "剑网3大唐20人格配置 (基于Zorron Engine v1.3.1规范)",
+  "_坐标系定义": {
+    "X轴_处世": "负值=出世/隐逸 (-10), 正值=入世/进取 (+10)",
+    "Y轴_立场": "负值=混沌/自由 (-10), 正值=守序/正义 (+10)",
+    "Z轴_性情": "负值=感性/热情 (-10), 正值=理性/冷静 (+10)"
+  },
+  "fragments": [
+    {
+      "id": "frag_scroll",
+      "name": "执行官的残卷",
+      "description": "记载了‘四星汇聚，弓月不坠’的预言，唯有药理、步法、神兵、禅音合一可破局。",
+      "relatedSectIds": [
+        "yantian",
+        "lingxue"
+      ]
+    },
+    {
+      "id": "frag_wine",
+      "name": "叶麟的浮生醉",
+      "description": "酒中透着刺鼻的金石味，是叶蒙将军为叶麟及冠时预备的烈酒。",
+      "relatedSectIds": [
+        "cangjian",
+        "badao",
+        "gaibang"
+      ]
+    },
+    {
+      "id": "frag_needle",
+      "name": "裴元的断针",
+      "description": "裴元在极度疲惫下折断的长针，叹息传统的穴位已无法封住此邪毒。",
+      "relatedSectIds": [
+        "wanhua",
+        "yaozong"
+      ]
+    },
+    {
+      "id": "frag_note",
+      "name": "苏白月的笔记",
+      "description": "泛黄的笔记记载了苍灵草水能产生短暂的‘气息全无’假死现象。",
+      "relatedSectIds": [
+        "yaozong",
+        "wanhua"
+      ]
+    },
+    {
+      "id": "frag_secret",
+      "name": "唐简的遗泽",
+      "description": "残破典籍中夹着关于苍灵草能‘隐匿生机’的秘辛。",
+      "relatedSectIds": [
+        "tangmen",
+        "yantian"
+      ]
+    },
+    {
+      "id": "frag_move",
+      "name": "公孙二娘的变招",
+      "description": "萧白胭曾言，二娘的变招往往生于绝境，理论上可克制任何奇功。",
+      "relatedSectIds": [
+        "qixiu",
+        "wudu"
+      ]
+    },
+    {
+      "id": "frag_drum",
+      "name": "燕燕的拨浪鼓",
+      "description": "不齐整的节拍，是她在火雷阵中生存的节奏。",
+      "relatedSectIds": [
+        "qixiu",
+        "wanling"
+      ]
+    },
+    {
+      "id": "frag_porcelain",
+      "name": "唐怀仁的碎瓷",
+      "description": "火雷阵残骸显示，震动中存在一个完全寂静的视觉盲区。",
+      "relatedSectIds": [
+        "tangmen",
+        "lingxue"
+      ]
+    },
+    {
+      "id": "frag_sword_intent",
+      "name": "叶英的剑意",
+      "description": "剑气凝霜，你察觉到谢采极度畏惧这种寒意，这似乎是他功法的克星。",
+      "relatedSectIds": [
+        "cangjian",
+        "chunyang"
+      ]
+    },
+    {
+      "id": "frag_rumor",
+      "name": "杏花谷的传闻",
+      "description": "西域杏花谷有一种遇火则结冰的玄铁矿石。",
+      "relatedSectIds": [
+        "mingjiao",
+        "cangjian"
+      ]
+    },
+    {
+      "id": "frag_breath_1",
+      "name": "小沙弥的异常",
+      "description": "极度惊恐下，小沙弥的呼吸声呈现出一种奇特的规律。",
+      "relatedSectIds": [
+        "shaolin",
+        "daozong"
+      ]
+    },
+    {
+      "id": "frag_breath_2",
+      "name": "渡法的呼吸",
+      "description": "渡法圆寂前的三次呼吸极其沉闷，竟能让周围狂暴的人群瞬间恢复神智。",
+      "relatedSectIds": [
+        "shaolin",
+        "chunyang"
+      ]
+    }
+  ],
+  "sectAnchors": [
+    {
+      "id": "tiance",
+      "name": "天策",
+      "anchor": {
+        "x": 12,
+        "y": 12,
+        "z": 12
+      },
+      "resultTexts": {
+        "layerA": "【家国守护】长枪独守大唐魂",
+        "layerB": "绝对的正统与责任"
+      }
+    },
+    {
+      "id": "lingxue",
+      "name": "凌雪阁",
+      "anchor": {
+        "x": 14,
+        "y": 10,
+        "z": 16
+      },
+      "resultTexts": {
+        "layerA": "【绝对利刃】未悔补天裂",
+        "layerB": "抹去情感的帝王工具"
+      }
+    },
+    {
+      "id": "duanshi",
+      "name": "段氏",
+      "anchor": {
+        "x": 10,
+        "y": 14,
+        "z": 8
+      },
+      "resultTexts": {
+        "layerA": "【世家风范】世第含章",
+        "layerB": "家族规则与掌控力"
+      }
+    },
+    {
+      "id": "cangyun",
+      "name": "苍云",
+      "anchor": {
+        "x": 12,
+        "y": 14,
+        "z": -8
+      },
+      "resultTexts": {
+        "layerA": "【悲情守望】誓言为盾",
+        "layerB": "铁骨下的深沉痛楚"
+      }
+    },
+    {
+      "id": "badao",
+      "name": "霸刀",
+      "anchor": {
+        "x": 14,
+        "y": 8,
+        "z": -12
+      },
+      "resultTexts": {
+        "layerA": "【傲骨家族】誓将浮名敬死生",
+        "layerB": "重情重义的北方汉子"
+      }
+    },
+    {
+      "id": "cangjian",
+      "name": "藏剑",
+      "anchor": {
+        "x": 8,
+        "y": 12,
+        "z": -10
+      },
+      "resultTexts": {
+        "layerA": "【君子如风】心剑逍遥",
+        "layerB": "虽守礼法，更重情怀"
+      }
+    },
+    {
+      "id": "tangmen",
+      "name": "唐门",
+      "anchor": {
+        "x": 12,
+        "y": -10,
+        "z": 14
+      },
+      "resultTexts": {
+        "layerA": "【精密算计】暴雨飞星",
+        "layerB": "虽身在江湖，行事却诡秘莫测"
+      }
+    },
+    {
+      "id": "yaozong",
+      "name": "药宗",
+      "anchor": {
+        "x": 10,
+        "y": -12,
+        "z": 8
+      },
+      "resultTexts": {
+        "layerA": "【敢试生死】医者仁心",
+        "layerB": "打破常规的实用主义救赎"
+      }
+    },
+    {
+      "id": "gaibang",
+      "name": "丐帮",
+      "anchor": {
+        "x": 14,
+        "y": -14,
+        "z": -10
+      },
+      "resultTexts": {
+        "layerA": "【豪迈乐天】醉卧江湖",
+        "layerB": "极致的自由与兄弟情"
+      }
+    },
+    {
+      "id": "mingjiao",
+      "name": "明教",
+      "anchor": {
+        "x": 10,
+        "y": -10,
+        "z": -14
+      },
+      "resultTexts": {
+        "layerA": "【圣火信仰】爱恨分明",
+        "layerB": "极端的善恶观与宗教热情"
+      }
+    },
+    {
+      "id": "qixiu",
+      "name": "七秀",
+      "anchor": {
+        "x": 8,
+        "y": -6,
+        "z": -16
+      },
+      "resultTexts": {
+        "layerA": "【至情至性】一舞剑器",
+        "layerB": "以情入道，刚烈不屈"
+      }
+    },
+    {
+      "id": "yantian",
+      "name": "衍天宗",
+      "anchor": {
+        "x": -14,
+        "y": 12,
+        "z": 12
+      },
+      "resultTexts": {
+        "layerA": "【天道观测】星占太乙",
+        "layerB": "绝对的旁观者视角"
+      }
+    },
+    {
+      "id": "chunyang",
+      "name": "纯阳",
+      "anchor": {
+        "x": -10,
+        "y": 10,
+        "z": 14
+      },
+      "resultTexts": {
+        "layerA": "【清冷问道】坐忘无我",
+        "layerB": "道法自然的逻辑秩序"
+      }
+    },
+    {
+      "id": "shaolin",
+      "name": "少林",
+      "anchor": {
+        "x": -8,
+        "y": 16,
+        "z": 6
+      },
+      "resultTexts": {
+        "layerA": "【佛门清规】晨钟暮鼓",
+        "layerB": "虽怀慈悲，更守戒律"
+      }
+    },
+    {
+      "id": "wanhua",
+      "name": "万花",
+      "anchor": {
+        "x": -8,
+        "y": 6,
+        "z": -10
+      },
+      "resultTexts": {
+        "layerA": "【避世理想】只笑桃源",
+        "layerB": "不愿同流合污的艺术洁癖"
+      }
+    },
+    {
+      "id": "changge",
+      "name": "长歌",
+      "anchor": {
+        "x": -6,
+        "y": 12,
+        "z": -6
+      },
+      "resultTexts": {
+        "layerA": "【儒门风骨】相知莫问",
+        "layerB": "居庙堂之高的文人情怀"
+      }
+    },
+    {
+      "id": "daozong",
+      "name": "刀宗",
+      "anchor": {
+        "x": -12,
+        "y": -10,
+        "z": 12
+      },
+      "resultTexts": {
+        "layerA": "【孤绝求败】断雨残云",
+        "layerB": "只求武道极致，不问世俗对错"
+      }
+    },
+    {
+      "id": "wudu",
+      "name": "五毒",
+      "anchor": {
+        "x": -8,
+        "y": -12,
+        "z": 8
+      },
+      "resultTexts": {
+        "layerA": "【深情执念】敢爱敢恨",
+        "layerB": "不通教化，唯爱至上 (注：原设定为感性，但在V3.1移至此象限以平衡)"
+      }
+    },
+    {
+      "id": "penglai",
+      "name": "蓬莱",
+      "anchor": {
+        "x": -12,
+        "y": -8,
+        "z": -6
+      },
+      "resultTexts": {
+        "layerA": "【云端逍遥】方外之仙",
+        "layerB": "疏离冷淡，不受拘束"
+      }
+    },
+    {
+      "id": "wanling",
+      "name": "万灵",
+      "anchor": {
+        "x": -6,
+        "y": -6,
+        "z": -12
+      },
+      "resultTexts": {
+        "layerA": "【山海稚心】与兽同游",
+        "layerB": "纯真直觉，原始野性"
+      }
+    }
+  ]
+}

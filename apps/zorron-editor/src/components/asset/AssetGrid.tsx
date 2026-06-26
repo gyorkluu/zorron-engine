@@ -10,6 +10,7 @@ import { memo, type DragEvent } from 'react';
 import type { Asset, AssetType } from '@/types/asset';
 import { formatFileSize, isLocalAsset } from '@/types/asset';
 import { useAssetStore } from '@/stores/assetStore';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Accent color per asset type for the card badge. */
@@ -69,6 +70,7 @@ function TypeIcon({ type }: { type: AssetType }) {
 
 /** A single asset card. */
 function AssetCard({ asset }: { asset: Asset }) {
+  const { t } = useT();
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);
   const selectAsset = useAssetStore((s) => s.selectAsset);
   const isSelected = selectedAssetId === asset.id;
@@ -116,7 +118,7 @@ function AssetCard({ asset }: { asset: Asset }) {
         </span>
         {local && (
           <span className="absolute right-1 top-1 rounded bg-amber-500/30 px-1 py-0.5 text-[9px] font-semibold text-amber-200">
-            local
+            {t('asset.local')}
           </span>
         )}
       </div>
@@ -133,13 +135,14 @@ export interface AssetGridProps {
 }
 
 function AssetGridImpl({ assets, className }: AssetGridProps) {
+  const { t } = useT();
   if (assets.length === 0) {
     return (
       <div className={cn('flex flex-1 items-center justify-center p-6 text-center', className)}>
         <div>
-          <p className="text-xs font-medium text-slate-400">No assets</p>
+          <p className="text-xs font-medium text-slate-400">{t('asset.empty')}</p>
           <p className="mt-1 text-[10px] text-slate-600">
-            Upload a file or adjust your filters.
+            {t('asset.emptyHint')}
           </p>
         </div>
       </div>

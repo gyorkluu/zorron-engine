@@ -3,6 +3,7 @@
  */
 
 import { memo } from 'react';
+import { useT } from '@/i18n/useT';
 import type { GameState } from '@/engine/GameEngine';
 
 /** Props for LinkStage. */
@@ -11,6 +12,7 @@ export interface LinkStageProps {
 }
 
 function LinkStageImpl({ state }: LinkStageProps) {
+  const { t } = useT();
   const link = state.link;
   if (!link) return null;
 
@@ -34,7 +36,7 @@ function LinkStageImpl({ state }: LinkStageProps) {
         rel="noopener noreferrer"
         className="rounded-full bg-cyan-500/20 px-6 py-3 text-sm font-medium text-cyan-200 hover:bg-cyan-500/30"
       >
-        Open link
+        {t('player.openLink')}
       </a>
     </div>
   );

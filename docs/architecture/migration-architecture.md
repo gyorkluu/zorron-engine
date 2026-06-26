@@ -540,3 +540,60 @@ volumes:
 6. **阶段 6：3D 可视化与打磨**
    - 使用 React Three Fiber 实现可选 3D 向量视图。
    - 完善埋点、错误处理、移动端 H5 适配。
+
+---
+
+## 12. 迁移状态更新（2026-06）
+
+### 已完成项
+
+#### 基础架构迁移
+- ✅ Monorepo 结构（pnpm workspace）已建立
+- ✅ React 18 + Vite 前端已从 Vue 3 完整迁移
+- ✅ ElysiaJS + Bun 后端已搭建
+- ✅ Drizzle ORM + PostgreSQL 16 数据层已就绪
+- ✅ Redis 缓存/队列已集成
+
+#### 功能迁移
+- ✅ 8 种节点类型（start, scene, logic, setter, calculator, settlement, video, link）全部迁移
+- ✅ 3 种交互方式（tap, hold, slash）已实现
+- ✅ 三维向量空间（Canvas 等距投影）已迁移
+- ✅ 蒙特卡洛模拟器已迁移（Mulberry32 PRNG）
+- ✅ H5 Embed SDK（UMD + ESM）已就绪
+- ✅ Feature Flags（vector3d, cloudSync）已实现
+
+#### 国际化
+- ✅ 中英文双语界面已实现（中文默认）
+- ✅ 轻量级 i18n 方案（translations + localeStore + useT）
+- ✅ 200+ 翻译键覆盖全部 UI
+
+#### 示例数据
+- ✅ 「江湖奇遇录」完整示例项目已迁移（9 节点 + 10 边 + 3 门派）
+- ✅ 后端 seed.ts 已更新
+
+### P1 优化（已完成）
+- ✅ 编辑器内预览播放器
+- ✅ 首次使用引导教程
+- ✅ 右键上下文菜单（复制/粘贴/删除/添加节点）
+- ✅ 节点搜索（Ctrl+P 快速跳转）
+- ✅ CI/CD 流水线（GitHub Actions：lint → test → build → docker）
+
+### P2 优化（已完成）
+- ✅ 变量管理面板（含引用计数）
+- ✅ 碎片系统可视化
+- ✅ 模板库（预设模板一键插入）
+- ✅ 可视化条件构建器
+- ✅ 版本历史快照
+
+### 技术债务清理（已完成）
+- ✅ 速率限制中间件（TD-1）
+- ✅ 补充 Inspector 表单和播放器 Stage 组件测试（TD-2）
+- ✅ 迁移文档更新（TD-3）
+- ✅ OpenAPI 自动导出（TD-4）
+
+### 待办事项（P3 及以后）
+- ⬜ 用户权限体系（RBAC）
+- ⬜ 多人协作编辑（CRDT）
+- ⬜ 资源 CDN 分发
+- ⬜ 数据分析仪表盘
+- ⬜ 移动端适配优化

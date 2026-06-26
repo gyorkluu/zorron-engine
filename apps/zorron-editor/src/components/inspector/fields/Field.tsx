@@ -7,6 +7,7 @@
 
 import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/useT';
 
 /** Field wrapper with a label. */
 export function Field({
@@ -83,6 +84,7 @@ export function UrlField({
   onChange: (value: string) => void;
   placeholder?: string;
 }) {
+  const { t } = useT();
   return (
     <div
       onDrop={(e) => {
@@ -103,12 +105,12 @@ export function UrlField({
       <input
         type="url"
         value={value ?? ''}
-        placeholder={placeholder ?? 'https://...'}
+        placeholder={placeholder ?? t('field.urlPlaceholder')}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none transition-colors focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
       />
       {value && (
-        <span className="flex-shrink-0 text-[10px] text-emerald-400">set</span>
+        <span className="flex-shrink-0 text-[10px] text-emerald-400">{t('field.set')}</span>
       )}
     </div>
   );

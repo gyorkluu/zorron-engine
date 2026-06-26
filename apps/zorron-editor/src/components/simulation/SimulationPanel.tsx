@@ -18,6 +18,7 @@ import {
   type SimulationConfig,
 } from '@/engine/simulator';
 import { SimulationReportView } from './SimulationReport';
+import { useT } from '@/i18n/useT';
 
 /** Props for the SimulationPanel. */
 export interface SimulationPanelProps {
@@ -28,6 +29,7 @@ export interface SimulationPanelProps {
 }
 
 function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
+  const { t } = useT();
   const [runs, setRuns] = useState(DEFAULT_SIMULATION_CONFIG.runs);
   const [seed, setSeed] = useState('');
   const [strategy, setStrategy] = useState<SimulationConfig['strategy']>('random');
@@ -85,7 +87,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <h2 className="text-sm font-semibold text-slate-100">
-            Monte Carlo Simulation
+            {t('sim.title')}
           </h2>
           <button
             type="button"
@@ -103,14 +105,13 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
           ) : (
             <div className="space-y-4 p-4" data-testid="simulation-config">
               <p className="text-xs text-slate-400">
-                Run random traversals of the current flow graph to discover dead
-                ends, unreachable nodes and settlement distribution imbalances.
+                {t('sim.desc')}
               </p>
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="block space-y-1">
                   <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Runs
+                    {t('sim.runs')}
                   </span>
                   <input
                     type="number"
@@ -123,13 +124,13 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                 </label>
                 <label className="block space-y-1">
                   <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    Seed (optional)
+                    {t('sim.seed')}
                   </span>
                   <input
                     type="text"
                     value={seed}
                     onChange={(e) => setSeed(e.target.value)}
-                    placeholder="random"
+                    placeholder={t('sim.seedPh')}
                     className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
                   />
                 </label>
@@ -137,7 +138,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
 
               <label className="block space-y-1">
                 <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Strategy
+                  {t('sim.strategy')}
                 </span>
                 <select
                   value={strategy}
@@ -146,8 +147,8 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                   }
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 outline-none focus:border-cyan-500/60"
                 >
-                  <option value="random">Random (uniform)</option>
-                  <option value="weighted">Weighted (by choice order)</option>
+                  <option value="random">{t('sim.strategy.random')}</option>
+                  <option value="weighted">{t('sim.strategy.weighted')}</option>
                 </select>
               </label>
 
@@ -164,7 +165,7 @@ function SimulationPanelImpl({ open, onClose }: SimulationPanelProps) {
                 className="w-full rounded-lg border border-cyan-600/50 bg-cyan-600/20 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-600/30 disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="simulation-run-button"
               >
-                {running ? 'Running...' : 'Run Simulation'}
+                {running ? t('sim.running') : t('sim.run')}
               </button>
             </div>
           )}

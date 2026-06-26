@@ -3,19 +3,21 @@
  */
 
 import { memo } from 'react';
+import { useT } from '@/i18n/useT';
 import { NodeShell, type ZorronNodeProps } from './NodeShell';
 import type { SceneNodeData } from '@/types/flow';
 
 function SceneNodeImpl({ data, selected }: ZorronNodeProps) {
+  const { t } = useT();
   const d = data as SceneNodeData;
   const choices = d.choices ?? [];
   return (
-    <NodeShell type="scene" label={d.label ?? 'Scene'} selected={selected} icon="D">
+    <NodeShell type="scene" label={d.label ?? t('nodeFallback.scene')} selected={selected} icon="D">
       <div className="space-y-1.5">
         {d.dialogue ? (
           <p className="line-clamp-2 text-slate-300">{d.dialogue}</p>
         ) : (
-          <p className="italic text-slate-500">No dialogue yet</p>
+          <p className="italic text-slate-500">{t('nodeFallback.noDialogue')}</p>
         )}
         {choices.length > 0 && (
           <ul className="space-y-1">
@@ -29,7 +31,7 @@ function SceneNodeImpl({ data, selected }: ZorronNodeProps) {
               </li>
             ))}
             {choices.length > 3 && (
-              <li className="text-[10px] text-slate-500">+{choices.length - 3} more</li>
+              <li className="text-[10px] text-slate-500">{t('nodeFallback.more', { n: choices.length - 3 })}</li>
             )}
           </ul>
         )}

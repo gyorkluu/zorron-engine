@@ -8,10 +8,12 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { PlayerShell } from '@/components/player/PlayerShell';
-import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
+import { useProjectStore } from '@/stores/projectStore';
+import { useT, tt } from '@/i18n/useT';
 import { createEmptyFlowData } from '@/types/flow';
 import type { FlowData } from '@/types/flow';
+import * as projectService from '@/services/project.service';
 
 /** Loading state for the player page. */
 type PlayerPageState =
@@ -21,29 +23,31 @@ type PlayerPageState =
 
 /** Standalone player page. */
 export function PlayerPage() {
+  const { t } = useT();
   const { projectId } = useParams<{ projectId: string }>();
   const [state, setState] = useState<PlayerPageState>({ status: 'loading' });
-  const loadProject = useProjectStore((s) => s.loadProject);
   const loadFlow = useEditorStore((s) => s.loadFlow);
+  const setSettings = useProjectStore((s) => s.setSettings);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       if (!projectId) {
         if (!cancelled) {
-          setState({ status: 'error', message: 'No project id provided' });
+          setState({ status: 'error', message: tt('player.noProjectId') });
         }
         return;
       }
       try {
-        const detail = await loadProject(projectId);
+        const detail = await projectService.getPlayableProject(projectId);
         if (cancelled) return;
         const flow = detail.data ?? createEmptyFlowData();
         loadFlow(flow.nodes ?? [], flow.edges ?? []);
+        setSettings(flow.settings ?? createEmptyFlowData().settings);
         setState({ status: 'ready', flowData: flow });
       } catch (err) {
         if (cancelled) return;
-        const message = err instanceof Error ? err.message : 'Failed to load project';
+        const message = err instanceof Error ? err.message : tt('player.loadProjectFail');
         setState({ status: 'error', message });
       }
     };
@@ -51,12 +55,12 @@ export function PlayerPage() {
     return () => {
       cancelled = true;
     };
-  }, [projectId, loadProject, loadFlow]);
+  }, [projectId, loadFlow]);
 
   if (state.status === 'loading') {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-slate-400">
-        <div className="text-sm">Loading player...</div>
+        <div className="text-sm">{t('player.loadingPlayer')}</div>
       </div>
     );
   }
@@ -64,13 +68,13 @@ export function PlayerPage() {
   if (state.status === 'error') {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center gap-2 bg-slate-950 text-center text-slate-400">
-        <div className="text-base font-medium text-rose-400">Failed to load</div>
+        <div className="text-base font-medium text-rose-400">{t('player.loadFail')}</div>
         <div className="text-sm opacity-70">{state.message}</div>
         <a
           href="/"
           className="mt-4 rounded-full border border-slate-600 bg-slate-900/70 px-6 py-2 text-sm text-slate-200 hover:bg-slate-800"
         >
-          Back to Editor
+          {t('player.backToEditor')}
         </a>
       </div>
     );

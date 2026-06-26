@@ -3,15 +3,17 @@
  */
 
 import { memo } from 'react';
+import { useT } from '@/i18n/useT';
 import { NodeShell, type ZorronNodeProps } from './NodeShell';
 import type { LinkNodeData } from '@/types/flow';
 
 function LinkNodeImpl({ data, selected }: ZorronNodeProps) {
+  const { t } = useT();
   const d = data as LinkNodeData;
   return (
     <NodeShell
       type="link"
-      label={d.label ?? 'Link'}
+      label={d.label ?? t('nodeFallback.link')}
       selected={selected}
       showSource={false}
       icon="↗"
@@ -21,7 +23,7 @@ function LinkNodeImpl({ data, selected }: ZorronNodeProps) {
         {d.url ? (
           <p className="truncate text-slate-400">{d.url}</p>
         ) : (
-          <p className="italic text-slate-500">No URL</p>
+          <p className="italic text-slate-500">{t('nodeFallback.noUrl')}</p>
         )}
       </div>
     </NodeShell>

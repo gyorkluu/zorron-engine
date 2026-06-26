@@ -14,6 +14,7 @@
 import { memo, useCallback, useState } from 'react';
 import { useWorkspaceStore } from '@/stores/workspaceStore';
 import { useCloudSync, type ConflictResolution } from '@/hooks/useCloudSync';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Props for the ConflictDialog. */
@@ -25,6 +26,7 @@ export interface ConflictDialogProps {
 }
 
 function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
+  const { t } = useT();
   const conflict = useWorkspaceStore((s) => s.conflict);
   const setConflict = useWorkspaceStore((s) => s.setConflict);
   const { resolveConflict } = useCloudSync({ autoSync: false });
@@ -62,7 +64,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
           <h2 className="text-sm font-semibold text-amber-200">
-            Sync Conflict Detected
+            {t('conflict.title')}
           </h2>
           <button
             type="button"
@@ -77,27 +79,26 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
         {/* Body */}
         <div className="space-y-3 p-4">
           <p className="text-xs text-slate-400">
-            The project <span className="font-medium text-slate-200">{local.title}</span> was
-            modified both locally and in the cloud. Choose which version to keep.
+            {t('conflict.body', { title: local.title })}
           </p>
 
           <div className="grid grid-cols-2 gap-3">
             {/* Local version card */}
             <div className="rounded-lg border border-emerald-700/40 bg-emerald-900/20 p-3">
               <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-                Local
+                {t('conflict.local')}
               </div>
               <dl className="space-y-1 text-[11px] text-slate-300">
                 <div>
-                  <dt className="inline text-slate-500">Title: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.titleLabel')} </dt>
                   <dd className="inline">{local.title}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Updated: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.updated')} </dt>
                   <dd className="inline">{local.updatedAt}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Nodes: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.nodes')} </dt>
                   <dd className="inline">{local.data.nodes.length}</dd>
                 </div>
               </dl>
@@ -106,19 +107,19 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             {/* Cloud version card */}
             <div className="rounded-lg border border-cyan-700/40 bg-cyan-900/20 p-3">
               <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Cloud
+                {t('conflict.cloud')}
               </div>
               <dl className="space-y-1 text-[11px] text-slate-300">
                 <div>
-                  <dt className="inline text-slate-500">Title: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.titleLabel')} </dt>
                   <dd className="inline">{cloud.title}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Updated: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.updated')} </dt>
                   <dd className="inline">{cloud.updatedAt}</dd>
                 </div>
                 <div>
-                  <dt className="inline text-slate-500">Nodes: </dt>
+                  <dt className="inline text-slate-500">{t('conflict.nodes')} </dt>
                   <dd className="inline">{cloud.data.nodes.length}</dd>
                 </div>
               </dl>
@@ -137,7 +138,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             )}
             data-testid="conflict-keep-local"
           >
-            Keep Local
+            {t('conflict.keepLocal')}
           </button>
           <button
             type="button"
@@ -148,7 +149,7 @@ function ConflictDialogImpl({ open, onClose }: ConflictDialogProps) {
             )}
             data-testid="conflict-keep-cloud"
           >
-            Keep Cloud
+            {t('conflict.keepCloud')}
           </button>
         </div>
       </div>

@@ -41,6 +41,12 @@ interface CanvasSnapshot {
   edges: Edge[];
 }
 
+/** Clipboard payload for copy/paste operations. */
+export interface ClipboardPayload {
+  nodes: FlowNode[];
+  edges: Edge[];
+}
+
 /** Editor store state shape. */
 interface EditorState {
   nodes: Node[];
@@ -48,6 +54,9 @@ interface EditorState {
   selectedNodeId: string | null;
   selectedEdgeId: string | null;
   viewport: { x: number; y: number; zoom: number };
+
+  // Clipboard (P1-3)
+  clipboard: ClipboardPayload | null;
 
   // History
   past: CanvasSnapshot[];
@@ -70,6 +79,14 @@ interface EditorState {
   setEdges: (edges: Edge[]) => void;
   loadFlow: (nodes: Node[], edges: Edge[]) => void;
   clear: () => void;
+
+  // Clipboard operations (P1-3)
+  /** Copy selected node (and its connected edges) to clipboard. */
+  copyNode: (id: string) => void;
+  /** Paste clipboard content at a given position. */
+  pasteNode: (position: { x: number; y: number }) => void;
+  /** Focus/select a node and center viewport on it. */
+  focusNode: (id: string) => void;
 
   // Undo/redo
   undo: () => void;
@@ -106,6 +123,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedNodeId: null,
   selectedEdgeId: null,
   viewport: { x: 0, y: 0, zoom: 1 },
+  clipboard: null,
   past: [],
   future: [],
 
@@ -201,6 +219,46 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }));
   },
 
+  copyNode: (id) => {
+    const state = get();
+    const node = state.nodes.find((n) => n.id === id) as FlowNode | undefined;
+    if (!node) return;
+    // Capture the node and its connected edges; edges are rebuilt on paste
+    // because source/target ids will change.
+    const connectedEdges = state.edges.filter(
+      (e) => e.source === id || e.target === id,
+    );
+    set({
+      clipboard: {
+        nodes: [{ ...(node as FlowNode), data: { ...node.data } as GameNodeData }],
+        edges: connectedEdges.map((e) => ({ ...e })),
+      },
+    });
+  },
+
+  pasteNode: (position) => {
+    const state = get();
+    if (!state.clipboard || state.clipboard.nodes.length === 0) return;
+    const source = state.clipboard.nodes[0] as FlowNode;
+    const newId = `${source.type}_${nanoid(6)}`;
+    const clone: FlowNode = {
+      ...(source as FlowNode),
+      id: newId,
+      position,
+      selected: false,
+      data: { ...source.data } as GameNodeData,
+    } as FlowNode;
+    set((s) => ({
+      ...pushHistory(s),
+      nodes: [...s.nodes, clone],
+      selectedNodeId: newId,
+    }));
+  },
+
+  focusNode: (id) => {
+    set({ selectedNodeId: id, selectedEdgeId: null });
+  },
+
   updateNodeData: (id, data) => {
     set((state) => {
       const nodes = state.nodes.map((n) =>
@@ -232,6 +290,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       edges: [],
       selectedNodeId: null,
       selectedEdgeId: null,
+      clipboard: null,
       past: [],
       future: [],
     }),

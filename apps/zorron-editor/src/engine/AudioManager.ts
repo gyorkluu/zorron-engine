@@ -60,11 +60,6 @@ export class AudioManager {
     if (typeof window === 'undefined') return;
     if (this.currentBgmUrl === url) return;
 
-    if (!this.isAudioUnlocked) {
-      this.pendingBgm = { url, volume };
-      return;
-    }
-
     // Fade out existing BGM.
     if (this.bgm) {
       this.fadeOut(this.bgm, 800);
@@ -80,12 +75,22 @@ export class AudioManager {
     audio.crossOrigin = 'anonymous';
     this.bgm = audio;
 
-    void audio.play().then(() => {
-      this.fadeIn(audio, volume, 800);
-      this.notify(true);
-    }).catch(() => {
-      // Autoplay blocked; will retry on user interaction.
-    });
+    const attemptPlay = (): void => {
+      void audio.play().then(() => {
+        this.fadeIn(audio, volume, 800);
+        this.notify(true);
+      }).catch(() => {
+        // Autoplay blocked; queue for retry on user interaction.
+        this.pendingBgm = { url, volume };
+      });
+    };
+
+    if (!this.isAudioUnlocked) {
+      this.pendingBgm = { url, volume };
+      return;
+    }
+
+    attemptPlay();
   }
 
   /** Play a one-shot sound effect. */
@@ -138,33 +143,38 @@ export class AudioManager {
     return () => this.listeners.delete(listener);
   }
 
-  /** Attempt to unlock audio playback on mobile (call on first user gesture). */
+  /** Attempt to unlock audio playback after a user gesture. */
   unlock(): Promise<boolean> {
-    if (this.isAudioUnlocked || typeof window === 'undefined' || !this.isMobile()) {
+    if (typeof window === 'undefined') {
+      return Promise.resolve(false);
+    }
+    const resumePending = (): void => {
       this.isAudioUnlocked = true;
+      if (this.pendingBgm) {
+        this.playBgm(this.pendingBgm.url, this.pendingBgm.volume);
+        this.pendingBgm = null;
+      }
+    };
+
+    // Already unlocked: just resume any pending BGM.
+    if (this.isAudioUnlocked) {
+      resumePending();
       return Promise.resolve(true);
     }
+
     return new Promise((resolve) => {
       const tempAudio = new Audio();
       tempAudio.volume = 0;
       void tempAudio
         .play()
         .then(() => {
-          this.isAudioUnlocked = true;
           tempAudio.pause();
-          if (this.pendingBgm) {
-            this.playBgm(this.pendingBgm.url, this.pendingBgm.volume);
-            this.pendingBgm = null;
-          }
+          resumePending();
           resolve(true);
         })
         .catch(() => {
           // Mark unlocked anyway; user has interacted.
-          this.isAudioUnlocked = true;
-          if (this.pendingBgm) {
-            this.playBgm(this.pendingBgm.url, this.pendingBgm.volume);
-            this.pendingBgm = null;
-          }
+          resumePending();
           resolve(true);
         });
     });

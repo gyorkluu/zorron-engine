@@ -15,6 +15,14 @@ import {
  * [Elysia]: project routes (all require authentication via derive plugin).
  */
 export const projectRoute = new Elysia({ prefix: '/api/projects' })
+  .get(
+    '/:id/play',
+    ({ params }) => controller.getPlayableProject({ params }),
+    {
+      params: ProjectIdParamSchema,
+      response: ProjectDetailSchema,
+    },
+  )
   .use(authPlugin)
   .post(
     '/',

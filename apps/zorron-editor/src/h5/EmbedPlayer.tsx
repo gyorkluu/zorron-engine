@@ -9,6 +9,7 @@
 import { memo, useEffect, useState } from 'react';
 import { PlayerShell } from '@/components/player/PlayerShell';
 import { API_BASE_URL, http } from '@/services/api';
+import { useT, tt } from '@/i18n/useT';
 import { createEmptyFlowData } from '@/types/flow';
 import type { FlowData } from '@/types/flow';
 import type { ProjectDetail } from '@/types/project';
@@ -34,6 +35,7 @@ function EmbedPlayerImpl({
   features,
   className,
 }: EmbedPlayerProps) {
+  const { t } = useT();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
 
   /** Override the API base URL if provided. */
@@ -61,7 +63,7 @@ function EmbedPlayerImpl({
           const base = apiBase ?? API_BASE_URL;
           const res = await fetch(`${base}/api/projects/${projectId}/export`);
           if (!res.ok) {
-            throw new Error(`Failed to load project: ${res.status}`);
+            throw new Error(tt('player.loadProjectStatus', { status: res.status }));
           }
           const detail = (await res.json()) as ProjectDetail;
           if (!cancelled) {
@@ -72,10 +74,10 @@ function EmbedPlayerImpl({
           }
           return;
         }
-        throw new Error('No projectId or projectJson provided');
+        throw new Error(tt('player.noProjectJson'));
       } catch (err) {
         if (!cancelled) {
-          const message = err instanceof Error ? err.message : 'Failed to load';
+          const message = err instanceof Error ? err.message : tt('player.loadFail');
           setState({ status: 'error', message });
         }
       }
@@ -95,7 +97,7 @@ function EmbedPlayerImpl({
         className={`flex h-full w-full items-center justify-center ${themeClass} ${className ?? ''}`}
         data-testid="embed-player-loading"
       >
-        <div className="text-sm opacity-70">Loading...</div>
+        <div className="text-sm opacity-70">{t('player.loading')}</div>
       </div>
     );
   }
@@ -106,7 +108,7 @@ function EmbedPlayerImpl({
         className={`flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center ${themeClass} ${className ?? ''}`}
         data-testid="embed-player-error"
       >
-        <div className="text-sm font-medium text-rose-400">Failed to load</div>
+        <div className="text-sm font-medium text-rose-400">{t('player.loadFail')}</div>
         <div className="text-xs opacity-70">{state.message}</div>
       </div>
     );

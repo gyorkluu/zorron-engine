@@ -4,6 +4,7 @@
 
 import { memo } from 'react';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useT } from '@/i18n/useT';
 import type { GameState } from '@/engine/GameEngine';
 
 /** Props for StartStage. */
@@ -12,6 +13,7 @@ export interface StartStageProps {
 }
 
 function StartStageImpl({ state }: StartStageProps) {
+  const { t } = useT();
   const advance = usePlayerStore((s) => s.advanceFromStart);
   const start = state.start;
   if (!start) return null;
@@ -39,7 +41,7 @@ function StartStageImpl({ state }: StartStageProps) {
         onClick={advance}
         className="relative rounded-full bg-cyan-500/20 px-8 py-3 text-sm font-medium text-cyan-200 hover:bg-cyan-500/30"
       >
-        Begin
+        {t('player.begin')}
       </button>
     </div>
   );

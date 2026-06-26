@@ -16,7 +16,9 @@ export const NodeTypeSchema = z.enum([
 export const BaseNodeDataSchema = z.object({ label: z.string().optional() });
 
 export const StartNodeDataSchema = BaseNodeDataSchema.extend({
-  coverUrl: z.string().url().optional(),
+  coverUrl: z.string().optional(),
+  cover: z.string().optional(),
+  background: z.string().optional(),
   title: z.string().optional(),
   intro: z.string().optional(),
 });
@@ -30,6 +32,7 @@ export const SceneChoiceSchema = z.object({
   text: z.string(),
   targetNodeId: z.string().optional(),
   interaction: z.enum(['tap', 'hold', 'slash']).default('tap'),
+  interactionType: z.enum(['tap', 'hold', 'slash']).optional(),
   holdDuration: z.number().optional(),
   slashDirection: z.enum(['left', 'right', 'up', 'down']).optional(),
   vector: z
@@ -39,17 +42,27 @@ export const SceneChoiceSchema = z.object({
       z: z.number(),
     })
     .optional(),
-  dropFragmentId: z.string().optional(),
+  dropFragmentId: z.string().nullable().optional(),
 });
 
 export const SceneNodeDataSchema = BaseNodeDataSchema.extend({
   dialogue: z.string().optional(),
-  backgroundUrl: z.string().url().optional(),
-  characterUrl: z.string().url().optional(),
+  backgroundUrl: z.string().optional(),
+  background: z.string().optional(),
+  characterUrl: z.string().optional(),
+  character: z.string().optional(),
+  spiritGuide: z.string().optional(),
+  focusObject: z.string().optional(),
   speaker: z.string().optional(),
   choices: z.array(SceneChoiceSchema).default([]),
   bgm: z.string().optional(),
   sfx: z.string().optional(),
+  stageWeight: z.number().optional(),
+  interactionType: z.enum(['tap', 'hold', 'slash']).optional(),
+  interaction: z.enum(['tap', 'hold', 'slash']).optional(),
+  isBackgroundRemote: z.boolean().optional(),
+  isSpiritGuideRemote: z.boolean().optional(),
+  isFocusObjectRemote: z.boolean().optional(),
 });
 
 export const LogicNodeDataSchema = BaseNodeDataSchema.extend({
@@ -73,11 +86,13 @@ export const SetterNodeDataSchema = BaseNodeDataSchema.extend({
 });
 
 export const CalculatorNodeDataSchema = BaseNodeDataSchema.extend({
-  vector: z.object({
-    x: z.number().default(0),
-    y: z.number().default(0),
-    z: z.number().default(0),
-  }),
+  vector: z
+    .object({
+      x: z.number().default(0),
+      y: z.number().default(0),
+      z: z.number().default(0),
+    })
+    .default({ x: 0, y: 0, z: 0 }),
   targetVariable: z.string().optional(),
   description: z.string().optional(),
 });
@@ -90,20 +105,61 @@ export const SettlementResultMappingSchema = z.object({
   coverUrl: z.string().url().optional(),
 });
 
+export const SettlementButtonActionSchema = z.object({
+  varName: z.string().optional(),
+  variableName: z.string().optional(),
+  action: z.enum(['set', 'add', 'sub']).optional(),
+  operation: z.enum(['set', 'add', 'sub']).optional(),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
+});
+
+export const SettlementButtonSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  actions: z.array(SettlementButtonActionSchema).default([]),
+  outputHandleId: z.string().nullable().optional(),
+});
+
+export const SettlementVariableModifierSchema = z.object({
+  variableName: z.string().optional(),
+  varName: z.string().optional(),
+  operation: z.enum(['set', 'add', 'sub']).optional(),
+  action: z.enum(['set', 'add', 'sub']).optional(),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional(),
+  useVariable: z.boolean().optional(),
+  sourceVariable: z.string().optional(),
+});
+
 export const SettlementNodeDataSchema = BaseNodeDataSchema.extend({
   resultMapping: z.array(SettlementResultMappingSchema).default([]),
+  buttons: z.array(SettlementButtonSchema).default([]),
+  modifiers: z.array(SettlementVariableModifierSchema).default([]),
+  archetypes: z.array(z.record(z.unknown())).default([]),
+  variableModifiers: z.array(SettlementVariableModifierSchema).default([]),
 });
 
 export const VideoNodeDataSchema = BaseNodeDataSchema.extend({
-  videoUrl: z.string().url(),
+  videoUrl: z.string().url().or(z.string().max(0)).optional(),
+  videoSrc: z.string().optional(),
   autoPlay: z.boolean().default(true),
   skipAllowed: z.boolean().default(true),
+  skipable: z.boolean().optional(),
+  poster: z.string().optional(),
+  loop: z.boolean().optional(),
+  muted: z.boolean().optional(),
+  isRemote: z.boolean().optional(),
+  skipAfter: z.number().optional(),
+  externalLink: z.string().optional(),
+  externalLinkLabel: z.string().optional(),
 });
 
 export const LinkNodeDataSchema = BaseNodeDataSchema.extend({
   url: z.string().url(),
   title: z.string().optional(),
   description: z.string().optional(),
+  confirmText: z.string().optional(),
+  showConfirm: z.boolean().optional(),
+  openInNewTab: z.boolean().optional(),
 });
 
 /**
@@ -196,6 +252,11 @@ export const VariableSchema = z.record(
   z.union([z.string(), z.number(), z.boolean()]),
 );
 
+export const SectResultTextsSchema = z.object({
+  layerA: z.string().optional(),
+  layerB: z.string().optional(),
+});
+
 export const SectAnchorSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -203,6 +264,7 @@ export const SectAnchorSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   coverUrl: z.string().url().optional(),
+  resultTexts: SectResultTextsSchema.optional(),
 });
 
 export const VectorSpaceConfigSchema = z.object({
@@ -221,8 +283,8 @@ export const VectorSpaceConfigSchema = z.object({
 export const ProjectSettingsSchema = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
-  coverUrl: z.string().url().optional(),
-  bgmUrl: z.string().url().optional(),
+  coverUrl: z.string().optional(),
+  bgmUrl: z.string().optional(),
   vectorSpace: VectorSpaceConfigSchema,
 });
 

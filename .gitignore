@@ -68,3 +68,8 @@ apps/zorron-server/.drizzle/
 /zorron-editor/
 /zorron-server/
 /产品设计文档.md
+
+# Temporary screenshots and debug artifacts
+tmp-*.png
+tmp-*.ts
+tmp-*.json

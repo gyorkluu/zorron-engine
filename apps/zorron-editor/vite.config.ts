@@ -12,12 +12,19 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: 5175,
     host: true,
   },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Exclude Playwright E2E specs (they use @playwright/test, not vitest).
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/tests/e2e/**',
+      '**/*.spec.ts',
+    ],
   },
 });

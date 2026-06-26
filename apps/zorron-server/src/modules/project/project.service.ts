@@ -85,6 +85,24 @@ export async function getProject(
 }
 
 /**
+ * Returns a project for the standalone player without requiring ownership.
+ * Requires the project to be published.
+ */
+export async function getPlayableProject(projectId: string): Promise<ProjectDetail> {
+  const project = await repository.findProjectById(projectId);
+
+  if (!project) {
+    throw new AppError('PROJECT_001', 'Project not found', 404);
+  }
+
+  if (!project.isPublished) {
+    throw new AppError('PROJECT_003', 'Project is not published', 403);
+  }
+
+  return toProjectDetail(project);
+}
+
+/**
  * Updates a project that the user owns.
  */
 export async function updateProject(

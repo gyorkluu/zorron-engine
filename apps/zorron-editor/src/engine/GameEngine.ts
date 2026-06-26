@@ -36,8 +36,13 @@ import {
   type SceneChoice,
   type PersonalityVector,
   type SectAnchor,
+  type SectResultTexts,
+  type SettlementButton,
+  type SettlementButtonAction,
+  type SettlementVariableModifier,
   type NodeType,
   type Variables,
+  type SettlementResultMapping,
 } from '@/types/flow';
 import {
   add,
@@ -67,6 +72,12 @@ export interface SettlementResult {
   title: string;
   description?: string;
   coverUrl?: string;
+  /** Layered personality texts from the original project data. */
+  resultTexts?: SectResultTexts;
+  /** Buttons configured on the settlement node. */
+  buttons?: SettlementButton[];
+  /** Matched result mapping entry (for dev/debug). */
+  mapping?: SettlementResultMapping;
 }
 
 /** Snapshot of the engine state exposed to subscribers. */
@@ -91,10 +102,17 @@ export interface GameState {
   scene: {
     dialogue?: string;
     backgroundUrl?: string;
+    background?: string;
     characterUrl?: string;
+    character?: string;
+    spiritGuide?: string;
+    focusObject?: string;
     speaker?: string;
     bgm?: string;
     sfx?: string;
+    isBackgroundRemote?: boolean;
+    isSpiritGuideRemote?: boolean;
+    isFocusObjectRemote?: boolean;
   } | null;
 }
 
@@ -208,6 +226,56 @@ export class GameEngine {
     return this.state;
   }
 
+  /** Select a button on the current settlement node. Returns the new state. */
+  selectSettlementButton(buttonId: string): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'settlement') return this.state;
+
+    const data = node.data as SettlementNodeData;
+    const button = data.buttons?.find((b) => b.id === buttonId);
+    if (!button) return this.state;
+
+    // Apply per-button actions (variable writes).
+    for (const action of button.actions ?? []) {
+      this.applySettlementAction(action);
+    }
+
+    // Apply node-level variable modifiers as a fallback/compatibility layer.
+    for (const modifier of data.variableModifiers ?? data.modifiers ?? []) {
+      this.applySettlementModifier(modifier);
+    }
+
+    // Resolve the outgoing edge via the button's output handle.
+    const handleId = button.outputHandleId ?? `button_${(data.buttons ?? []).indexOf(button)}`;
+    const nextId = this.findTargetNodeId(node.id, handleId) ?? this.findTargetNodeId(node.id, null);
+
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, choices: [] };
+      this.notify();
+      return this.state;
+    }
+
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Apply a settlement button action to the variables map. */
+  private applySettlementAction(action: SettlementButtonAction): void {
+    const variable = action.varName ?? action.variableName ?? '';
+    if (!variable) return;
+    const operator = action.action ?? 'set';
+    this.applyAssignment(variable, action.value ?? 0, operator);
+  }
+
+  /** Apply a settlement node-level variable modifier. */
+  private applySettlementModifier(modifier: SettlementVariableModifier): void {
+    const variable = modifier.variableName ?? modifier.varName ?? '';
+    if (!variable) return;
+    const operator = modifier.operation ?? modifier.action ?? 'set';
+    this.applyAssignment(variable, modifier.value ?? 0, operator);
+  }
+
   /** Skip the current video node (advances to the next node). */
   skipVideo(): GameState {
     if (!this.currentNodeId) return this.state;
@@ -302,7 +370,7 @@ export class GameEngine {
       start: {
         title: data.title,
         intro: data.intro,
-        coverUrl: data.coverUrl,
+        coverUrl: data.coverUrl ?? data.cover,
       },
       choices: [],
       isFinished: false,
@@ -343,11 +411,18 @@ export class GameEngine {
       currentNodeType: 'scene',
       scene: {
         dialogue: data.dialogue,
-        backgroundUrl: data.backgroundUrl,
-        characterUrl: data.characterUrl,
+        backgroundUrl: data.backgroundUrl ?? data.background,
+        background: data.background,
+        characterUrl: data.characterUrl ?? data.character ?? data.spiritGuide,
+        character: data.character,
+        spiritGuide: data.spiritGuide,
+        focusObject: data.focusObject,
         speaker: data.speaker,
         bgm: data.bgm,
         sfx: data.sfx,
+        isBackgroundRemote: data.isBackgroundRemote,
+        isSpiritGuideRemote: data.isSpiritGuideRemote,
+        isFocusObjectRemote: data.isFocusObjectRemote,
       },
       choices,
       isFinished: false,
@@ -468,6 +543,9 @@ export class GameEngine {
       title: mapping?.title ?? sect?.name ?? 'Settlement',
       description: mapping?.description ?? sect?.description,
       coverUrl: mapping?.coverUrl ?? sect?.coverUrl,
+      resultTexts: sect?.resultTexts,
+      buttons: data.buttons,
+      mapping,
     };
     this.lastSettlementResult = result;
 

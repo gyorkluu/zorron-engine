@@ -8,11 +8,12 @@
 import { memo } from 'react';
 import {
   NODE_TYPES,
-  NODE_TYPE_LABELS,
-  NODE_TYPE_DESCRIPTIONS,
+  NODE_TYPE_LABEL_KEYS,
+  NODE_TYPE_DESC_KEYS,
   NODE_TYPE_ACCENTS,
   type NodeType,
 } from '@/types/flow';
+import { useT } from '@/i18n/useT';
 
 /** Props for the NodePalette. */
 export interface NodePaletteProps {
@@ -28,7 +29,9 @@ function PaletteItem({
   type: NodeType;
   onCreate?: (type: NodeType) => void;
 }) {
+  const { t } = useT();
   const accent = NODE_TYPE_ACCENTS[type];
+  const label = t(NODE_TYPE_LABEL_KEYS[type]);
   return (
     <div
       draggable
@@ -43,12 +46,12 @@ function PaletteItem({
         className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg text-xs font-bold"
         style={{ background: `${accent}22`, color: accent }}
       >
-        {NODE_TYPE_LABELS[type][0]}
+        {label[0]}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-100">{NODE_TYPE_LABELS[type]}</p>
+        <p className="text-sm font-medium text-slate-100">{label}</p>
         <p className="line-clamp-2 text-[11px] text-slate-400">
-          {NODE_TYPE_DESCRIPTIONS[type]}
+          {t(NODE_TYPE_DESC_KEYS[type])}
         </p>
       </div>
     </div>
@@ -56,10 +59,11 @@ function PaletteItem({
 }
 
 function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
+  const { t } = useT();
   return (
     <aside className="flex h-full w-56 flex-col gap-2 overflow-y-auto border-r border-slate-800/60 bg-slate-950/40 p-3 backdrop-blur-sm">
       <h2 className="px-1 text-xs font-semibold uppercase tracking-wider text-slate-500">
-        Node Palette
+        {t('palette.title')}
       </h2>
       <div className="flex flex-col gap-2">
         {NODE_TYPES.map((type) => (
@@ -67,7 +71,7 @@ function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
         ))}
       </div>
       <div className="mt-auto rounded-lg border border-slate-800/60 bg-slate-900/40 p-2 text-[10px] text-slate-500">
-        Drag a node onto the canvas, or click to add at center.
+        {t('palette.hint')}
       </div>
     </aside>
   );

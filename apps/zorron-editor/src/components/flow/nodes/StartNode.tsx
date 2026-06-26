@@ -3,13 +3,15 @@
  */
 
 import { memo } from 'react';
+import { useT } from '@/i18n/useT';
 import { NodeShell, type ZorronNodeProps } from './NodeShell';
 import type { StartNodeData } from '@/types/flow';
 
 function StartNodeImpl({ data, selected }: ZorronNodeProps) {
+  const { t } = useT();
   const d = data as StartNodeData;
   return (
-    <NodeShell type="start" label={d.label ?? 'Start'} selected={selected} showTarget={false} icon="S">
+    <NodeShell type="start" label={d.label ?? t('node.default.start')} selected={selected} showTarget={false} icon="S">
       <div className="space-y-1">
         {d.title && <p className="font-medium text-cyan-200">{d.title}</p>}
         {d.intro && <p className="line-clamp-2 text-slate-400">{d.intro}</p>}

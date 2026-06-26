@@ -6,6 +6,8 @@
  */
 
 import type { Node, Edge, XYPosition } from '@xyflow/react';
+import { tt } from '@/i18n/useT';
+import type { TranslationKey } from '@/i18n/translations';
 
 /** Supported narrative node types in Zorron Engine. */
 export type NodeType =
@@ -30,28 +32,51 @@ export const NODE_TYPES: NodeType[] = [
   'link',
 ];
 
+/** Translation keys for each node type's label and description. */
+export const NODE_TYPE_LABEL_KEYS: Record<NodeType, TranslationKey> = {
+  start: 'node.start.label',
+  scene: 'node.scene.label',
+  logic: 'node.logic.label',
+  setter: 'node.setter.label',
+  calculator: 'node.calculator.label',
+  settlement: 'node.settlement.label',
+  video: 'node.video.label',
+  link: 'node.link.label',
+};
+
+export const NODE_TYPE_DESC_KEYS: Record<NodeType, TranslationKey> = {
+  start: 'node.start.desc',
+  scene: 'node.scene.desc',
+  logic: 'node.logic.desc',
+  setter: 'node.setter.desc',
+  calculator: 'node.calculator.desc',
+  settlement: 'node.settlement.desc',
+  video: 'node.video.desc',
+  link: 'node.link.desc',
+};
+
 /** Human-readable labels for each node type, used in the palette and inspector. */
 export const NODE_TYPE_LABELS: Record<NodeType, string> = {
-  start: 'Start',
-  scene: 'Scene',
-  logic: 'Logic',
-  setter: 'Setter',
-  calculator: 'Calculator',
-  settlement: 'Settlement',
-  video: 'Video',
-  link: 'External Link',
+  start: tt('node.start.label'),
+  scene: tt('node.scene.label'),
+  logic: tt('node.logic.label'),
+  setter: tt('node.setter.label'),
+  calculator: tt('node.calculator.label'),
+  settlement: tt('node.settlement.label'),
+  video: tt('node.video.label'),
+  link: tt('node.link.label'),
 };
 
 /** Short descriptions for the node palette. */
 export const NODE_TYPE_DESCRIPTIONS: Record<NodeType, string> = {
-  start: 'Entry point of the narrative flow',
-  scene: 'Dialogue stage with choices and media',
-  logic: 'Branch flow based on variables or fragments',
-  setter: 'Modify narrative variables',
-  calculator: 'Apply pending personality vector deltas',
-  settlement: 'Final result and archetype matching',
-  video: 'Fullscreen video playback node',
-  link: 'Open an external URL',
+  start: tt('node.start.desc'),
+  scene: tt('node.scene.desc'),
+  logic: tt('node.logic.desc'),
+  setter: tt('node.setter.desc'),
+  calculator: tt('node.calculator.desc'),
+  settlement: tt('node.settlement.desc'),
+  video: tt('node.video.desc'),
+  link: tt('node.link.desc'),
 };
 
 /** Accent color per node type for canvas visuals. */
@@ -87,6 +112,8 @@ export interface BaseNodeData {
 /** Start node data. */
 export interface StartNodeData extends BaseNodeData {
   coverUrl?: string;
+  /** Legacy Vue editor field, kept for migration compatibility. */
+  cover?: string;
   title?: string;
   intro?: string;
 }
@@ -108,12 +135,28 @@ export interface SceneChoice {
 /** Scene node data. */
 export interface SceneNodeData extends BaseNodeData {
   dialogue?: string;
+  /** Primary background image URL (mapped from legacy `background`). */
   backgroundUrl?: string;
+  /** Legacy background image field, kept for migration compatibility. */
+  background?: string;
+  /** Character portrait / spirit guide image URL. */
   characterUrl?: string;
+  /** Legacy character field alias. */
+  character?: string;
+  /** Legacy spirit guide image field. */
+  spiritGuide?: string;
+  /** Legacy focus object / item image field. */
+  focusObject?: string;
   speaker?: string;
   choices: SceneChoice[];
   bgm?: string;
   sfx?: string;
+  stageWeight?: number;
+  interactionType?: InteractionType;
+  interaction?: InteractionType;
+  isBackgroundRemote?: boolean;
+  isSpiritGuideRemote?: boolean;
+  isFocusObjectRemote?: boolean;
 }
 
 /** Logic node data. */
@@ -155,9 +198,40 @@ export interface SettlementResultMapping {
   coverUrl?: string;
 }
 
+/** A single action performed when a settlement button is clicked. */
+export interface SettlementButtonAction {
+  varName?: string;
+  variableName?: string;
+  action?: 'set' | 'add' | 'sub';
+  operation?: 'set' | 'add' | 'sub';
+  value?: string | number | boolean;
+}
+
+/** A button shown on the settlement stage. */
+export interface SettlementButton {
+  id: string;
+  label: string;
+  actions?: SettlementButtonAction[];
+  outputHandleId?: string | null;
+}
+
+/** A variable modifier applied by the settlement node. */
+export interface SettlementVariableModifier {
+  variableName?: string;
+  varName?: string;
+  operation?: 'set' | 'add' | 'sub';
+  action?: 'set' | 'add' | 'sub';
+  value?: string | number | boolean;
+  useVariable?: boolean;
+  sourceVariable?: string;
+}
+
 /** Settlement node data. */
 export interface SettlementNodeData extends BaseNodeData {
   resultMapping: SettlementResultMapping[];
+  buttons?: SettlementButton[];
+  variableModifiers?: SettlementVariableModifier[];
+  modifiers?: SettlementVariableModifier[];
 }
 
 /** Video node data. */
@@ -192,6 +266,11 @@ export type VariableValue = string | number | boolean;
 export type Variables = Record<string, VariableValue>;
 
 /** A sect anchor used by the settlement matcher. */
+export interface SectResultTexts {
+  layerA?: string;
+  layerB?: string;
+}
+
 export interface SectAnchor {
   id: string;
   name: string;
@@ -199,6 +278,7 @@ export interface SectAnchor {
   title: string;
   description?: string;
   coverUrl?: string;
+  resultTexts?: SectResultTexts;
 }
 
 /** Vector space configuration stored in project settings. */
@@ -252,21 +332,21 @@ export function createEmptyFlowData(): FlowData {
 export function createDefaultNodeData(type: NodeType): GameNodeData {
   switch (type) {
     case 'start':
-      return { label: 'Start', title: 'New Story', intro: '' };
+      return { label: tt('node.default.start'), title: tt('node.default.newStory'), intro: '' };
     case 'scene':
-      return { label: 'Scene', dialogue: '', choices: [] };
+      return { label: tt('node.default.scene'), dialogue: '', choices: [] };
     case 'logic':
-      return { label: 'Logic', condition: '', checkType: 'variable' };
+      return { label: tt('node.default.logic'), condition: '', checkType: 'variable' };
     case 'setter':
-      return { label: 'Setter', assignments: [] };
+      return { label: tt('node.default.setter'), assignments: [] };
     case 'calculator':
-      return { label: 'Calculator', vector: { x: 0, y: 0, z: 0 } };
+      return { label: tt('node.default.calculator'), vector: { x: 0, y: 0, z: 0 } };
     case 'settlement':
-      return { label: 'Settlement', resultMapping: [] };
+      return { label: tt('node.default.settlement'), resultMapping: [] };
     case 'video':
-      return { label: 'Video', videoUrl: '', autoPlay: true, skipAllowed: true };
+      return { label: tt('node.default.video'), videoUrl: '', autoPlay: true, skipAllowed: true };
     case 'link':
-      return { label: 'Link', url: '', title: '' };
+      return { label: tt('node.default.link'), url: '', title: '' };
   }
 }
 

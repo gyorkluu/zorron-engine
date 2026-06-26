@@ -64,6 +64,13 @@ export async function getProject(ctx: ParamsContext): Promise<ProjectDetail> {
 }
 
 /**
+ * Gets a published project for the public player.
+ */
+export async function getPlayableProject(ctx: ParamsContext): Promise<ProjectDetail> {
+  return service.getPlayableProject(ctx.params.id);
+}
+
+/**
  * Updates a project by id.
  */
 export async function updateProject(

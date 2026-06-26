@@ -22,6 +22,8 @@ interface PlayerStoreState {
   start: (flowData: FlowData) => GameState;
   /** Select a choice on the current scene node. */
   selectChoice: (choiceId: string) => void;
+  /** Select a button on the current settlement node. */
+  selectSettlementButton: (buttonId: string) => void;
   /** Advance from a start node. */
   advanceFromStart: () => void;
   /** Skip the current video node. */
@@ -57,6 +59,12 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     const engine = get().engine;
     if (!engine) return;
     engine.selectChoice(choiceId);
+  },
+
+  selectSettlementButton: (buttonId) => {
+    const engine = get().engine;
+    if (!engine) return;
+    engine.selectSettlementButton(buttonId);
   },
 
   advanceFromStart: () => {

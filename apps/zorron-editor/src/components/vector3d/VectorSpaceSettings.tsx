@@ -12,6 +12,7 @@
 
 import { memo, useCallback } from 'react';
 import { useProjectStore } from '@/stores/projectStore';
+import { useT, tt } from '@/i18n/useT';
 import { Field, TextField, SwitchField } from '@/components/inspector/fields/Field';
 import { VectorEditor } from '@/components/inspector/fields/VectorEditor';
 import type { SectAnchor, VectorSpaceConfig, ProjectSettings } from '@/types/flow';
@@ -24,6 +25,7 @@ export interface VectorSpaceSettingsProps {
 }
 
 function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
+  const { t } = useT();
   const settings = useProjectStore((s) => s.settings);
   const setSettings = useProjectStore((s) => s.setSettings);
 
@@ -57,9 +59,9 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     const sects = vectorSpace.sects ?? [];
     const newSect: SectAnchor = {
       id: `sect_${nanoid(6)}`,
-      name: `Sect ${sects.length + 1}`,
+      name: tt('vector3d.sects.default', { n: sects.length + 1 }),
       vector: { x: 0, y: 0, z: 0 },
-      title: `Sect ${sects.length + 1}`,
+      title: tt('vector3d.sects.default', { n: sects.length + 1 }),
     };
     updateVectorSpace({ sects: [...sects, newSect] });
   }, [vectorSpace.sects, updateVectorSpace]);
@@ -77,7 +79,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     <div className={className} data-testid="vector-space-settings">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Vector Space
+          {t('vector3d.settings')}
         </h3>
       </div>
 
@@ -85,13 +87,13 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
         <SwitchField
           checked={vectorSpace.enabled}
           onChange={(enabled) => updateVectorSpace({ enabled })}
-          label="Enable 3D vector space"
+          label={t('vector3d.enable')}
         />
 
         {vectorSpace.enabled && (
           <>
             <div className="grid grid-cols-3 gap-2">
-              <Field label="X Axis">
+              <Field label={t('vector3d.xAxis')}>
                 <TextField
                   value={vectorSpace.dimensions.x}
                   onChange={(x) =>
@@ -102,7 +104,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                   placeholder="处世"
                 />
               </Field>
-              <Field label="Y Axis">
+              <Field label={t('vector3d.yAxis')}>
                 <TextField
                   value={vectorSpace.dimensions.y}
                   onChange={(y) =>
@@ -113,7 +115,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                   placeholder="立场"
                 />
               </Field>
-              <Field label="Z Axis">
+              <Field label={t('vector3d.zAxis')}>
                 <TextField
                   value={vectorSpace.dimensions.z}
                   onChange={(z) =>
@@ -129,20 +131,20 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Sect Anchors ({vectorSpace.sects?.length ?? 0})
+                  {t('vector3d.sects.title', { n: vectorSpace.sects?.length ?? 0 })}
                 </span>
                 <button
                   type="button"
                   onClick={addSect}
                   className="rounded-md bg-violet-500/20 px-2 py-1 text-xs text-violet-200 hover:bg-violet-500/30"
                 >
-                  + Add Sect
+                  {t('vector3d.sects.add')}
                 </button>
               </div>
 
               {(vectorSpace.sects ?? []).length === 0 && (
                 <p className="rounded-lg border border-dashed border-slate-700 p-3 text-center text-xs text-slate-500">
-                  No sect anchors yet. Add one to define a personality archetype.
+                  {t('vector3d.sects.empty')}
                 </p>
               )}
 
@@ -156,26 +158,26 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                       <TextField
                         value={sect.name}
                         onChange={(name) => updateSect(sect.id, { name })}
-                        placeholder="Sect name"
+                        placeholder={t('vector3d.sects.namePh')}
                       />
                       <button
                         type="button"
                         onClick={() => removeSect(sect.id)}
                         className="flex-shrink-0 rounded-md px-2 py-1 text-xs text-rose-300 hover:bg-rose-500/20"
                       >
-                        Del
+                        {t('vector3d.sects.del')}
                       </button>
                     </div>
-                    <Field label="Title">
+                    <Field label={t('vector3d.sects.titleField')}>
                       <TextField
                         value={sect.title}
                         onChange={(title) => updateSect(sect.id, { title })}
-                        placeholder="Display title"
+                        placeholder={t('vector3d.sects.titlePh')}
                       />
                     </Field>
                     <Field
-                      label="Anchor Vector"
-                      hint="Position of this sect in the 3D space."
+                      label={t('vector3d.sects.anchor')}
+                      hint={t('vector3d.sects.anchor.hint')}
                     >
                       <VectorEditor
                         value={sect.vector}

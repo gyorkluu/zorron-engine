@@ -14,6 +14,9 @@ import { exportProjectJson, pickJsonFile } from '@/utils/fileIO';
 import { SyncStatusIndicator } from '@/components/cloud/SyncStatusIndicator';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
 import { featureFlags } from '@/lib/featureFlags';
+import { sampleFlowData, sampleProjectMeta } from '@/data/sampleProject';
+import { useT } from '@/i18n/useT';
+import { useLocaleStore } from '@/i18n/localeStore';
 import type { ProjectDetail } from '@/types/project';
 import type { FlowData } from '@/types/flow';
 import { cn } from '@/lib/utils';
@@ -32,6 +35,9 @@ export interface EditorToolbarProps {
 }
 
 function EditorToolbarImpl({ className }: EditorToolbarProps) {
+  const { t } = useT();
+  const toggleLocale = useLocaleStore((s) => s.toggle);
+  const locale = useLocaleStore((s) => s.locale);
   const navigate = useNavigate();
   const title = useProjectStore((s) => s.title);
   const saveStatus = useProjectStore((s) => s.saveStatus);
@@ -81,11 +87,27 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
     }
   }, [importProject, loadFlow, title]);
 
+  /** Load the built-in sample project into the editor (local mode). */
+  const handleLoadSample = useCallback(() => {
+    useProjectStore.getState().reset();
+    useProjectStore.setState({
+      title: sampleProjectMeta.title,
+      description: sampleProjectMeta.description,
+      variables: sampleFlowData.variables,
+      settings: sampleFlowData.settings,
+      version: sampleFlowData.version,
+      lastSavedSnapshot: sampleFlowData,
+      lastSavedAt: new Date().toISOString(),
+      saveStatus: 'saved',
+    });
+    loadFlow(sampleFlowData.nodes, sampleFlowData.edges);
+  }, [loadFlow]);
+
   const statusLabel: Record<string, string> = {
-    saved: 'Saved',
-    saving: 'Saving...',
-    unsaved: 'Unsaved',
-    error: 'Error',
+    saved: t('toolbar.save.saved'),
+    saving: t('toolbar.save.saving'),
+    unsaved: t('toolbar.save.unsaved'),
+    error: t('toolbar.save.error'),
   };
 
   return (
@@ -97,13 +119,13 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
     >
       <div className="flex min-w-0 items-center gap-3">
         <span className="flex-shrink-0 text-sm font-bold tracking-tight text-cyan-300">
-          Zorron
+          {t('brand.name')}
         </span>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Untitled Project"
+          placeholder={t('toolbar.untitled')}
           className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-slate-100 outline-none hover:border-slate-700 focus:border-cyan-500/60 focus:bg-slate-900/60"
         />
       </div>
@@ -131,31 +153,50 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
             type="button"
             onClick={() => navigate('/projects')}
             className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
-            title="Browse cloud projects"
+            title={t('toolbar.projects.tip')}
           >
-            Projects
+            {t('toolbar.projects')}
           </button>
         )}
+
+        {/* Language toggle. */}
+        <button
+          type="button"
+          onClick={toggleLocale}
+          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-800"
+          title={t('toolbar.lang.tip')}
+        >
+          {locale === 'zh' ? '中 / EN' : 'EN / 中'}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleLoadSample}
+          className="rounded-md border border-violet-600/50 bg-violet-600/20 px-2.5 py-1 text-xs font-medium text-violet-100 hover:bg-violet-600/30"
+          title={t('toolbar.sample.tip')}
+        >
+          {t('toolbar.sample')}
+        </button>
         <button
           type="button"
           onClick={handleImport}
           className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Import
+          {t('toolbar.import')}
         </button>
         <button
           type="button"
           onClick={handleExport}
           className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
         >
-          Export
+          {t('toolbar.export')}
         </button>
         <button
           type="button"
           onClick={handleSave}
           className="rounded-md border border-cyan-600/50 bg-cyan-600/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30"
         >
-          Save
+          {t('toolbar.save')}
         </button>
       </div>
     </header>

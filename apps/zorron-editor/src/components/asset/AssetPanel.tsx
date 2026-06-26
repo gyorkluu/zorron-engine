@@ -14,16 +14,18 @@ import type { AssetType } from '@/types/asset';
 import { AssetUploader } from './AssetUploader';
 import { AssetGrid } from './AssetGrid';
 import { AssetDetail } from './AssetDetail';
+import { useT } from '@/i18n/useT';
+import type { TranslationKey } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
 
 /** Filter tab definitions. */
-const TYPE_TABS: ReadonlyArray<{ value: AssetType | undefined; label: string }> = [
-  { value: undefined, label: 'All' },
-  { value: 'image', label: 'Image' },
-  { value: 'audio', label: 'Audio' },
-  { value: 'video', label: 'Video' },
-  { value: 'font', label: 'Font' },
-  { value: 'other', label: 'Other' },
+const TYPE_TABS: ReadonlyArray<{ value: AssetType | undefined; labelKey: TranslationKey }> = [
+  { value: undefined, labelKey: 'asset.all' },
+  { value: 'image', labelKey: 'asset.image' },
+  { value: 'audio', labelKey: 'asset.audio' },
+  { value: 'video', labelKey: 'asset.video' },
+  { value: 'font', labelKey: 'asset.font' },
+  { value: 'other', labelKey: 'asset.other' },
 ];
 
 /** Extract every URL-valued field from a node's data for reference scanning. */
@@ -48,6 +50,7 @@ export interface AssetPanelProps {
 }
 
 function AssetPanelImpl({ className }: AssetPanelProps) {
+  const { t } = useT();
   const allAssets = useAllAssets();
   const typeFilter = useAssetStore((s) => s.typeFilter);
   const keyword = useAssetStore((s) => s.keyword);
@@ -98,7 +101,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
     >
       <div className="border-b border-slate-800/60 px-3 py-2">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Assets
+          {t('asset.title')}
         </h2>
       </div>
 
@@ -106,7 +109,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
       <div className="flex flex-wrap gap-1 border-b border-slate-800/60 p-2">
         {TYPE_TABS.map((tab) => (
           <button
-            key={tab.label}
+            key={tab.labelKey}
             type="button"
             onClick={() => setTypeFilter(tab.value)}
             className={cn(
@@ -116,7 +119,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
                 : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200',
             )}
           >
-            {tab.label}
+            {t(tab.labelKey)}
           </button>
         ))}
       </div>
@@ -127,7 +130,7 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
           type="search"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Search assets..."
+          placeholder={t('asset.search')}
           className="w-full rounded-md border border-slate-700 bg-slate-900/60 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-500/60 focus:ring-1 focus:ring-cyan-500/30"
         />
       </div>

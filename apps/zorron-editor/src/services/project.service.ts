@@ -34,6 +34,11 @@ export function getProject(id: string): Promise<ProjectDetail> {
   return http.get<ProjectDetail>(`/api/projects/${id}`);
 }
 
+/** Fetch a published project for the standalone player. */
+export function getPlayableProject(id: string): Promise<ProjectDetail> {
+  return http.get<ProjectDetail>(`/api/projects/${id}/play`);
+}
+
 /** Update a project (partial). */
 export function updateProject(
   id: string,

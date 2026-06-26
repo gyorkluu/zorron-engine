@@ -107,6 +107,9 @@ describe('useSimulation', () => {
     let promise: Promise<unknown> | undefined;
     act(() => {
       promise = result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      // Pre-catch to prevent unhandled rejection between the worker error
+      // event and the assertion below.
+      promise.catch(() => {});
     });
     act(() => {
       mockWorker.onmessage?.({
@@ -161,7 +164,9 @@ describe('useSimulation', () => {
     const onError = vi.fn();
     const { result } = renderHook(() => useSimulation({ onError }));
     act(() => {
-      result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      const promise = result.current.run(sampleFlow, { runs: 10, strategy: 'random' });
+      // Pre-catch to prevent unhandled rejection.
+      promise.catch(() => {});
     });
     act(() => {
       mockWorker.onmessage?.({
