@@ -19,6 +19,7 @@
  */
 
 import { memo, useCallback, useState } from 'react';
+import { Eye, Variable, Puzzle, LayoutTemplate, History } from 'lucide-react';
 import { AssetPanel } from '@/components/asset/AssetPanel';
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodePalette } from '@/components/flow/NodePalette';
@@ -83,11 +84,11 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   }, []);
 
   /** Side panel toolbar button definitions. */
-  const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: string }> = [
-    { id: 'variables', label: t('vars.title'), icon: 'V' },
-    { id: 'fragments', label: t('frag.title'), icon: 'F' },
-    { id: 'templates', label: t('tpl.title'), icon: 'T' },
-    { id: 'history', label: t('history.title'), icon: 'H' },
+  const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }> = [
+    { id: 'variables', label: t('vars.title'), icon: Variable },
+    { id: 'fragments', label: t('frag.title'), icon: Puzzle },
+    { id: 'templates', label: t('tpl.title'), icon: LayoutTemplate },
+    { id: 'history', label: t('history.title'), icon: History },
   ];
 
   return (
@@ -108,10 +109,11 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
             <button
               type="button"
               onClick={() => setShowPreview(true)}
-              className="rounded-md border border-cyan-600/50 bg-cyan-600/20 px-3 py-1.5 text-xs font-medium text-cyan-100 shadow-lg backdrop-blur-md hover:bg-cyan-600/30"
+              className="group flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-medium text-cyan-200 shadow-lg shadow-cyan-500/10 backdrop-blur-md transition-all duration-150 hover:border-cyan-400/50 hover:bg-cyan-500/25 hover:text-cyan-100 active:scale-[0.97]"
               title={t('toolbar.preview.tip')}
             >
-              {t('toolbar.preview')}
+              <Eye size={14} className="transition-transform group-hover:scale-110" />
+              <span>{t('toolbar.preview')}</span>
             </button>
           </div>
 
@@ -128,22 +130,25 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
             )}
             {/* Toolbar buttons. */}
             <div className="flex gap-1.5 rounded-lg border border-slate-800/60 bg-slate-950/80 p-1.5 shadow-lg backdrop-blur-md">
-              {sidePanelButtons.map((btn) => (
-                <button
-                  key={btn.id}
-                  type="button"
-                  onClick={() => toggleSidePanel(btn.id)}
-                  title={btn.label}
-                  className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-md text-xs font-bold transition-colors',
-                    activeSidePanel === btn.id
-                      ? 'bg-cyan-600/30 text-cyan-200 ring-1 ring-cyan-500/50'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200',
-                  )}
-                >
-                  {btn.icon}
-                </button>
-              ))}
+              {sidePanelButtons.map((btn) => {
+                const Icon = btn.icon;
+                return (
+                  <button
+                    key={btn.id}
+                    type="button"
+                    onClick={() => toggleSidePanel(btn.id)}
+                    title={btn.label}
+                    className={cn(
+                      'flex h-8 w-8 items-center justify-center rounded-md transition-all duration-150',
+                      activeSidePanel === btn.id
+                        ? 'bg-cyan-600/30 text-cyan-200 ring-1 ring-cyan-500/50 shadow-lg shadow-cyan-500/10'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200',
+                    )}
+                  >
+                    <Icon size={14} />
+                  </button>
+                );
+              })}
             </div>
           </div>
 

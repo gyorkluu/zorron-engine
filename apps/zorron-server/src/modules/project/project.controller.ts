@@ -25,6 +25,10 @@ interface ParamsContext extends Context {
   params: { id: string };
 }
 
+interface PublicParamsContext {
+  params: { id: string };
+}
+
 interface BodyParamsContext<T> extends Context {
   params: { id: string };
   body: T;
@@ -66,7 +70,7 @@ export async function getProject(ctx: ParamsContext): Promise<ProjectDetail> {
 /**
  * Gets a published project for the public player.
  */
-export async function getPlayableProject(ctx: ParamsContext): Promise<ProjectDetail> {
+export async function getPlayableProject(ctx: PublicParamsContext): Promise<ProjectDetail> {
   return service.getPlayableProject(ctx.params.id);
 }
 

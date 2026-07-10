@@ -10,6 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ReactFlow,
   Background,
+  BackgroundVariant,
   Controls,
   MiniMap,
   type Connection,
@@ -17,26 +18,36 @@ import {
   type Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { ZoomIn, ZoomOut, Maximize, MousePointer2, Sparkles } from 'lucide-react';
 import { useEditorStore } from '@/stores/editorStore';
 import { nodeTypes } from './nodes';
 import { ZorronEdge } from './edges/ZorronEdge';
 import { ContextMenu, type ContextMenuState } from './ContextMenu';
 import { NodeSearch } from './NodeSearch';
-import type { NodeType } from '@/types/flow';
+import { EmptyStateIllustration } from '@/components/brand/EmptyStateIllustration';
+import { NODE_TYPE_ACCENTS, type NodeType } from '@/types/flow';
+import { cn } from '@/lib/utils';
 
-/** Terminal node types that cannot have outgoing edges. */
-const TERMINAL_TYPES: ReadonlySet<NodeType> = new Set([
-  'settlement',
-  'link',
-]);
-
-/** Edge types registry. */
+const TERMINAL_TYPES: ReadonlySet<NodeType> = new Set(['settlement', 'link']);
 const edgeTypes = { zorron: ZorronEdge };
 
-/** Props for the FlowCanvas. */
 export interface FlowCanvasProps {
-  /** Optional class name for the wrapper. */
   className?: string;
+}
+
+function CustomControls() {
+  return (
+    <div className="!bottom-4 !left-4 flex flex-col gap-1 rounded-xl border border-slate-800/50 bg-slate-900/80 p-1.5 shadow-xl backdrop-blur-xl">
+      <Controls
+        className="!static !m-0 !flex !flex-col !gap-1 !border-0 !bg-transparent !p-0 !shadow-none"
+        position="bottom-left"
+        showInteractive={false}
+        zoomInIcon={<ZoomIn size={12} className="text-slate-300" />}
+        zoomOutIcon={<ZoomOut size={12} className="text-slate-300" />}
+        fitViewIcon={<Maximize size={12} className="text-slate-300" />}
+      />
+    </div>
+  );
 }
 
 export function FlowCanvas({ className }: FlowCanvasProps) {
@@ -54,17 +65,11 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [showSearch, setShowSearch] = useState(false);
 
-  /** Connection validation: terminal nodes can't be sources; no duplicates. */
   const isValidConnection: IsValidConnection<Connection & { source: string; target: string }> =
     useCallback(
       (connection) => {
-        const sourceNode = nodes.find((n) => n.id === connection.source) as
-          | Node
-          | undefined;
-        if (sourceNode && TERMINAL_TYPES.has(sourceNode.type as NodeType)) {
-          return false;
-        }
-        // Prevent duplicate edges between the same source/target/handles.
+        const sourceNode = nodes.find((n) => n.id === connection.source) as Node | undefined;
+        if (sourceNode && TERMINAL_TYPES.has(sourceNode.type as NodeType)) return false;
         const exists = edges.some(
           (e) =>
             e.source === connection.source &&
@@ -77,7 +82,6 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
       [nodes, edges],
     );
 
-  /** Handle drop from the NodePalette. */
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();
@@ -97,27 +101,16 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     event.dataTransfer.dropEffect = 'move';
   }, []);
 
-  /** Keyboard shortcuts: undo/redo/delete/copy/paste/search. */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      // Ignore when typing in inputs/textareas.
-      if (
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable)
-      ) {
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
         return;
       }
       const isMod = e.ctrlKey || e.metaKey;
       if (isMod && e.key.toLowerCase() === 'z') {
         e.preventDefault();
-        if (e.shiftKey) {
-          redo();
-        } else {
-          undo();
-        }
+        e.shiftKey ? redo() : undo();
       } else if (isMod && e.key.toLowerCase() === 'y') {
         e.preventDefault();
         redo();
@@ -125,23 +118,18 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         e.preventDefault();
         setShowSearch(true);
       } else if (isMod && e.key.toLowerCase() === 'c') {
-        // Copy selected node.
         const selectedId = useEditorStore.getState().selectedNodeId;
         if (selectedId) {
           e.preventDefault();
           useEditorStore.getState().copyNode(selectedId);
         }
       } else if (isMod && e.key.toLowerCase() === 'v') {
-        // Paste near the currently selected node.
         const selectedId = useEditorStore.getState().selectedNodeId;
         if (selectedId) {
           const node = useEditorStore.getState().nodes.find((n) => n.id === selectedId);
           if (node) {
             e.preventDefault();
-            useEditorStore.getState().pasteNode({
-              x: (node.position?.x ?? 0) + 40,
-              y: (node.position?.y ?? 0) + 40,
-            });
+            useEditorStore.getState().pasteNode({ x: (node.position?.x ?? 0) + 40, y: (node.position?.y ?? 0) + 40 });
           }
         }
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -156,55 +144,34 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     return () => window.removeEventListener('keydown', handler);
   }, [undo, redo, removeNode]);
 
-  /** Click on a node selects it. */
-  const onNodeClick = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
-      selectNode(node.id);
-    },
-    [selectNode],
-  );
-
-  /** Click on the pane background clears selection. */
-  const onPaneClick = useCallback(() => {
-    selectNode(null);
-  }, [selectNode]);
-
-  /** Right-click on a node opens the node context menu. */
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => { selectNode(node.id); }, [selectNode]);
+  const onPaneClick = useCallback(() => { selectNode(null); }, [selectNode]);
   const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
     event.preventDefault();
     setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
   }, []);
-
-  /** Right-click on the pane opens the canvas context menu. */
   const onPaneContextMenu = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
     setContextMenu({ x: event.clientX, y: event.clientY, nodeId: null });
   }, []);
 
-  const minimapNodeColor = useCallback((n: Node) => {
-    const accents: Record<string, string> = {
-      start: '#22d3ee',
-      scene: '#a78bfa',
-      logic: '#f59e0b',
-      setter: '#34d399',
-      calculator: '#60a5fa',
-      settlement: '#f472b6',
-      video: '#fb7185',
-      link: '#94a3b8',
-    };
-    return accents[n.type ?? ''] ?? '#64748b';
-  }, []);
-
+  const minimapNodeColor = useCallback((n: Node) => NODE_TYPE_ACCENTS[n.type as NodeType] ?? '#64748b', []);
   const flowNodes = useMemo(() => nodes, [nodes]);
   const flowEdges = useMemo(() => edges, [edges]);
+
+  const hasNodes = nodes.length > 0;
 
   return (
     <div
       ref={wrapperRef}
-      className={className}
+      className={cn('relative overflow-hidden', className)}
       onDrop={onDrop}
       onDragOver={onDragOver}
     >
+      <div className="pointer-events-none absolute inset-0 z-0" style={{
+        background: 'radial-gradient(ellipse 80% 60% at 50% 40%, rgba(34,211,238,0.03), transparent 70%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(167,139,250,0.02), transparent 70%)',
+      }} />
+
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -220,22 +187,77 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         isValidConnection={isValidConnection}
         fitView
         proOptions={{ hideAttribution: true }}
-        className="bg-slate-950"
+        defaultEdgeOptions={{
+          type: 'zorron',
+          animated: true,
+          style: { strokeWidth: 2 },
+        }}
+        className="!bg-slate-950"
       >
-        <Background gap={20} size={1} color="#1e293b" />
-        <Controls className="!border-slate-700 !bg-slate-900/80" />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={24}
+          size={1.5}
+          color="#1e293b"
+          style={{ opacity: 0.6 }}
+        />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={120}
+          size={2}
+          color="#334155"
+          style={{ opacity: 0.3 }}
+        />
+        <CustomControls />
         <MiniMap
           nodeColor={minimapNodeColor}
-          className="!bg-slate-900/80"
-          maskColor="rgba(2,6,23,0.7)"
+          className="!bottom-4 !right-4 !overflow-hidden !rounded-xl !border !border-slate-800/50 !bg-slate-900/80 !p-0 shadow-xl backdrop-blur-xl"
+          maskColor="rgba(2,6,23,0.75)"
+          nodeStrokeWidth={3}
+          pannable
+          zoomable
         />
       </ReactFlow>
-      {contextMenu ? (
-        <ContextMenu
-          state={contextMenu}
-          onClose={() => setContextMenu(null)}
-        />
-      ) : null}
+
+      {!hasNodes && (
+        <div className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center p-8">
+          <div className="flex flex-col items-center gap-5 text-center">
+            <EmptyStateIllustration
+              illustration="empty-canvas"
+              alt="Empty canvas"
+              className="max-w-md opacity-80"
+              aspectRatio="video"
+            />
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <Sparkles size={16} className="text-cyan-400" />
+                <h3 className="text-xl font-bold bg-gradient-to-r from-cyan-200 via-indigo-200 to-purple-200 bg-clip-text text-transparent">
+                  开始构建你的叙事
+                </h3>
+                <Sparkles size={16} className="text-purple-400" />
+              </div>
+              <p className="text-sm text-slate-400">
+                从左侧面板拖拽节点到画布上，或点击节点快速创建
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1">
+                <kbd className="rounded border border-slate-700 bg-slate-800/80 px-1.5 py-0.5 font-mono">Ctrl</kbd>
+                <span>+</span>
+                <kbd className="rounded border border-slate-700 bg-slate-800/80 px-1.5 py-0.5 font-mono">P</kbd>
+                <span>搜索节点</span>
+              </span>
+              <span className="text-slate-700">·</span>
+              <span className="flex items-center gap-1">
+                <MousePointer2 size={12} />
+                <span>拖拽创建</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {contextMenu ? <ContextMenu state={contextMenu} onClose={() => setContextMenu(null)} /> : null}
       {showSearch ? <NodeSearch onClose={() => setShowSearch(false)} /> : null}
     </div>
   );

@@ -12,14 +12,14 @@ function SetterNodeImpl({ data, selected }: ZorronNodeProps) {
   const d = data as SetterNodeData;
   const assignments = d.assignments ?? [];
   return (
-    <NodeShell type="setter" label={d.label ?? t('nodeFallback.setter')} selected={selected} icon="=">
-      <div className="space-y-1">
+    <NodeShell type="setter" label={d.label ?? t('nodeFallback.setter')} selected={selected}>
+      <div className="space-y-1.5">
         {assignments.length === 0 ? (
-          <p className="italic text-slate-500">{t('nodeFallback.noAssign')}</p>
+          <p className="italic text-[11px] text-slate-500">{t('nodeFallback.noAssign')}</p>
         ) : (
-          <ul className="space-y-0.5 font-mono text-[11px]">
+          <ul className="space-y-1 font-mono text-[10px]">
             {assignments.slice(0, 3).map((a, i) => (
-              <li key={i} className="text-emerald-200/90">
+              <li key={i} className="rounded bg-slate-800/40 px-2 py-0.5 text-emerald-200/90">
                 {a.variable} {a.operator === 'set' ? '=' : a.operator === 'add' ? '+=' : '-='}{' '}
                 {String(a.value)}
               </li>

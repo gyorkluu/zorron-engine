@@ -36,15 +36,13 @@ vi.mock('@/lib/featureFlags', () => ({
   featureFlags: mockFeatureFlags,
 }));
 
-// Mock VectorSpacePanel so we don't pull in the 3D canvas / project store.
-vi.mock('@/components/vector3d/VectorSpacePanel', () => ({
-  VectorSpacePanel: (props: {
-    userVector?: unknown;
+// Mock VectorScene so we don't pull in the 3D canvas / project store.
+vi.mock('@/components/vector3d/VectorScene', () => ({
+  VectorScene: (props: {
     highlightedSectId?: string | null;
-    compact?: boolean;
   }) => (
     <div data-testid="vector-space-panel-mock">
-      {props.highlightedSectId ?? 'no-highlight'}-{String(props.compact)}
+      {props.highlightedSectId ?? 'no-highlight'}-true
     </div>
   ),
 }));

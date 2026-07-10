@@ -94,3 +94,8 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     set({ engine: null, state: null, isRunning: false });
   },
 }));
+
+if (typeof window !== 'undefined') {
+  (window as any).usePlayerStore = usePlayerStore;
+}
+

@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
+    "sharp": "^0.35.3",
     "turbo": "^2.3.3"
   }
 }

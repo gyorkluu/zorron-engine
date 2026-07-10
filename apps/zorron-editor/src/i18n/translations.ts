@@ -82,6 +82,7 @@ export const translations = {
   'node.default.newStory': { zh: '新故事', en: 'New Story' },
 
   // ── Inspector Panel ─────────────────────────────────────────
+  'inspector.title': { zh: '检查器', en: 'Inspector' },
   'inspector.noSelect': { zh: '未选中节点', en: 'No node selected' },
   'inspector.noSelect.hint': { zh: '点击画布上的节点以编辑属性。', en: 'Click a node on the canvas to edit its properties.' },
 

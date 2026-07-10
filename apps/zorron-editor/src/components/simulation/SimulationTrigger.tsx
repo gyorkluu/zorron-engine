@@ -6,6 +6,7 @@
  */
 
 import { memo, useCallback, useState } from 'react';
+import { BarChart3 } from 'lucide-react';
 import { SimulationPanel } from './SimulationPanel';
 import { useT } from '@/i18n/useT';
 
@@ -20,22 +21,12 @@ function SimulationTriggerImpl() {
       <button
         type="button"
         onClick={handleClick}
-        className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-200 shadow-lg backdrop-blur-sm hover:bg-slate-800"
+        className="group flex items-center gap-1.5 rounded-lg border border-violet-500/40 bg-violet-500/15 px-3 py-1.5 text-xs font-medium text-violet-200 shadow-lg shadow-violet-500/10 backdrop-blur-md transition-all duration-150 hover:border-violet-400/50 hover:bg-violet-500/25 hover:text-violet-100 active:scale-[0.97]"
         data-testid="simulation-trigger"
         title={t('sim.trigger.tip')}
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M3 3v18h18" />
-          <path d="M7 14l4-4 4 4 5-5" />
-        </svg>
-        {t('sim.trigger')}
+        <BarChart3 size={14} className="transition-transform group-hover:scale-110" />
+        <span>{t('sim.trigger')}</span>
       </button>
       <SimulationPanel open={open} onClose={handleClose} />
     </>

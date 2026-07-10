@@ -17,15 +17,14 @@ function SettlementNodeImpl({ data, selected }: ZorronNodeProps) {
       label={d.label ?? t('nodeFallback.settlement')}
       selected={selected}
       showSource={false}
-      icon="★"
     >
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {mappings.length === 0 ? (
-          <p className="italic text-slate-500">{t('nodeFallback.noResults')}</p>
+          <p className="italic text-[11px] text-slate-500">{t('nodeFallback.noResults')}</p>
         ) : (
-          <ul className="space-y-0.5">
+          <ul className="space-y-1">
             {mappings.slice(0, 3).map((m) => (
-              <li key={m.resultId} className="truncate text-pink-200/90">
+              <li key={m.resultId} className="truncate rounded border border-pink-500/20 bg-pink-500/8 px-2 py-0.5 text-[11px] text-pink-200/90">
                 {m.title}
               </li>
             ))}

@@ -6,7 +6,7 @@
  * editing changes don't restart the player mid-preview.
  */
 
-import { memo, useState } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { PlayerShell } from '@/components/player/PlayerShell';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
 import { useEditorStore } from '@/stores/editorStore';
@@ -23,7 +23,14 @@ function PreviewOverlayImpl({ onExit }: PreviewOverlayProps) {
   const { t } = useT();
   const nodes = useEditorStore((s) => s.nodes);
   // Snapshot the flow once on mount so preview isn't disrupted by edits.
-  const [flowData] = useState<FlowData>(() => buildCurrentFlowData());
+  const [flowData, setFlowData] = useState<FlowData>(() => buildCurrentFlowData());
+
+  // If the snapshot was initialized empty, but the canvas now has nodes, update it.
+  useEffect(() => {
+    if (flowData.nodes.length === 0 && nodes.length > 0) {
+      setFlowData(buildCurrentFlowData());
+    }
+  }, [nodes, flowData.nodes.length]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-950">

@@ -16,14 +16,13 @@ function LinkNodeImpl({ data, selected }: ZorronNodeProps) {
       label={d.label ?? t('nodeFallback.link')}
       selected={selected}
       showSource={false}
-      icon="↗"
     >
-      <div className="space-y-1">
-        {d.title && <p className="font-medium text-slate-200">{d.title}</p>}
+      <div className="space-y-1.5">
+        {d.title && <p className="text-[11px] font-semibold text-slate-200">{d.title}</p>}
         {d.url ? (
-          <p className="truncate text-slate-400">{d.url}</p>
+          <p className="truncate rounded bg-slate-700/20 px-2 py-1 font-mono text-[10px] text-slate-400">{d.url}</p>
         ) : (
-          <p className="italic text-slate-500">{t('nodeFallback.noUrl')}</p>
+          <p className="italic text-[11px] text-slate-500">{t('nodeFallback.noUrl')}</p>
         )}
       </div>
     </NodeShell>

@@ -1,80 +1,46 @@
 /**
  * AssetGrid - grid of draggable asset cards.
- *
- * Each card sets `application/zorron-asset-url` (and `text/plain` fallback) in
- * the DataTransfer so the inspector's UrlField can accept the drop. Clicking a
- * card selects it for the detail panel.
  */
 
 import { memo, type DragEvent } from 'react';
+import {
+  Image as ImageIcon,
+  Music,
+  Film,
+  Type as TypeIcon,
+  FileBox,
+  HardDrive,
+  PackageOpen,
+} from 'lucide-react';
 import type { Asset, AssetType } from '@/types/asset';
 import { formatFileSize, isLocalAsset } from '@/types/asset';
 import { useAssetStore } from '@/stores/assetStore';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
-/** Accent color per asset type for the card badge. */
-const TYPE_ACCENTS: Record<AssetType, string> = {
-  image: '#22d3ee',
-  audio: '#a78bfa',
-  video: '#fb7185',
-  font: '#34d399',
-  other: '#94a3b8',
+const TYPE_ACCENTS: Record<AssetType, { bg: string; text: string; border: string }> = {
+  image: { bg: 'bg-violet-500/15', text: 'text-violet-300', border: 'border-violet-500/25' },
+  audio: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', border: 'border-emerald-500/25' },
+  video: { bg: 'bg-rose-500/15', text: 'text-rose-300', border: 'border-rose-500/25' },
+  font: { bg: 'bg-amber-500/15', text: 'text-amber-300', border: 'border-amber-500/25' },
+  other: { bg: 'bg-slate-500/15', text: 'text-slate-300', border: 'border-slate-500/25' },
 };
 
-/** Inline SVG icon per asset type. */
-function TypeIcon({ type }: { type: AssetType }) {
-  const accent = TYPE_ACCENTS[type];
-  const common = { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: accent, strokeWidth: 2 } as const;
-  switch (type) {
-    case 'image':
-      return (
-        <svg {...common}>
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <polyline points="21 15 16 10 5 21" />
-        </svg>
-      );
-    case 'audio':
-      return (
-        <svg {...common}>
-          <path d="M9 18V5l12-2v13" />
-          <circle cx="6" cy="18" r="3" />
-          <circle cx="18" cy="16" r="3" />
-        </svg>
-      );
-    case 'video':
-      return (
-        <svg {...common}>
-          <polygon points="23 7 16 12 23 17 23 7" />
-          <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-        </svg>
-      );
-    case 'font':
-      return (
-        <svg {...common}>
-          <polyline points="4 7 4 4 20 4 20 7" />
-          <line x1="9" y1="20" x2="15" y2="20" />
-          <line x1="12" y1="4" x2="12" y2="20" />
-        </svg>
-      );
-    default:
-      return (
-        <svg {...common}>
-          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-          <polyline points="13 2 13 9 20 9" />
-        </svg>
-      );
-  }
-}
+const TYPE_ICONS: Record<AssetType, React.ComponentType<{ size?: number; className?: string }>> = {
+  image: ImageIcon,
+  audio: Music,
+  video: Film,
+  font: TypeIcon,
+  other: FileBox,
+};
 
-/** A single asset card. */
 function AssetCard({ asset }: { asset: Asset }) {
   const { t } = useT();
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);
   const selectAsset = useAssetStore((s) => s.selectAsset);
   const isSelected = selectedAssetId === asset.id;
   const accent = TYPE_ACCENTS[asset.type];
+  const TypeIconComponent = TYPE_ICONS[asset.type];
   const local = isLocalAsset(asset);
 
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
@@ -89,46 +55,49 @@ function AssetCard({ asset }: { asset: Asset }) {
       onDragStart={onDragStart}
       onClick={() => selectAsset(asset.id)}
       className={cn(
-        'group relative flex cursor-grab flex-col gap-1 rounded-lg border bg-slate-900/50 p-1.5 transition-all hover:border-slate-500/70 hover:bg-slate-800/60 active:cursor-grabbing',
-        isSelected ? 'border-cyan-500/70 ring-1 ring-cyan-500/40' : 'border-slate-700/50',
+        'group relative flex cursor-grab flex-col gap-1 rounded-xl border bg-slate-900/40 p-1.5 transition-all duration-200 hover:-translate-y-0.5 active:cursor-grabbing active:scale-[0.98]',
+        isSelected
+          ? 'border-cyan-500/50 bg-slate-900/70 shadow-lg shadow-cyan-500/10 ring-1 ring-cyan-500/30'
+          : 'border-slate-800/50 hover:border-slate-600/50 hover:bg-slate-800/50',
       )}
       title={`${asset.name}\n${asset.mimeType} · ${formatFileSize(asset.size)}`}
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-md bg-slate-950/60">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gradient-to-br from-slate-800/60 to-slate-950/60">
         {asset.type === 'image' ? (
           <img
             src={asset.url}
             alt={asset.name}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <TypeIcon type={asset.type} />
+            <div className={cn('flex h-8 w-8 items-center justify-center rounded-lg', accent.bg)}>
+              <TypeIconComponent size={14} className={accent.text} />
+            </div>
           </div>
         )}
         <span
-          className="absolute left-1 top-1 rounded px-1 py-0.5 text-[9px] font-semibold uppercase"
-          style={{ background: `${accent}33`, color: accent }}
+          className={cn('absolute left-1 top-1 rounded-md border px-1.5 py-0.5 text-[9px] font-bold uppercase', accent.bg, accent.text, accent.border)}
         >
           {asset.type}
         </span>
         {local && (
-          <span className="absolute right-1 top-1 rounded bg-amber-500/30 px-1 py-0.5 text-[9px] font-semibold text-amber-200">
+          <span className="absolute right-1 top-1 flex items-center gap-0.5 rounded-md border border-amber-500/30 bg-amber-500/20 px-1 py-0.5 text-[8px] font-bold text-amber-200">
+            <HardDrive size={7} />
             {t('asset.local')}
           </span>
         )}
       </div>
-      <p className="truncate text-[11px] text-slate-200">{asset.name}</p>
-      <p className="text-[9px] text-slate-500">{formatFileSize(asset.size)}</p>
+      <p className="truncate px-0.5 text-[11px] font-medium text-slate-200">{asset.name}</p>
+      <p className="px-0.5 text-[9px] text-slate-500">{formatFileSize(asset.size)}</p>
     </div>
   );
 }
 
-/** Props for the AssetGrid. */
 export interface AssetGridProps {
   assets: Asset[];
   className?: string;
@@ -138,20 +107,21 @@ function AssetGridImpl({ assets, className }: AssetGridProps) {
   const { t } = useT();
   if (assets.length === 0) {
     return (
-      <div className={cn('flex flex-1 items-center justify-center p-6 text-center', className)}>
-        <div>
-          <p className="text-xs font-medium text-slate-400">{t('asset.empty')}</p>
-          <p className="mt-1 text-[10px] text-slate-600">
-            {t('asset.emptyHint')}
-          </p>
+      <div className={cn('flex flex-1 flex-col items-center justify-center p-6 text-center', className)}>
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-800/60 to-slate-900/30 border border-slate-800/40 mb-3">
+          <PackageOpen size={24} className="text-slate-600" />
         </div>
+        <p className="text-sm font-semibold text-slate-400">{t('asset.empty')}</p>
+        <p className="mt-1 max-w-[180px] text-[11px] leading-relaxed text-slate-600">
+          {t('asset.emptyHint')}
+        </p>
       </div>
     );
   }
   return (
     <div
       className={cn(
-        'grid grid-cols-2 gap-2 overflow-y-auto p-2',
+        'grid grid-cols-2 gap-2 overflow-y-auto p-2 scrollbar-thin',
         className,
       )}
     >

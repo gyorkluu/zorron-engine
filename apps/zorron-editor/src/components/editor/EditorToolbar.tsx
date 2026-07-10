@@ -7,6 +7,7 @@
 
 import { memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Eye, Check, Loader2, AlertCircle } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
@@ -17,21 +18,54 @@ import { featureFlags } from '@/lib/featureFlags';
 import { sampleFlowData, sampleProjectMeta } from '@/data/sampleProject';
 import { useT } from '@/i18n/useT';
 import { useLocaleStore } from '@/i18n/localeStore';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import type { ProjectDetail } from '@/types/project';
 import type { FlowData } from '@/types/flow';
 import { cn } from '@/lib/utils';
 
-/** Status badge color mapping. */
-const STATUS_STYLES: Record<string, string> = {
-  saved: 'bg-emerald-500/20 text-emerald-300',
-  saving: 'bg-amber-500/20 text-amber-300',
-  unsaved: 'bg-slate-500/20 text-slate-300',
-  error: 'bg-rose-500/20 text-rose-300',
+const STATUS_STYLES: Record<string, { bg: string; text: string; icon: typeof Check }> = {
+  saved: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', icon: Check },
+  saving: { bg: 'bg-amber-500/15', text: 'text-amber-300', icon: Loader2 },
+  unsaved: { bg: 'bg-slate-500/15', text: 'text-slate-300', icon: AlertCircle },
+  error: { bg: 'bg-rose-500/15', text: 'text-rose-300', icon: AlertCircle },
 };
 
-/** Props for the EditorToolbar. */
 export interface EditorToolbarProps {
   className?: string;
+}
+
+function ToolbarButton({
+  onClick,
+  icon: Icon,
+  label,
+  variant = 'default',
+  title,
+}: {
+  onClick?: () => void;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label?: string;
+  variant?: 'default' | 'primary' | 'accent';
+  title?: string;
+}) {
+  const styles = {
+    default: 'border-slate-700/60 bg-slate-800/40 text-slate-300 hover:bg-slate-700/60 hover:text-slate-100 hover:border-slate-600/60',
+    primary: 'border-cyan-500/40 bg-cyan-500/15 text-cyan-200 hover:bg-cyan-500/25 hover:border-cyan-400/50 hover:text-cyan-100 shadow-lg shadow-cyan-500/5',
+    accent: 'border-violet-500/40 bg-violet-500/15 text-violet-200 hover:bg-violet-500/25 hover:border-violet-400/50 hover:text-violet-100',
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all duration-150 active:scale-[0.97]',
+        styles[variant],
+      )}
+      title={title}
+    >
+      <Icon size={13} className={variant === 'primary' ? 'animate-pulse' : ''} />
+      {label && <span>{label}</span>}
+    </button>
+  );
 }
 
 function EditorToolbarImpl({ className }: EditorToolbarProps) {
@@ -52,7 +86,6 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   }, [save]);
 
   const handleExport = useCallback(() => {
-    // Build a ProjectDetail-like payload from the current state.
     const flowData = buildCurrentFlowData();
     const project: ProjectDetail = {
       id: id ?? 'local',
@@ -70,7 +103,6 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   const handleImport = useCallback(async () => {
     const parsed = await pickJsonFile<{ data?: FlowData; title?: string } | FlowData>();
     if (!parsed) return;
-    // Accept both { data, title } and a bare FlowData payload.
     const flowData: FlowData =
       parsed && typeof parsed === 'object' && 'data' in parsed && parsed.data
         ? (parsed as { data: FlowData }).data
@@ -87,7 +119,6 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
     }
   }, [importProject, loadFlow, title]);
 
-  /** Load the built-in sample project into the editor (local mode). */
   const handleLoadSample = useCallback(() => {
     useProjectStore.getState().reset();
     useProjectStore.setState({
@@ -110,94 +141,71 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
     error: t('toolbar.save.error'),
   };
 
+  const StatusIcon = STATUS_STYLES[saveStatus]?.icon ?? AlertCircle;
+
   return (
     <header
       className={cn(
-        'flex h-12 items-center justify-between gap-3 border-b border-slate-800/60 bg-slate-950/60 px-4 backdrop-blur-sm',
+        'flex h-12 items-center justify-between gap-3 border-b border-slate-800/50 bg-gradient-to-b from-slate-900/95 to-slate-950/95 px-4 backdrop-blur-xl',
         className,
       )}
     >
       <div className="flex min-w-0 items-center gap-3">
-        <span className="flex-shrink-0 text-sm font-bold tracking-tight text-cyan-300">
-          {t('brand.name')}
-        </span>
+        <BrandLogo size={26} />
+        <div className="h-5 w-px bg-slate-700/50" />
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t('toolbar.untitled')}
-          className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-slate-100 outline-none hover:border-slate-700 focus:border-cyan-500/60 focus:bg-slate-900/60"
+          className="min-w-0 flex-1 max-w-[200px] rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-medium text-slate-100 outline-none transition-colors hover:border-slate-700/50 focus:border-cyan-500/40 focus:bg-slate-800/50"
         />
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-2">
-        {/* Cloud sync status indicator (feature-flagged). */}
         {featureFlags.cloudSync && <SyncStatusIndicator />}
 
-        {/* Save status badge. */}
         <span
           className={cn(
-            'rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
-            STATUS_STYLES[saveStatus] ?? STATUS_STYLES.unsaved,
+            'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider',
+            STATUS_STYLES[saveStatus]?.bg,
+            STATUS_STYLES[saveStatus]?.text,
+            saveStatus === 'saving' && '[&>svg]:animate-spin',
           )}
           data-testid="save-status"
         >
+          <StatusIcon size={10} />
           {statusLabel[saveStatus] ?? saveStatus}
         </span>
 
-        {/* Workspace mode switcher (feature-flagged). */}
         {featureFlags.cloudSync && <WorkspaceSwitcher />}
 
         {featureFlags.cloudSync && (
-          <button
-            type="button"
+          <ToolbarButton
             onClick={() => navigate('/projects')}
-            className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
+            icon={FolderOpen}
+            label={t('toolbar.projects')}
             title={t('toolbar.projects.tip')}
-          >
-            {t('toolbar.projects')}
-          </button>
+          />
         )}
 
-        {/* Language toggle. */}
-        <button
-          type="button"
+        <ToolbarButton
           onClick={toggleLocale}
-          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-800"
+          icon={Languages}
+          label={locale === 'zh' ? '中/EN' : 'EN/中'}
           title={t('toolbar.lang.tip')}
-        >
-          {locale === 'zh' ? '中 / EN' : 'EN / 中'}
-        </button>
+        />
 
-        <button
-          type="button"
+        <ToolbarButton
           onClick={handleLoadSample}
-          className="rounded-md border border-violet-600/50 bg-violet-600/20 px-2.5 py-1 text-xs font-medium text-violet-100 hover:bg-violet-600/30"
+          icon={Sparkles}
+          label={t('toolbar.sample')}
+          variant="accent"
           title={t('toolbar.sample.tip')}
-        >
-          {t('toolbar.sample')}
-        </button>
-        <button
-          type="button"
-          onClick={handleImport}
-          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
-        >
-          {t('toolbar.import')}
-        </button>
-        <button
-          type="button"
-          onClick={handleExport}
-          className="rounded-md border border-slate-700 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-200 hover:bg-slate-800"
-        >
-          {t('toolbar.export')}
-        </button>
-        <button
-          type="button"
-          onClick={handleSave}
-          className="rounded-md border border-cyan-600/50 bg-cyan-600/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-600/30"
-        >
-          {t('toolbar.save')}
-        </button>
+        />
+        <ToolbarButton onClick={handleImport} icon={Upload} label={t('toolbar.import')} />
+        <ToolbarButton onClick={handleExport} icon={Download} label={t('toolbar.export')} />
+        <ToolbarButton onClick={handleSave} icon={Save} label={t('toolbar.save')} variant="primary" />
       </div>
     </header>
   );

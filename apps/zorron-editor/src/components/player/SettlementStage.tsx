@@ -12,6 +12,7 @@ import { useProjectStore } from '@/stores/projectStore';
 import type { GameState } from '@/engine/GameEngine';
 import { VectorScene } from '@/components/vector3d/VectorScene';
 import cdnMapping from '@/assets/cdn-mapping.json';
+import { featureFlags } from '@/lib/featureFlags';
 
 /** Props for SettlementStage. */
 export interface SettlementStageProps {
@@ -38,7 +39,18 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
   }, [result.sect?.id]);
 
   const axisLabels = settings.vectorSpace?.dimensions ?? { x: 'X', y: 'Y', z: 'Z' };
-  const sects = settings.vectorSpace?.sects ?? [];
+  const sects = useMemo(() => {
+    const list = settings.vectorSpace?.sects ?? [];
+    if (list.length === 0 && result?.sect) {
+      return [result.sect];
+    }
+    return list;
+  }, [settings.vectorSpace?.sects, result?.sect]);
+
+  const formatVectorValue = (val: number) => {
+    const formatted = val.toFixed(2);
+    return val >= 0 ? `+${formatted}` : formatted;
+  };
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-slate-950">
@@ -94,7 +106,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
           )}
 
           {/* Interactive 3D vector radar. */}
-          {sects.length > 0 && (
+          {featureFlags.vector3d && sects.length > 0 && (
             <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -114,16 +126,34 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
               <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[10px]">
                 <div className="rounded-md bg-slate-900/60 p-1.5">
                   <div className="text-red-400">{axisLabels.x}</div>
-                  <div className="font-mono text-cyan-300">{result.finalVector.x.toFixed(2)}</div>
+                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.x)}</div>
                 </div>
                 <div className="rounded-md bg-slate-900/60 p-1.5">
                   <div className="text-green-400">{axisLabels.y}</div>
-                  <div className="font-mono text-cyan-300">{result.finalVector.y.toFixed(2)}</div>
+                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.y)}</div>
                 </div>
                 <div className="rounded-md bg-slate-900/60 p-1.5">
                   <div className="text-blue-400">{axisLabels.z}</div>
-                  <div className="font-mono text-cyan-300">{result.finalVector.z.toFixed(2)}</div>
+                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.z)}</div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Flat vector readout shown when 3D space is disabled. */}
+          {!featureFlags.vector3d && (
+            <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
+              <div className="rounded-md bg-slate-900/60 p-2">
+                <div className="text-slate-400 font-semibold mb-1">X</div>
+                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.x)}</span>
+              </div>
+              <div className="rounded-md bg-slate-900/60 p-2">
+                <div className="text-slate-400 font-semibold mb-1">Y</div>
+                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.y)}</span>
+              </div>
+              <div className="rounded-md bg-slate-900/60 p-2">
+                <div className="text-slate-400 font-semibold mb-1">Z</div>
+                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.z)}</span>
               </div>
             </div>
           )}

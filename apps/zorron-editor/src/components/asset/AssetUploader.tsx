@@ -1,19 +1,15 @@
 /**
  * AssetUploader - file picker + drag-drop zone that uploads via assetStore.
- *
- * Uses the store's `uploadAssetWithFallback` so uploads succeed even when the
- * backend is unreachable (assets are then persisted in IndexedDB).
  */
 
 import { memo, useRef, useState, type DragEvent } from 'react';
+import { Upload, Loader2, CloudUpload } from 'lucide-react';
 import { useAssetStore } from '@/stores/assetStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
-/** Props for the AssetUploader. */
 export interface AssetUploaderProps {
-  /** Optional class name. */
   className?: string;
 }
 
@@ -28,12 +24,11 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    // Upload sequentially so progress is predictable; small batches expected.
     for (const file of Array.from(files)) {
       try {
         await upload(file, projectId ?? undefined);
       } catch {
-        // The fallback already handles backend failures; only surface unexpected errors.
+        // fallback handles backend failures
       }
     }
   };
@@ -43,13 +38,6 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
     setIsDragOver(false);
     void handleFiles(e.dataTransfer.files);
   };
-
-  const onDragOver = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const onDragLeave = () => setIsDragOver(false);
 
   return (
     <div className={className}>
@@ -64,28 +52,31 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
           }
         }}
         onDrop={onDrop}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
+        onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+        onDragLeave={() => setIsDragOver(false)}
         className={cn(
-          'flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/40 px-3 py-4 text-center transition-colors',
-          isDragOver && 'border-cyan-500/60 bg-cyan-500/5',
+          'group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-3 py-5 text-center transition-all duration-200',
+          isDragOver
+            ? 'border-cyan-400/60 bg-gradient-to-b from-cyan-500/10 to-cyan-500/5 shadow-inner shadow-cyan-500/10'
+            : 'border-slate-800/60 bg-slate-900/30 hover:border-cyan-500/30 hover:bg-slate-900/50',
           isUploading && 'pointer-events-none opacity-60',
         )}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="text-slate-400"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
-        <p className="text-xs font-medium text-slate-300">
+        <div className={cn(
+          'flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
+          isDragOver
+            ? 'bg-cyan-500/20 text-cyan-300'
+            : 'bg-slate-800/60 text-slate-400 group-hover:text-cyan-400',
+        )}>
+          {isUploading ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : isDragOver ? (
+            <CloudUpload size={18} />
+          ) : (
+            <Upload size={18} />
+          )}
+        </div>
+        <p className="text-xs font-semibold text-slate-300">
           {isUploading ? t('asset.uploading') : t('asset.upload')}
         </p>
         <p className="text-[10px] text-slate-500">{t('asset.uploadHint')}</p>
@@ -97,12 +88,12 @@ function AssetUploaderImpl({ className }: AssetUploaderProps) {
         className="hidden"
         onChange={(e) => {
           void handleFiles(e.target.files);
-          // Reset so selecting the same file again re-fires onChange.
           e.target.value = '';
         }}
       />
       {error && (
-        <p className="mt-1 text-[10px] text-rose-400" role="alert">
+        <p className="mt-1.5 flex items-center gap-1 text-[10px] text-rose-400" role="alert">
+          <Upload size={10} />
           {error}
         </p>
       )}

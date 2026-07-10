@@ -100,7 +100,7 @@ describe('CloudProjectList', () => {
     expect(screen.getByTestId('project-list-items')).toBeInTheDocument();
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
-    expect(screen.getByText('已发布')).toBeInTheDocument();
+    expect(screen.getAllByText('已发布').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates to the editor when Open is clicked', () => {

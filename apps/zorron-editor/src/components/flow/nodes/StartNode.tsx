@@ -11,12 +11,12 @@ function StartNodeImpl({ data, selected }: ZorronNodeProps) {
   const { t } = useT();
   const d = data as StartNodeData;
   return (
-    <NodeShell type="start" label={d.label ?? t('node.default.start')} selected={selected} showTarget={false} icon="S">
-      <div className="space-y-1">
-        {d.title && <p className="font-medium text-cyan-200">{d.title}</p>}
-        {d.intro && <p className="line-clamp-2 text-slate-400">{d.intro}</p>}
+    <NodeShell type="start" label={d.label ?? t('node.default.start')} selected={selected} showTarget={false}>
+      <div className="space-y-2">
+        {d.title && <p className="text-[11px] font-semibold text-cyan-200">{d.title}</p>}
+        {d.intro && <p className="line-clamp-2 text-[11px] leading-relaxed text-slate-400">{d.intro}</p>}
         {d.coverUrl && (
-          <div className="mt-1 h-16 w-full overflow-hidden rounded-lg bg-slate-800">
+          <div className="mt-1 h-16 w-full overflow-hidden rounded-lg border border-cyan-500/20 bg-slate-800/50">
             <img src={d.coverUrl} alt="" className="h-full w-full object-cover" />
           </div>
         )}
