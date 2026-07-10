@@ -2,6 +2,15 @@ import { z } from 'zod';
 
 export const PositionSchema = z.object({ x: z.number(), y: z.number() });
 
+/**
+ * Generalized N-dimensional vector.
+ *
+ * Each key is an axis id, each value is the component along that axis. The
+ * legacy 3D shape `{ x, y, z }` is a valid vector, so existing project data
+ * needs no migration. Mirrors the frontend `Vector` type.
+ */
+export const VectorSchema = z.record(z.string(), z.number());
+
 export const NodeTypeSchema = z.enum([
   'start',
   'scene',
@@ -86,13 +95,7 @@ export const SetterNodeDataSchema = BaseNodeDataSchema.extend({
 });
 
 export const CalculatorNodeDataSchema = BaseNodeDataSchema.extend({
-  vector: z
-    .object({
-      x: z.number().default(0),
-      y: z.number().default(0),
-      z: z.number().default(0),
-    })
-    .default({ x: 0, y: 0, z: 0 }),
+  vector: VectorSchema.default({}),
   targetVariable: z.string().optional(),
   description: z.string().optional(),
 });
@@ -260,7 +263,7 @@ export const SectResultTextsSchema = z.object({
 export const SectAnchorSchema = z.object({
   id: z.string(),
   name: z.string(),
-  vector: z.object({ x: z.number(), y: z.number(), z: z.number() }),
+  vector: VectorSchema,
   title: z.string().optional(),
   description: z.string().optional(),
   coverUrl: z.string().url().optional(),
@@ -269,10 +272,13 @@ export const SectAnchorSchema = z.object({
 
 export const VectorSpaceConfigSchema = z.object({
   enabled: z.boolean().default(false),
-  dimensions: z.object({
-    x: z.string().default('处世'),
-    y: z.string().default('立场'),
-    z: z.string().default('性情'),
+  // dimensions maps axis id -> human-readable label. Number of keys defines
+  // vector space dimensionality (2, 3, 4, ...). Defaults to the legacy 3-axis
+  // space so existing projects without explicit dimensions keep working.
+  dimensions: z.record(z.string(), z.string()).default({
+    x: '处世',
+    y: '立场',
+    z: '性情',
   }),
   sects: z.array(SectAnchorSchema).optional(),
 }).default({

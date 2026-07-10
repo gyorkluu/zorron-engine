@@ -9,7 +9,7 @@
  */
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import type { PersonalityVector, SectAnchor } from '@/types/flow';
+import type { AxisId, PersonalityVector, SectAnchor } from '@/types/flow';
 import {
   renderVectorSpace,
   DEFAULT_CAMERA,
@@ -18,8 +18,8 @@ import {
 
 /** Props for the VectorScene. */
 export interface VectorSceneProps {
-  /** Axis labels (dimension names). */
-  axisLabels: { x: string; y: string; z: string };
+  /** Axis labels keyed by axis id (only the first three are projected). */
+  axisLabels: Record<AxisId, string>;
   /** Sect anchors to render. */
   sects: SectAnchor[];
   /** The user's current vector position. */

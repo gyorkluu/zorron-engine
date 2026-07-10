@@ -49,6 +49,11 @@ const BAR_COLORS = [
 function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
   const { t } = useT();
   const nodes = useEditorStore((s) => s.nodes);
+  const axisLabels = useProjectStore((s) => s.settings.vectorSpace.dimensions);
+  const axisIds = useMemo(
+    () => Object.keys(report.meanVector),
+    [report.meanVector],
+  );
 
   /** Build the settlement distribution bars. */
   const settlementBars: Bar[] = useMemo(() => {
@@ -160,38 +165,25 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           {t('sim.vectorStats')}
         </h3>
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <VectorStat
-            label={t('sim.axis')}
-            value={t('sim.meanStd')}
-            header
-          />
-          <VectorStat label="X" value="" header />
-          <VectorStat label="Y" value="" header />
-          <VectorStat
-            label={t('sim.mean')}
-            value={report.meanVector.x.toFixed(2)}
-          />
-          <VectorStat
-            label=""
-            value={report.meanVector.y.toFixed(2)}
-          />
-          <VectorStat
-            label=""
-            value={report.meanVector.z.toFixed(2)}
-          />
-          <VectorStat
-            label={t('sim.stddev')}
-            value={report.stdDevVector.x.toFixed(2)}
-          />
-          <VectorStat
-            label=""
-            value={report.stdDevVector.y.toFixed(2)}
-          />
-          <VectorStat
-            label=""
-            value={report.stdDevVector.z.toFixed(2)}
-          />
+        <div className="space-y-1">
+          <div className="grid grid-cols-3 gap-2 text-center text-[10px] uppercase tracking-wider text-slate-500">
+            <div>{t('sim.axis')}</div>
+            <div>{t('sim.mean')}</div>
+            <div>{t('sim.stddev')}</div>
+          </div>
+          {axisIds.map((axisId) => (
+            <div key={axisId} className="grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-md bg-slate-900/60 p-1.5 text-[10px] uppercase tracking-wider text-slate-400">
+                {axisLabels[axisId] ?? axisId}
+              </div>
+              <div className="rounded-md bg-slate-900/60 p-1.5 font-mono text-sm text-cyan-300">
+                {(report.meanVector[axisId] ?? 0).toFixed(2)}
+              </div>
+              <div className="rounded-md bg-slate-900/60 p-1.5 font-mono text-sm text-cyan-300">
+                {(report.stdDevVector[axisId] ?? 0).toFixed(2)}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -271,32 +263,6 @@ function StatCard({
       <div className={`font-mono text-lg ${color}`}>{value}</div>
       <div className="text-[10px] uppercase tracking-wider text-slate-500">
         {label}
-      </div>
-    </div>
-  );
-}
-
-/** A vector stat cell. */
-function VectorStat({
-  label,
-  value,
-  header = false,
-}: {
-  label: string;
-  value: string;
-  header?: boolean;
-}) {
-  return (
-    <div className="rounded-md bg-slate-900/60 p-1.5">
-      <div className="text-[10px] uppercase tracking-wider text-slate-500">
-        {label}
-      </div>
-      <div
-        className={`font-mono text-sm ${
-          header ? 'text-slate-400' : 'text-cyan-300'
-        }`}
-      >
-        {value}
       </div>
     </div>
   );

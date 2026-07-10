@@ -180,7 +180,9 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    expect(screen.getByPlaceholderText('处世')).toBeInTheDocument();
+    // Dimension labels are now rendered as TextField values (axis id is the
+    // placeholder; the label is the value).
+    expect(screen.getByDisplayValue('处世')).toBeInTheDocument();
     expect(screen.getByText('门派锚点（0）')).toBeInTheDocument();
   });
 

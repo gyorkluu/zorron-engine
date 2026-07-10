@@ -89,25 +89,15 @@ function VectorSpacePanelImpl({
         highlightedSectId={highlightedSectId}
         height={compact ? 240 : 320}
       />
-      <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[10px]">
-        <div className="rounded-md bg-slate-900/60 p-1.5">
-          <div className="text-red-400">{axisLabels.x}</div>
-          <div className="font-mono text-cyan-300">
-            {effectiveVector.x.toFixed(2)}
+      <div className="mt-2 flex flex-wrap gap-2 text-center text-[10px]">
+        {Object.entries(axisLabels).map(([axisId, label]) => (
+          <div key={axisId} className="min-w-[4rem] flex-1 rounded-md bg-slate-900/60 p-1.5">
+            <div className="text-red-400">{label}</div>
+            <div className="font-mono text-cyan-300">
+              {(effectiveVector[axisId] ?? 0).toFixed(2)}
+            </div>
           </div>
-        </div>
-        <div className="rounded-md bg-slate-900/60 p-1.5">
-          <div className="text-green-400">{axisLabels.y}</div>
-          <div className="font-mono text-cyan-300">
-            {effectiveVector.y.toFixed(2)}
-          </div>
-        </div>
-        <div className="rounded-md bg-slate-900/60 p-1.5">
-          <div className="text-blue-400">{axisLabels.z}</div>
-          <div className="font-mono text-cyan-300">
-            {effectiveVector.z.toFixed(2)}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

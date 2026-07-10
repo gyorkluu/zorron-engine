@@ -151,12 +151,13 @@ export function SetterForm({ node, update }: { node: FlowNode; update: (data: Pa
 export function CalculatorForm({ node, update }: { node: FlowNode; update: (data: Partial<CalculatorNodeData>) => void }) {
   const { t } = useT();
   const d = node.data as CalculatorNodeData;
+  const dimensions = useProjectStore((s) => s.settings.vectorSpace.dimensions);
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
       <Field label={t('field.description')}><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
       <Field label={t('field.vectorDelta')} hint={t('field.vectorDelta.hint')}>
-        <VectorEditor value={d.vector ?? { x: 0, y: 0, z: 0 }} onChange={(vector) => update({ vector })} />
+        <VectorEditor value={d.vector ?? {}} onChange={(vector) => update({ vector })} labels={dimensions} />
       </Field>
       <Field label={t('field.targetVar')} hint={t('field.targetVar.hint')}>
         <TextField value={d.targetVariable ?? ''} onChange={(targetVariable) => update({ targetVariable })} placeholder={t('field.targetVar.ph')} />

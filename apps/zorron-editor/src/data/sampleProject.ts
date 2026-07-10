@@ -94,7 +94,7 @@ const nodes: FlowNode[] = [
     position: { x: 600, y: 250 },
     data: {
       label: '勇气向量结算',
-      vector: { x: 0, y: 0, z: 0 },
+      vector: {},
       targetVariable: 'bravery',
       description: '战斗后勇气值提升',
     },

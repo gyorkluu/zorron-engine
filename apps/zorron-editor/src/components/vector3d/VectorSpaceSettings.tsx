@@ -3,7 +3,8 @@
  *
  * Allows the user to:
  * - Toggle the vector space on/off.
- * - Edit the dimension labels (X/Y/Z).
+ * - Add/remove axes (changing vector space dimensionality: 2D, 3D, 4D, ...).
+ * - Edit the label of each axis.
  * - Add/remove/edit sect anchors (id, name, vector, title).
  *
  * Wired to `projectStore.setSettings` so changes flow into the project's
@@ -15,13 +16,21 @@ import { useProjectStore } from '@/stores/projectStore';
 import { useT, tt } from '@/i18n/useT';
 import { Field, TextField, SwitchField } from '@/components/inspector/fields/Field';
 import { VectorEditor } from '@/components/inspector/fields/VectorEditor';
-import type { SectAnchor, VectorSpaceConfig, ProjectSettings } from '@/types/flow';
+import { createZeroVector } from '@/engine/vectorMath';
+import type { AxisId, SectAnchor, VectorSpaceConfig, ProjectSettings, Vector } from '@/types/flow';
 import { nanoid } from 'nanoid';
 
 /** Props for the VectorSpaceSettings. */
 export interface VectorSpaceSettingsProps {
   /** Optional class name. */
   className?: string;
+}
+
+/** Strip a key from a vector, returning a new vector without that axis. */
+function removeAxisFromVector(vector: Vector, axisId: AxisId): Vector {
+  const out: Vector = { ...vector };
+  delete out[axisId];
+  return out;
 }
 
 function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
@@ -54,17 +63,18 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     [vectorSpace.sects, updateVectorSpace],
   );
 
-  /** Add a new sect anchor with a default vector. */
+  /** Add a new sect anchor with a zero vector matching the current axes. */
   const addSect = useCallback(() => {
     const sects = vectorSpace.sects ?? [];
+    const axisIds = Object.keys(vectorSpace.dimensions);
     const newSect: SectAnchor = {
       id: `sect_${nanoid(6)}`,
       name: tt('vector3d.sects.default', { n: sects.length + 1 }),
-      vector: { x: 0, y: 0, z: 0 },
+      vector: createZeroVector(axisIds),
       title: tt('vector3d.sects.default', { n: sects.length + 1 }),
     };
     updateVectorSpace({ sects: [...sects, newSect] });
-  }, [vectorSpace.sects, updateVectorSpace]);
+  }, [vectorSpace.sects, vectorSpace.dimensions, updateVectorSpace]);
 
   /** Remove a sect anchor by id. */
   const removeSect = useCallback(
@@ -74,6 +84,44 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
     },
     [vectorSpace.sects, updateVectorSpace],
   );
+
+  /** Add a new axis to the vector space (increments dimensionality). */
+  const addAxis = useCallback(() => {
+    const axisId = `axis_${nanoid(4)}`;
+    const dimensions = { ...vectorSpace.dimensions, [axisId]: axisId };
+    // Seed the new axis as 0 on every existing sect vector so the dimension
+    // count stays consistent across anchors.
+    const sects = (vectorSpace.sects ?? []).map((s) => ({
+      ...s,
+      vector: { ...s.vector, [axisId]: 0 },
+    }));
+    updateVectorSpace({ dimensions, sects });
+  }, [vectorSpace.dimensions, vectorSpace.sects, updateVectorSpace]);
+
+  /** Remove an axis from the vector space (decrements dimensionality). */
+  const removeAxis = useCallback(
+    (axisId: AxisId) => {
+      const dimensions = { ...vectorSpace.dimensions };
+      delete dimensions[axisId];
+      const sects = (vectorSpace.sects ?? []).map((s) => ({
+        ...s,
+        vector: removeAxisFromVector(s.vector, axisId),
+      }));
+      updateVectorSpace({ dimensions, sects });
+    },
+    [vectorSpace.dimensions, vectorSpace.sects, updateVectorSpace],
+  );
+
+  /** Rename the label of an axis (keeps the axis id stable). */
+  const renameAxis = useCallback(
+    (axisId: AxisId, label: string) => {
+      const dimensions = { ...vectorSpace.dimensions, [axisId]: label };
+      updateVectorSpace({ dimensions });
+    },
+    [vectorSpace.dimensions, updateVectorSpace],
+  );
+
+  const axisEntries = Object.entries(vectorSpace.dimensions);
 
   return (
     <div className={className} data-testid="vector-space-settings">
@@ -92,40 +140,45 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
 
         {vectorSpace.enabled && (
           <>
-            <div className="grid grid-cols-3 gap-2">
-              <Field label={t('vector3d.xAxis')}>
-                <TextField
-                  value={vectorSpace.dimensions.x}
-                  onChange={(x) =>
-                    updateVectorSpace({
-                      dimensions: { ...vectorSpace.dimensions, x },
-                    })
-                  }
-                  placeholder="处世"
-                />
-              </Field>
-              <Field label={t('vector3d.yAxis')}>
-                <TextField
-                  value={vectorSpace.dimensions.y}
-                  onChange={(y) =>
-                    updateVectorSpace({
-                      dimensions: { ...vectorSpace.dimensions, y },
-                    })
-                  }
-                  placeholder="立场"
-                />
-              </Field>
-              <Field label={t('vector3d.zAxis')}>
-                <TextField
-                  value={vectorSpace.dimensions.z}
-                  onChange={(z) =>
-                    updateVectorSpace({
-                      dimensions: { ...vectorSpace.dimensions, z },
-                    })
-                  }
-                  placeholder="性情"
-                />
-              </Field>
+            {/* Axis editor: add/remove axes to change dimensionality. */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                  {t('vector3d.dimensions')}
+                </span>
+                <button
+                  type="button"
+                  onClick={addAxis}
+                  className="rounded-md bg-cyan-500/20 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-500/30"
+                >
+                  {t('vector3d.axis.add')}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {axisEntries.map(([axisId, label]) => (
+                  <div
+                    key={axisId}
+                    className="flex items-end gap-1"
+                    data-testid={`axis-editor-${axisId}`}
+                  >
+                    <Field label={axisId}>
+                      <TextField
+                        value={label}
+                        onChange={(newLabel) => renameAxis(axisId, newLabel)}
+                        placeholder={axisId}
+                      />
+                    </Field>
+                    <button
+                      type="button"
+                      onClick={() => removeAxis(axisId)}
+                      className="mb-1 flex-shrink-0 rounded-md px-1.5 py-1 text-xs text-rose-300 hover:bg-rose-500/20"
+                      title={t('vector3d.axis.remove')}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -182,6 +235,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
                       <VectorEditor
                         value={sect.vector}
                         onChange={(vector) => updateSect(sect.id, { vector })}
+                        labels={vectorSpace.dimensions}
                       />
                     </Field>
                   </div>

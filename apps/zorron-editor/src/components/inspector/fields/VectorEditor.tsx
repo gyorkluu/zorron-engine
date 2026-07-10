@@ -1,43 +1,52 @@
 /**
- * VectorEditor - edit a 3D personality vector (x/y/z).
+ * VectorEditor - edit an N-dimensional vector.
+ *
+ * Renders one number field per axis. The set of axes is driven by `labels`
+ * (a `Record<AxisId, string>`); when omitted, the editor falls back to the
+ * keys present on `value`, or the legacy `x/y/z` triplet for an empty vector.
  */
 
 import { memo } from 'react';
 import { Field, NumberField } from './Field';
-import type { PersonalityVector } from '@/types/flow';
+import type { AxisId, Vector } from '@/types/flow';
 
 /** Props for the VectorEditor. */
 export interface VectorEditorProps {
-  value: PersonalityVector;
-  onChange: (value: PersonalityVector) => void;
-  labels?: { x: string; y: string; z: string };
+  value: Vector;
+  onChange: (value: Vector) => void;
+  /**
+   * Axis id → human-readable label. The keys define which axes are rendered
+   * and their display order. When omitted, the editor derives axes from
+   * `value`'s own keys, falling back to `{x,y,z}` for an empty vector.
+   */
+  labels?: Record<AxisId, string>;
 }
 
+/** Default axis set used when neither `labels` nor `value` provide axes. */
+const DEFAULT_AXES: ReadonlyArray<readonly [AxisId, string]> = [
+  ['x', 'X'],
+  ['y', 'Y'],
+  ['z', 'Z'],
+] as const;
+
 function VectorEditorImpl({ value, onChange, labels }: VectorEditorProps) {
-  const lbl = labels ?? { x: 'X', y: 'Y', z: 'Z' };
+  const axisEntries: ReadonlyArray<readonly [AxisId, string]> = labels
+    ? Object.entries(labels)
+    : Object.keys(value).length > 0
+      ? Object.keys(value).map((k) => [k, k] as const)
+      : DEFAULT_AXES;
+
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <Field label={lbl.x}>
-        <NumberField
-          value={value.x}
-          onChange={(x) => onChange({ ...value, x })}
-          step={0.5}
-        />
-      </Field>
-      <Field label={lbl.y}>
-        <NumberField
-          value={value.y}
-          onChange={(y) => onChange({ ...value, y })}
-          step={0.5}
-        />
-      </Field>
-      <Field label={lbl.z}>
-        <NumberField
-          value={value.z}
-          onChange={(z) => onChange({ ...value, z })}
-          step={0.5}
-        />
-      </Field>
+    <div className="flex flex-wrap gap-2">
+      {axisEntries.map(([axisId, label]) => (
+        <Field key={axisId} label={label}>
+          <NumberField
+            value={value[axisId] ?? 0}
+            onChange={(n) => onChange({ ...value, [axisId]: n })}
+            step={0.5}
+          />
+        </Field>
+      ))}
     </div>
   );
 }

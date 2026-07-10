@@ -288,7 +288,8 @@ describe('GameEngine', () => {
     const state = engine.reset();
     expect(state.currentNodeId).toBeNull();
     expect(state.isFinished).toBe(false);
-    expect(state.vector).toEqual({ x: 0, y: 0, z: 0 });
+    // After reset the vector is the empty zero vector (identity for addition).
+    expect(state.vector).toEqual({});
   });
 
   it('matches the nearest sect at settlement when sects are configured', () => {

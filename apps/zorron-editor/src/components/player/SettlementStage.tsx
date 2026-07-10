@@ -14,6 +14,9 @@ import { VectorScene } from '@/components/vector3d/VectorScene';
 import cdnMapping from '@/assets/cdn-mapping.json';
 import { featureFlags } from '@/lib/featureFlags';
 
+/** Label colors for the (up to) first three projected axes: red / green / blue. */
+const AXIS_LABEL_COLORS = ['text-red-400', 'text-green-400', 'text-blue-400'];
+
 /** Props for SettlementStage. */
 export interface SettlementStageProps {
   state: GameState;
@@ -123,38 +126,30 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                 highlightedSectId={result.sect?.id ?? null}
                 height={240}
               />
-              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-[10px]">
-                <div className="rounded-md bg-slate-900/60 p-1.5">
-                  <div className="text-red-400">{axisLabels.x}</div>
-                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.x)}</div>
-                </div>
-                <div className="rounded-md bg-slate-900/60 p-1.5">
-                  <div className="text-green-400">{axisLabels.y}</div>
-                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.y)}</div>
-                </div>
-                <div className="rounded-md bg-slate-900/60 p-1.5">
-                  <div className="text-blue-400">{axisLabels.z}</div>
-                  <div className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.z)}</div>
-                </div>
+              <div className="mt-2 flex flex-wrap gap-2 text-center text-[10px]">
+                {Object.entries(axisLabels).map(([axisId, label], i) => (
+                  <div key={axisId} className="min-w-[4rem] flex-1 rounded-md bg-slate-900/60 p-1.5">
+                    <div className={AXIS_LABEL_COLORS[i] ?? 'text-slate-400'}>{label}</div>
+                    <div className="font-mono text-cyan-300">
+                      {formatVectorValue(result.finalVector[axisId] ?? 0)}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
 
           {/* Flat vector readout shown when 3D space is disabled. */}
           {!featureFlags.vector3d && (
-            <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="rounded-md bg-slate-900/60 p-2">
-                <div className="text-slate-400 font-semibold mb-1">X</div>
-                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.x)}</span>
-              </div>
-              <div className="rounded-md bg-slate-900/60 p-2">
-                <div className="text-slate-400 font-semibold mb-1">Y</div>
-                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.y)}</span>
-              </div>
-              <div className="rounded-md bg-slate-900/60 p-2">
-                <div className="text-slate-400 font-semibold mb-1">Z</div>
-                <span className="font-mono text-cyan-300">{formatVectorValue(result.finalVector.z)}</span>
-              </div>
+            <div className="mt-2 flex flex-wrap gap-2 text-center text-xs">
+              {Object.entries(axisLabels).map(([axisId, label]) => (
+                <div key={axisId} className="min-w-[4rem] flex-1 rounded-md bg-slate-900/60 p-2">
+                  <div className="text-slate-400 font-semibold mb-1">{label}</div>
+                  <span className="font-mono text-cyan-300">
+                    {formatVectorValue(result.finalVector[axisId] ?? 0)}
+                  </span>
+                </div>
+              ))}
             </div>
           )}
 

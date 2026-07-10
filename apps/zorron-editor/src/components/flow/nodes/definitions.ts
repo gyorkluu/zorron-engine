@@ -111,7 +111,7 @@ registerNode({
   InspectorForm: CalculatorForm,
   createDefault: () => ({
     label: tt('node.default.calculator'),
-    vector: { x: 0, y: 0, z: 0 },
+    vector: {},
   }),
 });
 

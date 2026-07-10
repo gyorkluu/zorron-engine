@@ -24,12 +24,32 @@ export type InteractionType = 'tap' | 'hold' | 'slash';
 /** Slash directions for slash-type choices. */
 export type SlashDirection = 'left' | 'right' | 'up' | 'down';
 
-/** 3D personality vector. */
-export interface PersonalityVector {
-  x: number;
-  y: number;
-  z: number;
-}
+/**
+ * Axis identifier — the key of a vector component.
+ *
+ * Axis ids are project-defined: a project may use 2 axes (`a`, `b`),
+ * the legacy 3 axes (`x`, `y`, `z`), or any N-dimensional space. Axis ids
+ * are paired with human-readable labels via `VectorSpaceConfig.dimensions`.
+ */
+export type AxisId = string;
+
+/**
+ * Generalized N-dimensional vector.
+ *
+ * Each key is an `AxisId`, each value is the component along that axis.
+ * The legacy 3D personality vector `{ x, y, z }` is a valid `Vector`
+ * (axis ids `x`, `y`, `z`), so existing project data needs no migration.
+ */
+export type Vector = Record<AxisId, number>;
+
+/**
+ * Personality vector — legacy alias for {@link Vector}.
+ *
+ * Kept as a type alias so existing imports continue to work while the
+ * codebase migrates from the hardcoded 3D `{ x, y, z }` shape to the
+ * generalized N-dimensional `Record<AxisId, number>` shape.
+ */
+export type PersonalityVector = Vector;
 
 /** Base data shared by all node types. */
 export interface BaseNodeData {
@@ -208,10 +228,17 @@ export interface SectAnchor {
   resultTexts?: SectResultTexts;
 }
 
-/** Vector space configuration stored in project settings. */
+/**
+ * Vector space configuration stored in project settings.
+ *
+ * `dimensions` maps each `AxisId` to a human-readable label. The number of
+ * keys defines the vector space dimensionality (2 for `{a, b}`, 3 for the
+ * legacy `{x, y, z}`, etc.). Axis ids are stable identifiers; labels are
+ * display-only.
+ */
 export interface VectorSpaceConfig {
   enabled: boolean;
-  dimensions: { x: string; y: string; z: string };
+  dimensions: Record<AxisId, string>;
   sects?: SectAnchor[];
 }
 

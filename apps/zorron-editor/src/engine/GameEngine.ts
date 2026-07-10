@@ -499,12 +499,8 @@ export class GameEngine {
 
   private processCalculator(node: FlowNode): void {
     const data = node.data as CalculatorNodeData;
-    // Apply pending vector deltas.
-    if (
-      this.pendingVector.x !== 0 ||
-      this.pendingVector.y !== 0 ||
-      this.pendingVector.z !== 0
-    ) {
+    // Apply pending vector deltas when any axis is non-zero.
+    if (Object.values(this.pendingVector).some((v) => v !== 0)) {
       this.currentVector = add(this.currentVector, this.pendingVector);
       this.pendingVector = { ...ZERO_VECTOR };
     }

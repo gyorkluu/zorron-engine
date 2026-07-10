@@ -72,11 +72,8 @@ export function applyCalculator(
   let pendingVector = { ...ctx.pendingVector };
   const variables = { ...ctx.variables };
 
-  if (
-    pendingVector.x !== 0 ||
-    pendingVector.y !== 0 ||
-    pendingVector.z !== 0
-  ) {
+  // Apply pending deltas when any axis is non-zero.
+  if (Object.values(pendingVector).some((v) => v !== 0)) {
     currentVector = add(currentVector, pendingVector);
     pendingVector = { ...ZERO_VECTOR };
   }

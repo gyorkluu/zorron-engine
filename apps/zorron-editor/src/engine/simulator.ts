@@ -118,8 +118,8 @@ function hashString(s: string): number {
   return h >>> 0;
 }
 
-/** The zero vector. */
-const ZERO: PersonalityVector = { x: 0, y: 0, z: 0 };
+/** The empty zero vector (identity for vector addition). */
+const ZERO: PersonalityVector = {};
 
 /**
  * Run a single simulation traversal.
@@ -181,38 +181,47 @@ function runSingle(
   };
 }
 
-/** Compute the mean of a list of vectors. */
+/** Compute the mean of a list of vectors across all axes. */
 function meanVector(vectors: PersonalityVector[]): PersonalityVector {
   if (vectors.length === 0) return { ...ZERO };
-  const sum = vectors.reduce(
-    (acc, v) => ({ x: acc.x + v.x, y: acc.y + v.y, z: acc.z + v.z }),
-    { ...ZERO },
-  );
-  return {
-    x: sum.x / vectors.length,
-    y: sum.y / vectors.length,
-    z: sum.z / vectors.length,
-  };
+  // Collect the union of all axis ids so missing axes default to 0.
+  const axisSet = new Set<string>();
+  for (const v of vectors) {
+    for (const k of Object.keys(v)) axisSet.add(k);
+  }
+  const out: PersonalityVector = {};
+  for (const axis of axisSet) {
+    let s = 0;
+    for (const v of vectors) {
+      s += v[axis] ?? 0;
+    }
+    out[axis] = s / vectors.length;
+  }
+  return out;
 }
 
-/** Compute the standard deviation of a list of vectors. */
+/** Compute the standard deviation of a list of vectors across all axes. */
 function stdDevVector(
   vectors: PersonalityVector[],
   mean: PersonalityVector,
 ): PersonalityVector {
   if (vectors.length === 0) return { ...ZERO };
-  const acc = { ...ZERO };
+  const axisSet = new Set<string>();
   for (const v of vectors) {
-    acc.x += (v.x - mean.x) ** 2;
-    acc.y += (v.y - mean.y) ** 2;
-    acc.z += (v.z - mean.z) ** 2;
+    for (const k of Object.keys(v)) axisSet.add(k);
   }
   const n = vectors.length;
-  return {
-    x: Math.sqrt(acc.x / n),
-    y: Math.sqrt(acc.y / n),
-    z: Math.sqrt(acc.z / n),
-  };
+  const out: PersonalityVector = {};
+  for (const axis of axisSet) {
+    let s = 0;
+    const m = mean[axis] ?? 0;
+    for (const v of vectors) {
+      const d = (v[axis] ?? 0) - m;
+      s += d * d;
+    }
+    out[axis] = Math.sqrt(s / n);
+  }
+  return out;
 }
 
 /**

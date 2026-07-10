@@ -9,9 +9,14 @@
  * The projection maps a 3D point `(x, y, z)` to a 2D screen point using a
  * fixed camera angle. The camera can be rotated by adjusting `yaw` so users
  * can inspect the space from different sides.
+ *
+ * Vectors may carry any number of dimensions (2D, the legacy 3D `{x,y,z}`, 4D,
+ * ...). Only the first three axes (in `Object.keys` order) are used for the 3D
+ * projection; missing axes default to 0 so a 2D vector still renders on the XZ
+ * floor with a zero height component.
  */
 
-import type { PersonalityVector } from '@/types/flow';
+import type { AxisId, PersonalityVector, Vector } from '@/types/flow';
 
 /** A 2D screen point. */
 export interface ScreenPoint {
@@ -36,14 +41,30 @@ export const DEFAULT_CAMERA: Camera = {
   zoom: 1,
 };
 
-/** Project a 3D vector to a 2D screen point using the camera. */
-export function project(
-  vector: PersonalityVector,
+/**
+ * Extract the first three axis values from an N-dimensional vector as the
+ * 3D triple `[x, y, z]` consumed by the projection math. Axes beyond the
+ * third are ignored, and missing axes (when the vector has fewer than three
+ * dimensions) default to `0`.
+ */
+function extractXYZ(vector: Vector): [number, number, number] {
+  const keys = Object.keys(vector).slice(0, 3);
+  return [
+    keys[0] !== undefined ? (vector[keys[0]] ?? 0) : 0,
+    keys[1] !== undefined ? (vector[keys[1]] ?? 0) : 0,
+    keys[2] !== undefined ? (vector[keys[2]] ?? 0) : 0,
+  ];
+}
+
+/** Project a 3D point `(x, y, z)` to a 2D screen point using the camera. */
+function projectXYZ(
+  x: number,
+  y: number,
+  z: number,
   camera: Camera,
   origin: ScreenPoint,
   scale: number,
 ): ScreenPoint {
-  const { x, y, z } = vector;
   const { yaw, pitch, zoom } = camera;
   const s = scale * zoom;
 
@@ -68,6 +89,17 @@ export function project(
   };
 }
 
+/** Project an N-dimensional vector to a 2D screen point using its first three axes. */
+export function project(
+  vector: PersonalityVector,
+  camera: Camera,
+  origin: ScreenPoint,
+  scale: number,
+): ScreenPoint {
+  const [x, y, z] = extractXYZ(vector);
+  return projectXYZ(x, y, z, camera, origin, scale);
+}
+
 /** The three coordinate axes as line segments from origin to the given length. */
 export interface AxisLine {
   start: ScreenPoint;
@@ -76,35 +108,40 @@ export interface AxisLine {
   color: string;
 }
 
-/** Build the three axis lines for rendering. */
+/** Distinct colors for the (up to) three projected axes: red, green, blue. */
+const AXIS_COLORS = ['#ef4444', '#22c55e', '#3b82f6'];
+
+/** End-point triples for each of the three projected axes. */
+const AXIS_ENDS: Array<[number, number, number]> = [
+  [1, 0, 0],
+  [0, 1, 0],
+  [0, 0, 1],
+];
+
+/**
+ * Build coordinate axis lines from the first three axes of `labels`.
+ *
+ * Each axis runs from the origin to `length` along its own direction. If
+ * `labels` carries fewer than three entries, only that many axes are drawn.
+ */
 export function buildAxes(
   camera: Camera,
   origin: ScreenPoint,
   scale: number,
   length: number,
-  labels: { x: string; y: string; z: string },
+  labels: Record<AxisId, string>,
 ): AxisLine[] {
-  const zero: PersonalityVector = { x: 0, y: 0, z: 0 };
-  return [
-    {
-      start: project(zero, camera, origin, scale),
-      end: project({ x: length, y: 0, z: 0 }, camera, origin, scale),
-      label: labels.x,
-      color: '#ef4444', // red for X
-    },
-    {
-      start: project(zero, camera, origin, scale),
-      end: project({ x: 0, y: length, z: 0 }, camera, origin, scale),
-      label: labels.y,
-      color: '#22c55e', // green for Y
-    },
-    {
-      start: project(zero, camera, origin, scale),
-      end: project({ x: 0, y: 0, z: length }, camera, origin, scale),
-      label: labels.z,
-      color: '#3b82f6', // blue for Z
-    },
-  ];
+  return Object.entries(labels)
+    .slice(0, 3)
+    .map(([axisId, label], i) => {
+      const [ex, ey, ez] = AXIS_ENDS[i];
+      return {
+        start: projectXYZ(0, 0, 0, camera, origin, scale),
+        end: projectXYZ(ex * length, ey * length, ez * length, camera, origin, scale),
+        label,
+        color: AXIS_COLORS[i] ?? '#94a3b8',
+      };
+    });
 }
 
 /** Draw the vector space scene onto a 2D canvas rendering context. */
@@ -117,8 +154,8 @@ export interface VectorSpaceRenderOptions {
   height: number;
   /** Camera parameters. */
   camera: Camera;
-  /** Axis labels. */
-  axisLabels: { x: string; y: string; z: string };
+  /** Axis labels keyed by axis id (only the first three are projected). */
+  axisLabels: Record<AxisId, string>;
   /** Sect anchors to render. */
   sects: Array<{ id: string; name: string; vector: PersonalityVector }>;
   /** The user's current vector position. */
@@ -190,13 +227,9 @@ export function renderVectorSpace(options: VectorSpaceRenderOptions): void {
   }
 
   // Draw the user's current vector as a glowing dot with a stem to the floor.
-  const userPoint = project(userVector, camera, origin, scale);
-  const floorPoint = project(
-    { x: userVector.x, y: 0, z: userVector.z },
-    camera,
-    origin,
-    scale,
-  );
+  const [ux, uy, uz] = extractXYZ(userVector);
+  const userPoint = projectXYZ(ux, uy, uz, camera, origin, scale);
+  const floorPoint = projectXYZ(ux, 0, uz, camera, origin, scale);
 
   // Stem from the floor to the user point.
   ctx.beginPath();
@@ -225,10 +258,10 @@ export function renderVectorSpace(options: VectorSpaceRenderOptions): void {
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // Coordinate readout next to the user point.
+  // Coordinate readout next to the user point (first three projected axes).
   ctx.fillStyle = '#67e8f9';
   ctx.font = '11px ui-monospace, monospace';
-  const readout = `(${userVector.x.toFixed(1)}, ${userVector.y.toFixed(1)}, ${userVector.z.toFixed(1)})`;
+  const readout = `(${ux.toFixed(1)}, ${uy.toFixed(1)}, ${uz.toFixed(1)})`;
   ctx.fillText(readout, userPoint.x + 12, userPoint.y + 4);
 }
 

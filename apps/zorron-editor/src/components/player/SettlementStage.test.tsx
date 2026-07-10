@@ -176,7 +176,7 @@ describe('SettlementStage', () => {
     expect(screen.getByText(/—/)).toBeInTheDocument();
   });
 
-  it('renders the X/Y/Z vector readout when the vector3d flag is off', () => {
+  it('renders the vector readout from project axis labels when the vector3d flag is off', () => {
     render(
       <SettlementStage
         state={makeState(
@@ -187,20 +187,20 @@ describe('SettlementStage', () => {
         )}
       />,
     );
-    // The VectorReadout helper renders `{sign}{value.toFixed(2)}` inside a
-    // <span class="font-mono...">. The sign and value are separate text nodes
-    // so the element's text content is e.g. "+ 1.50" (whitespace-normalized).
-    // Use regex matchers to find each axis value.
+    // The readout renders `{sign}{value.toFixed(2)}` for each axis. The sign
+    // and value are separate text nodes so the element's text content is e.g.
+    // "+1.50" (whitespace-normalized). Use regex matchers to find each value.
     expect(screen.getByText(/\+\s*1\.50/)).toBeInTheDocument();
     expect(screen.getByText(/-\s*2\.50/)).toBeInTheDocument();
     // For Z=0, the readout is "+0.00". Match the font-mono span specifically
     // to avoid colliding with the magnitude readout (also "0.00").
     const monoSpans = screen.getAllByText(/0\.00/);
     expect(monoSpans.length).toBeGreaterThanOrEqual(1);
-    // Axis labels X/Y/Z are rendered.
-    expect(screen.getAllByText('X').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Y').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Z').length).toBeGreaterThan(0);
+    // Axis labels come from the project's vectorSpace dimensions (the default
+    // {x:'处世', y:'立场', z:'性情'} from createEmptyFlowData).
+    expect(screen.getAllByText('处世').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('立场').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('性情').length).toBeGreaterThan(0);
   });
 
   it('renders the VectorSpacePanel when the vector3d flag is on', () => {

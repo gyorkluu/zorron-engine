@@ -48,7 +48,10 @@ describe('vectorMath', () => {
   it('produces a quadrant signature from signs', () => {
     expect(quadrant({ x: 1, y: -2, z: 3 })).toBe('+-+');
     expect(quadrant({ x: -1, y: -1, z: -1 })).toBe('---');
-    expect(quadrant(ZERO_VECTOR)).toBe('+++');
+    // An explicit 3-axis zero vector yields "+++".
+    expect(quadrant({ x: 0, y: 0, z: 0 })).toBe('+++');
+    // The empty ZERO_VECTOR has no axes, so its signature is the empty string.
+    expect(quadrant(ZERO_VECTOR)).toBe('');
   });
 
   it('sums a list of vectors', () => {
