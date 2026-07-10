@@ -27,6 +27,9 @@ export const users = pgTable('users', {
 
 /**
  * Projects table storing narrative flow data as JSONB.
+ *
+ * ECO-004: `forkedFromId` tracks the source project when a scenario is forked
+ * in the marketplace. A null value means the project is an original creation.
  */
 export const projects = pgTable(
   'projects',
@@ -40,12 +43,17 @@ export const projects = pgTable(
     coverUrl: text('cover_url'),
     isPublished: boolean('is_published').notNull().default(false),
     data: jsonb('data').notNull().default({}),
+    /** ECO-004: The source project this was forked from (null for originals). */
+    forkedFromId: uuid('forked_from_id'),
+    /** ECO-004: When the fork was created (null for originals). */
+    forkedAt: timestamp('forked_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
     ownerIdIdx: index('projects_owner_id_idx').on(table.ownerId),
     updatedAtIdx: index('projects_updated_at_idx').on(table.updatedAt),
+    forkedFromIdIdx: index('projects_forked_from_id_idx').on(table.forkedFromId),
   }),
 );
 
