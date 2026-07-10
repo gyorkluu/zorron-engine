@@ -135,6 +135,8 @@ export const SettlementVariableModifierSchema = z.object({
 
 export const SettlementNodeDataSchema = BaseNodeDataSchema.extend({
   resultMapping: z.array(SettlementResultMappingSchema).default([]),
+  strategy: z.string().default('vector-nearest'),
+  strategyConfig: z.record(z.string(), z.unknown()).optional(),
   buttons: z.array(SettlementButtonSchema).default([]),
   modifiers: z.array(SettlementVariableModifierSchema).default([]),
   archetypes: z.array(z.record(z.unknown())).default([]),

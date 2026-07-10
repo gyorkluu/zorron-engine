@@ -48,9 +48,9 @@ import {
   add,
   magnitude,
   quadrant,
-  findNearestAnchor,
   ZERO_VECTOR,
 } from './vectorMath';
+import { settlementStrategyRegistry } from './settlementStrategies';
 
 /** A choice presented to the player for the current scene. */
 export interface PlayerChoice {
@@ -523,25 +523,33 @@ export class GameEngine {
     const mag = magnitude(finalVector);
     const playerQuadrant = quadrant(finalVector);
 
-    // Resolve sect anchors from project settings, then match by nearest neighbor.
-    const sects = this.settings.vectorSpace?.sects ?? [];
-    const { anchor, distance: nearestDistance } = findNearestAnchor(finalVector, sects);
+    // Resolve result anchors from project settings.
+    const anchors = this.settings.vectorSpace?.sects ?? [];
 
-    // Find a matching result mapping (first whose condition is satisfied, else first).
-    const mapping = data.resultMapping?.[0];
+    // Use the settlement strategy registry to match the player state to an anchor.
+    const strategy = settlementStrategyRegistry.resolve(data.strategy);
+    const output = strategy.execute({
+      finalVector,
+      magnitude: mag,
+      quadrant: playerQuadrant,
+      variables: { ...this.variables },
+      fragments: new Set(this.fragments),
+      anchors,
+      nodeData: data,
+    });
 
     const result: SettlementResult = {
-      anchor,
-      distance: nearestDistance,
+      anchor: output.anchor,
+      distance: output.distance,
       magnitude: mag,
       finalVector,
       quadrant: playerQuadrant,
-      title: mapping?.title ?? anchor?.name ?? 'Settlement',
-      description: mapping?.description ?? anchor?.description,
-      coverUrl: mapping?.coverUrl ?? anchor?.coverUrl,
-      resultTexts: anchor?.resultTexts,
+      title: output.mapping?.title ?? output.anchor?.name ?? 'Settlement',
+      description: output.mapping?.description ?? output.anchor?.description,
+      coverUrl: output.mapping?.coverUrl ?? output.anchor?.coverUrl,
+      resultTexts: output.anchor?.resultTexts,
       buttons: data.buttons,
-      mapping,
+      mapping: output.mapping,
     };
     this.lastSettlementResult = result;
 

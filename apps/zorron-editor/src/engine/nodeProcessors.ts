@@ -17,7 +17,8 @@ import type {
   ResultAnchor,
   SettlementResultMapping,
 } from '@/types/flow';
-import { add, magnitude, distance, quadrant, findNearestAnchor, ZERO_VECTOR } from './vectorMath';
+import { add, magnitude, distance, quadrant, ZERO_VECTOR } from './vectorMath';
+import { settlementStrategyRegistry } from './settlementStrategies';
 
 /** Context passed to every processor. */
 export interface ProcessorContext {
@@ -113,15 +114,25 @@ export function evaluateSettlement(
   const finalVector = { ...ctx.currentVector };
   const mag = magnitude(finalVector);
   const q = quadrant(finalVector);
-  const { anchor, distance: nearest } = findNearestAnchor(finalVector, ctx.sects);
-  const mapping = data.resultMapping?.[0];
+
+  const strategy = settlementStrategyRegistry.resolve(data.strategy);
+  const output = strategy.execute({
+    finalVector,
+    magnitude: mag,
+    quadrant: q,
+    variables: { ...ctx.variables },
+    fragments: new Set(ctx.fragments),
+    anchors: ctx.sects,
+    nodeData: data,
+  });
+
   return {
-    anchor,
-    distance: nearest,
+    anchor: output.anchor,
+    distance: output.distance,
     magnitude: mag,
     finalVector,
     quadrant: q,
-    mapping,
+    mapping: output.mapping,
   };
 }
 
@@ -148,4 +159,4 @@ function compare(
 }
 
 /** Re-export vector math for convenience. */
-export { add, magnitude, distance, quadrant, findNearestAnchor, ZERO_VECTOR };
+export { add, magnitude, distance, quadrant, ZERO_VECTOR };

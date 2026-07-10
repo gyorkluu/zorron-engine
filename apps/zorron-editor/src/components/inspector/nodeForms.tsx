@@ -11,6 +11,7 @@ import { useT } from '@/i18n/useT';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { featureFlags } from '@/lib/featureFlags';
+import { settlementStrategyRegistry, STRATEGY_IDS } from '@/engine/settlementStrategies';
 import {
   Field,
   TextField,
@@ -174,6 +175,16 @@ export function SettlementForm({ node, update }: { node: FlowNode; update: (data
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.strategy') ?? 'Strategy'}>
+        <SelectField
+          value={d.strategy ?? STRATEGY_IDS.VECTOR_NEAREST}
+          onChange={(strategy) => update({ strategy })}
+          options={settlementStrategyRegistry.list().map((s) => ({
+            value: s.id,
+            label: s.name,
+          }))}
+        />
+      </Field>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium uppercase tracking-wider text-slate-400">

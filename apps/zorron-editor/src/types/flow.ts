@@ -176,6 +176,10 @@ export interface SettlementVariableModifier {
 /** Settlement node data. */
 export interface SettlementNodeData extends BaseNodeData {
   resultMapping: SettlementResultMapping[];
+  /** Settlement strategy id. Defaults to 'vector-nearest'. */
+  strategy?: string;
+  /** Strategy-specific configuration (shape depends on the strategy). */
+  strategyConfig?: Record<string, unknown>;
   buttons?: SettlementButton[];
   variableModifiers?: SettlementVariableModifier[];
   modifiers?: SettlementVariableModifier[];

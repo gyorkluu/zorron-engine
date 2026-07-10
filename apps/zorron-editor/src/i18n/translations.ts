@@ -88,6 +88,7 @@ export const translations = {
 
   // ── Inspector Field Labels ──────────────────────────────────
   'field.label': { zh: '标签', en: 'LABEL' },
+  'field.strategy': { zh: '结算策略', en: 'Settlement strategy' },
   'field.title': { zh: '标题', en: 'TITLE' },
   'field.intro': { zh: '简介', en: 'INTRO' },
   'field.coverUrl': { zh: '封面链接', en: 'COVER URL' },
