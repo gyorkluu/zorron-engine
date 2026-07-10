@@ -27,6 +27,13 @@ import {
   SETTLEMENT_STRATEGIES,
 } from './scenarioTypes';
 import { SCENARIO_PRESETS, findPreset } from './scenarioPresets';
+import {
+  VISUAL_BLOCKS,
+  findVisualBlock,
+  resolveVisualBlocks,
+  listVisualBlocks,
+  DEFAULT_VISUAL_BLOCKS,
+} from './visualBlocks';
 
 // ── Helpers ────────────────────────────────────────────────
 
@@ -631,6 +638,180 @@ describe('ScenarioPresets (ECO-001)', () => {
       (s) => s.choices?.some((c) => c.nextStep !== undefined),
     );
     expect(hasBranching).toBe(true);
+  });
+});
+
+// ── 4b. Visual Blocks Tests (ECO-002) ─────────────────────
+
+describe('VisualBlocks registry (ECO-002)', () => {
+  it('defines at least 10 visual block types', () => {
+    expect(VISUAL_BLOCKS.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('each block has required metadata', () => {
+    for (const b of VISUAL_BLOCKS) {
+      expect(b.type).toBeTruthy();
+      expect(b.label).toBeTruthy();
+      expect(b.description).toBeTruthy();
+      expect(b.propsSchema).toBeDefined();
+      expect(typeof b.usesVector).toBe('boolean');
+    }
+  });
+
+  it('covers the vision block types', () => {
+    const types = VISUAL_BLOCKS.map((b) => b.type);
+    expect(types).toEqual(
+      expect.arrayContaining([
+        'badge',
+        'sprite',
+        'layered-texts',
+        'radar',
+        'bar-chart',
+        'tags-cloud',
+        'game-profile-summary',
+        'ending-card',
+        'score-badge',
+        'text-only',
+      ]),
+    );
+  });
+
+  it('only radar uses the player vector', () => {
+    const vectorBlocks = VISUAL_BLOCKS.filter((b) => b.usesVector).map((b) => b.type);
+    expect(vectorBlocks).toEqual(['radar']);
+  });
+
+  it('findVisualBlock returns the block by type', () => {
+    const badge = findVisualBlock('badge');
+    expect(badge).toBeDefined();
+    expect(badge?.label).toBe('徽章');
+  });
+
+  it('findVisualBlock returns undefined for unknown type', () => {
+    expect(findVisualBlock('nonexistent')).toBeUndefined();
+  });
+
+  it('listVisualBlocks omits internal Zod schema', () => {
+    const list = listVisualBlocks();
+    expect(list.length).toBe(VISUAL_BLOCKS.length);
+    for (const entry of list) {
+      expect(entry).not.toHaveProperty('propsSchema');
+      expect(entry).toHaveProperty('type');
+      expect(entry).toHaveProperty('label');
+      expect(entry).toHaveProperty('defaultProps');
+    }
+  });
+
+  it('DEFAULT_VISUAL_BLOCKS has 3 entries', () => {
+    expect(DEFAULT_VISUAL_BLOCKS).toHaveLength(3);
+    expect(DEFAULT_VISUAL_BLOCKS).toContain('badge');
+  });
+});
+
+describe('resolveVisualBlocks (ECO-002)', () => {
+  it('resolves string ids to blocks with default props', () => {
+    const blocks = resolveVisualBlocks(['badge', 'radar']);
+    expect(blocks).toHaveLength(2);
+    expect(blocks[0].type).toBe('badge');
+    expect(blocks[0].props).toHaveProperty('title');
+    expect(blocks[1].type).toBe('radar');
+    expect(blocks[1].props).toHaveProperty('maxValue');
+  });
+
+  it('resolves { type, props } objects merging defaults', () => {
+    const blocks = resolveVisualBlocks([
+      { type: 'badge', props: { title: '完成', icon: '✓' } },
+    ]);
+    expect(blocks[0].type).toBe('badge');
+    expect(blocks[0].props).toEqual({ title: '完成', icon: '✓' });
+  });
+
+  it('falls back to default blocks when input is not an array', () => {
+    const blocks = resolveVisualBlocks(undefined);
+    expect(blocks).toHaveLength(DEFAULT_VISUAL_BLOCKS.length);
+    expect(blocks[0].type).toBe('badge');
+  });
+
+  it('handles unknown string id with empty props', () => {
+    const blocks = resolveVisualBlocks(['totally-unknown']);
+    expect(blocks[0].type).toBe('totally-unknown');
+    expect(blocks[0].props).toEqual({});
+  });
+
+  it('handles malformed entry by falling back to text-only', () => {
+    const blocks = resolveVisualBlocks([42]);
+    expect(blocks[0].type).toBe('text-only');
+  });
+});
+
+describe('FlowBuilder visualBlocks population (ECO-002)', () => {
+  it('populates settlement node with resolved visual blocks', () => {
+    const intent = makeMinimalIntent();
+    intent.settlement.visualBlocks = ['badge', 'radar'];
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ type: string; data: { visualBlocks?: Array<{ type: string }> } }>;
+    };
+    const settlement = flow.nodes.find((n) => n.type === 'settlement');
+    expect(settlement?.data.visualBlocks).toBeDefined();
+    expect(settlement?.data.visualBlocks).toHaveLength(2);
+    expect(settlement?.data.visualBlocks?.[0].type).toBe('badge');
+    expect(settlement?.data.visualBlocks?.[1].type).toBe('radar');
+  });
+
+  it('populates blocks from typed config objects', () => {
+    const intent = makeMinimalIntent();
+    intent.settlement.visualBlocks = [
+      { type: 'badge', props: { title: '自定义徽章' } },
+      { type: 'sprite', props: { imageUrl: 'https://example.com/a.png' } },
+    ];
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{
+        type: string;
+        data: { visualBlocks?: Array<{ type: string; props: Record<string, unknown> }> };
+      }>;
+    };
+    const settlement = flow.nodes.find((n) => n.type === 'settlement');
+    expect(settlement?.data.visualBlocks?.[0].props.title).toBe('自定义徽章');
+    expect(settlement?.data.visualBlocks?.[1].props.imageUrl).toBe('https://example.com/a.png');
+  });
+
+  it('uses default blocks when visualBlocks omitted', () => {
+    const intent = makeMinimalIntent();
+    // visualBlocks is provided by makeSettlement, so remove it.
+    delete (intent.settlement as { visualBlocks?: unknown }).visualBlocks;
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ type: string; data: { visualBlocks?: Array<{ type: string }> } }>;
+    };
+    const settlement = flow.nodes.find((n) => n.type === 'settlement');
+    // Schema applies the default ['badge', 'title', 'layered-texts'].
+    expect(settlement?.data.visualBlocks?.map((b) => b.type)).toEqual(
+      expect.arrayContaining(['badge', 'title', 'layered-texts']),
+    );
+  });
+});
+
+describe('Schema: visualBlocks accepts strings or typed configs (ECO-002)', () => {
+  it('accepts visualBlocks as string array', () => {
+    const intent = makeMinimalIntent();
+    intent.settlement.visualBlocks = ['badge', 'radar'];
+    const result = ScenarioIntentSchema.safeParse(intent);
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts visualBlocks as typed config array', () => {
+    const intent = makeMinimalIntent();
+    intent.settlement.visualBlocks = [
+      { type: 'badge', props: { title: 'X' } },
+    ];
+    const result = ScenarioIntentSchema.safeParse(intent);
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts a mixed array of strings and objects', () => {
+    const intent = makeMinimalIntent();
+    intent.settlement.visualBlocks = ['badge', { type: 'radar', props: { maxValue: 2 } }];
+    const result = ScenarioIntentSchema.safeParse(intent);
+    expect(result.success).toBe(true);
   });
 });
 

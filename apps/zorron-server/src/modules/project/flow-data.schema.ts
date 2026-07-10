@@ -141,6 +141,19 @@ export const SettlementNodeDataSchema = BaseNodeDataSchema.extend({
   modifiers: z.array(SettlementVariableModifierSchema).default([]),
   archetypes: z.array(z.record(z.unknown())).default([]),
   variableModifiers: z.array(SettlementVariableModifierSchema).default([]),
+  /**
+   * Composed visual blocks for the settlement page (ECO-002).
+   * Each entry is `{ type, props }`. Populated by FlowBuilder from the
+   * ScenarioIntent's settlement.visualBlocks declaration.
+   */
+  visualBlocks: z
+    .array(
+      z.object({
+        type: z.string(),
+        props: z.record(z.string(), z.unknown()).default({}),
+      }),
+    )
+    .default([]),
 });
 
 export const VideoNodeDataSchema = BaseNodeDataSchema.extend({

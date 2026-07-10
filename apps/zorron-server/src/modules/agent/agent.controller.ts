@@ -5,6 +5,7 @@
 import * as service from './agent.service';
 import { SCENARIO_TYPES, NODE_CAPABILITIES, SETTLEMENT_STRATEGIES } from './scenarioTypes';
 import { SCENARIO_PRESETS, findPreset } from './scenarioPresets';
+import { listVisualBlocks } from './visualBlocks';
 import type {
   CompileRequest,
   CompileResponse,
@@ -52,6 +53,11 @@ export function getPreset(id: string) {
     return null;
   }
   return preset;
+}
+
+/** GET /api/agent/visual-blocks - list all available visual block types (ECO-002). */
+export function getVisualBlocks() {
+  return { blocks: listVisualBlocks() };
 }
 
 /** POST /api/agent/compile */

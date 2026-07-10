@@ -11,6 +11,7 @@
 
 import type { ScenarioIntent, ScenarioStep } from './agent.schema';
 import type { FlowData } from '../project/flow-data.schema';
+import { resolveVisualBlocks } from './visualBlocks';
 
 // ── Types (mirrors frontend types/flow.ts, kept local to avoid cross-app deps) ──
 
@@ -60,6 +61,8 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
   }
 
   // ── 3. Settlement node ──
+  // Resolve visual block ids/configs into concrete blocks (ECO-002).
+  const resolvedBlocks = resolveVisualBlocks(intent.settlement.visualBlocks);
   const settlementData: Record<string, unknown> = {
     label: '结算',
     strategy: intent.settlement.strategy,
@@ -75,6 +78,7 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
       [{ resultId: 'default', title: '完成' }],
     buttons: [],
     variableModifiers: [],
+    visualBlocks: resolvedBlocks,
   };
   nodes.push({
     id: SETTLEMENT_NODE_ID,

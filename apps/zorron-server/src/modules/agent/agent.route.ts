@@ -45,6 +45,10 @@ export const agentRoute = new Elysia({ prefix: '/api/agent' })
       return preset;
     },
   )
+  .get(
+    '/visual-blocks',
+    () => controller.getVisualBlocks(),
+  )
   // ── Session endpoints (public for external consumption) ──
   .post(
     '/sessions',

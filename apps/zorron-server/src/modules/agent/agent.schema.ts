@@ -94,8 +94,23 @@ export const ScenarioSettlementSchema = z.object({
       }),
     )
     .optional(),
+  /**
+   * Visual blocks composing the settlement page (ECO-002).
+   *
+   * Each entry can be:
+   *  - a plain string id ("badge") → resolved with default props, OR
+   *  - a `{ type, props }` object → resolved with explicit props.
+   */
   visualBlocks: z
-    .array(z.string())
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          type: z.string(),
+          props: z.record(z.string(), z.unknown()).optional(),
+        }),
+      ]),
+    )
     .default(['badge', 'title', 'layered-texts']),
 });
 
