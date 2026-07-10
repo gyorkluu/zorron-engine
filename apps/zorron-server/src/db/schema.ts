@@ -95,6 +95,30 @@ export const refreshTokens = pgTable('refresh_tokens', {
 });
 
 /**
+ * Test sessions table - persists player test results for external consumption.
+ *
+ * Each record represents one completed test session. External systems
+ * (matching, recommendation, CRM) can query by userIdentifier or projectId.
+ */
+export const testSessions = pgTable(
+  'test_sessions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    userIdentifier: varchar('user_identifier', { length: 200 }).notNull(),
+    settlementResult: jsonb('settlement_result').notNull(),
+    metadata: jsonb('metadata'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    projectIdIdx: index('test_sessions_project_id_idx').on(table.projectId),
+    userIdentifierIdx: index('test_sessions_user_identifier_idx').on(table.userIdentifier),
+  }),
+);
+
+/**
  * Drizzle ORM relations.
  */
 export const usersRelations = relations(users, ({ many }) => ({
@@ -105,11 +129,16 @@ export const usersRelations = relations(users, ({ many }) => ({
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   owner: one(users, { fields: [projects.ownerId], references: [users.id] }),
   assets: many(assets),
+  testSessions: many(testSessions),
 }));
 
 export const assetsRelations = relations(assets, ({ one }) => ({
   owner: one(users, { fields: [assets.ownerId], references: [users.id] }),
   project: one(projects, { fields: [assets.projectId], references: [projects.id] }),
+}));
+
+export const testSessionsRelations = relations(testSessions, ({ one }) => ({
+  project: one(projects, { fields: [testSessions.projectId], references: [projects.id] }),
 }));
 
 export type User = typeof users.$inferSelect;
@@ -120,3 +149,5 @@ export type Asset = typeof assets.$inferSelect;
 export type NewAsset = typeof assets.$inferInsert;
 export type RefreshToken = typeof refreshTokens.$inferSelect;
 export type NewRefreshToken = typeof refreshTokens.$inferInsert;
+export type TestSession = typeof testSessions.$inferSelect;
+export type NewTestSession = typeof testSessions.$inferInsert;

@@ -11,6 +11,7 @@ import { healthRoute } from './modules/health/health.route';
 import { authRoute } from './modules/auth/auth.route';
 import { projectRoute } from './modules/project/project.route';
 import { assetRoute } from './modules/asset/asset.route';
+import { agentRoute } from './modules/agent/agent.route';
 
 /**
  * [Elysia]: assembled application instance with global middleware and routes.
@@ -60,6 +61,7 @@ export function createApp() {
       .use(authRoute)
       .use(projectRoute)
       .use(assetRoute)
+      .use(agentRoute)
       .get('/', () => ({ message: 'Zorron Engine API' }))
   );
 }
