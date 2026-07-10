@@ -8,6 +8,7 @@ import {
   jsonb,
   integer,
   index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -152,6 +153,81 @@ export const testSessions = pgTable(
 );
 
 /**
+ * Scenario variants table (SCALE-002).
+ *
+ * Each variant represents an A/B test arm for a project. Variants share the
+ * same projectId but may differ in flow data (stored on the variant). Traffic
+ * is split by `weight` (relative, not percentage). The `isControl` flag marks
+ * the baseline variant for comparison.
+ */
+export const scenarioVariants = pgTable(
+  'scenario_variants',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    /** Short key like 'A', 'B', 'control', 'treatment'. Unique per project. */
+    variantKey: varchar('variant_key', { length: 20 }).notNull(),
+    label: varchar('label', { length: 100 }),
+    description: text('description'),
+    /** Relative weight for traffic allocation (default 1 = equal split). */
+    weight: integer('weight').notNull().default(1),
+    isControl: boolean('is_control').notNull().default(false),
+    isActive: boolean('is_active').notNull().default(true),
+    /** SCALE-001: Tenant scope (null for platform-level). */
+    tenantId: uuid('tenant_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    projectIdVariantKeyUnique: uniqueIndex('scenario_variants_project_variant_unique')
+      .on(table.projectId, table.variantKey),
+    projectIdIdx: index('scenario_variants_project_id_idx').on(table.projectId),
+    tenantIdIdx: index('scenario_variants_tenant_id_idx').on(table.tenantId),
+  }),
+);
+
+/**
+ * Session events table (SCALE-002).
+ *
+ * Captures granular player behavior for completion-rate analytics. Each row
+ * is one event: entering the scenario, reaching a node, completing, or
+ * abandoning. The `sessionId` is null until the final settlement is saved.
+ */
+export const sessionEvents = pgTable(
+  'session_events',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    variantId: uuid('variant_id').references(() => scenarioVariants.id, {
+      onDelete: 'set null',
+    }),
+    /** Links to test_sessions once the session is finalized; null before. */
+    sessionId: uuid('session_id').references(() => testSessions.id, {
+      onDelete: 'set null',
+    }),
+    userIdentifier: varchar('user_identifier', { length: 200 }).notNull(),
+    /** enter | step | complete | abandon */
+    eventType: varchar('event_type', { length: 20 }).notNull(),
+    /** Node id where the event occurred (null for enter/complete). */
+    nodeId: varchar('node_id', { length: 100 }),
+    eventData: jsonb('event_data').default({}),
+    /** SCALE-001: Tenant scope (denormalized for fast filtering). */
+    tenantId: uuid('tenant_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    projectIdIdx: index('session_events_project_id_idx').on(table.projectId),
+    variantIdIdx: index('session_events_variant_id_idx').on(table.variantId),
+    userIdentifierIdx: index('session_events_user_identifier_idx').on(table.userIdentifier),
+    tenantIdIdx: index('session_events_tenant_id_idx').on(table.tenantId),
+  }),
+);
+
+/**
  * Drizzle ORM relations.
  */
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -170,6 +246,8 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   tenant: one(tenants, { fields: [projects.tenantId], references: [tenants.id] }),
   assets: many(assets),
   testSessions: many(testSessions),
+  variants: many(scenarioVariants),
+  events: many(sessionEvents),
 }));
 
 export const assetsRelations = relations(assets, ({ one }) => ({
@@ -177,9 +255,23 @@ export const assetsRelations = relations(assets, ({ one }) => ({
   project: one(projects, { fields: [assets.projectId], references: [projects.id] }),
 }));
 
-export const testSessionsRelations = relations(testSessions, ({ one }) => ({
+export const testSessionsRelations = relations(testSessions, ({ one, many }) => ({
   project: one(projects, { fields: [testSessions.projectId], references: [projects.id] }),
   tenant: one(tenants, { fields: [testSessions.tenantId], references: [tenants.id] }),
+  events: many(sessionEvents),
+}));
+
+export const scenarioVariantsRelations = relations(scenarioVariants, ({ one, many }) => ({
+  project: one(projects, { fields: [scenarioVariants.projectId], references: [projects.id] }),
+  tenant: one(tenants, { fields: [scenarioVariants.tenantId], references: [tenants.id] }),
+  events: many(sessionEvents),
+}));
+
+export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
+  project: one(projects, { fields: [sessionEvents.projectId], references: [projects.id] }),
+  variant: one(scenarioVariants, { fields: [sessionEvents.variantId], references: [scenarioVariants.id] }),
+  session: one(testSessions, { fields: [sessionEvents.sessionId], references: [testSessions.id] }),
+  tenant: one(tenants, { fields: [sessionEvents.tenantId], references: [tenants.id] }),
 }));
 
 export type User = typeof users.$inferSelect;
@@ -194,3 +286,7 @@ export type RefreshToken = typeof refreshTokens.$inferSelect;
 export type NewRefreshToken = typeof refreshTokens.$inferInsert;
 export type TestSession = typeof testSessions.$inferSelect;
 export type NewTestSession = typeof testSessions.$inferInsert;
+export type ScenarioVariant = typeof scenarioVariants.$inferSelect;
+export type NewScenarioVariant = typeof scenarioVariants.$inferInsert;
+export type SessionEvent = typeof sessionEvents.$inferSelect;
+export type NewSessionEvent = typeof sessionEvents.$inferInsert;
