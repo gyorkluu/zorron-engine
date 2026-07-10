@@ -49,17 +49,17 @@ vi.mock('@/i18n/useT', () => ({
     t: (key: string, params?: Record<string, string | number>) => {
       const map: Record<string, string> = {
         'vector3d.enable': '启用三维向量空间',
-        'vector3d.sects.add': '+ 添加门派',
-        'vector3d.sects.del': '删除',
-        'vector3d.sects.title': '门派锚点（{n}）',
-        'vector3d.sects': '{n} 个门派',
-        'vector3d.sects.namePh': '门派名称',
-        'vector3d.sects.titleField': '称号',
-        'vector3d.sects.titlePh': '显示称号',
-        'vector3d.sects.anchor': '锚点向量',
-        'vector3d.sects.anchor.hint': '此门派在三维空间中的位置。',
-        'vector3d.sects.default': '门派 {n}',
-        'vector3d.sects.empty': '暂无门派锚点。添加一个来定义人格原型。',
+        'vector3d.anchors.add': '+ 添加锚点',
+        'vector3d.anchors.del': '删除',
+        'vector3d.anchors.title': '锚点（{n}）',
+        'vector3d.anchors': '{n} 个锚点',
+        'vector3d.anchors.namePh': '锚点名称',
+        'vector3d.anchors.titleField': '称号',
+        'vector3d.anchors.titlePh': '显示称号',
+        'vector3d.anchors.vector': '锚点向量',
+        'vector3d.anchors.vector.hint': '此锚点在向量空间中的位置。',
+        'vector3d.anchors.default': '锚点 {n}',
+        'vector3d.anchors.empty': '暂无锚点。添加一个来定义原型。',
         'vector3d.settings': '向量空间',
         'vector3d.xAxis': 'X 轴',
         'vector3d.yAxis': 'Y 轴',
@@ -119,7 +119,7 @@ describe('VectorSpacePanel', () => {
     });
     render(<VectorSpacePanel />);
     expect(screen.getByTestId('vector-space-panel')).toBeInTheDocument();
-    expect(screen.getByText('1 个门派')).toBeInTheDocument();
+    expect(screen.getByText('1 个锚点')).toBeInTheDocument();
   });
 
   it('uses the player vector when no override is provided', () => {
@@ -183,7 +183,7 @@ describe('VectorSpaceSettings', () => {
     // Dimension labels are now rendered as TextField values (axis id is the
     // placeholder; the label is the value).
     expect(screen.getByDisplayValue('处世')).toBeInTheDocument();
-    expect(screen.getByText('门派锚点（0）')).toBeInTheDocument();
+    expect(screen.getByText('锚点（0）')).toBeInTheDocument();
   });
 
   it('adds a sect anchor when the add button is clicked', () => {
@@ -197,7 +197,7 @@ describe('VectorSpaceSettings', () => {
       },
     });
     render(<VectorSpaceSettings />);
-    fireEvent.click(screen.getByText('+ 添加门派'));
+    fireEvent.click(screen.getByText('+ 添加锚点'));
     expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(1);
   });
 

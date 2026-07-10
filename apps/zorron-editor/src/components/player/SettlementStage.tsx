@@ -116,7 +116,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                   {t('vector3d.title')}
                 </h3>
                 <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-medium text-cyan-200">
-                  {t('vector3d.sects', { n: sects.length })}
+                  {t('vector3d.anchors', { n: sects.length })}
                 </span>
               </div>
               <VectorScene
