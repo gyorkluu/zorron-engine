@@ -228,6 +228,84 @@ export const sessionEvents = pgTable(
 );
 
 /**
+ * Webhook subscriptions table (SCALE-003).
+ *
+ * External systems register a callback URL to receive events when players
+ * complete tests. Subscriptions can be scoped to a specific project or
+ * receive events for all projects owned by the subscriber's tenant.
+ */
+export const webhookSubscriptions = pgTable(
+  'webhook_subscriptions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** The user who owns this subscription. */
+    ownerId: uuid('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** Target URL to POST events to. */
+    callbackUrl: text('callback_url').notNull(),
+    /** HMAC-SHA256 signing secret for payload verification. */
+    secret: varchar('secret', { length: 128 }).notNull(),
+    /** JSON array of event types to subscribe to (e.g. ["session.completed"]). */
+    eventTypes: jsonb('event_types').notNull().default([]),
+    /** Scope to a specific project (null = all projects the owner can access). */
+    projectId: uuid('project_id').references(() => projects.id, {
+      onDelete: 'cascade',
+    }),
+    isActive: boolean('is_active').notNull().default(true),
+    /** SCALE-001: Tenant scope. */
+    tenantId: uuid('tenant_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    ownerIdIdx: index('webhook_subscriptions_owner_id_idx').on(table.ownerId),
+    projectIdIdx: index('webhook_subscriptions_project_id_idx').on(table.projectId),
+    tenantIdIdx: index('webhook_subscriptions_tenant_id_idx').on(table.tenantId),
+  }),
+);
+
+/**
+ * Webhook delivery log table (SCALE-003).
+ *
+ * Records each delivery attempt for observability and retry. A delivery is
+ * created when an event fires and updated with the HTTP response status.
+ */
+export const webhookDeliveries = pgTable(
+  'webhook_deliveries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    subscriptionId: uuid('subscription_id')
+      .notNull()
+      .references(() => webhookSubscriptions.id, { onDelete: 'cascade' }),
+    /** The test session that triggered this delivery. */
+    sessionId: uuid('session_id').references(() => testSessions.id, {
+      onDelete: 'cascade',
+    }),
+    eventType: varchar('event_type', { length: 50 }).notNull(),
+    /** The JSON payload sent to the webhook. */
+    payload: jsonb('payload').notNull(),
+    /** pending | success | failed | retry */
+    status: varchar('status', { length: 20 }).notNull().default('pending'),
+    /** Number of delivery attempts. */
+    attempts: integer('attempts').notNull().default(0),
+    /** HTTP status code from the last attempt (null if not yet sent). */
+    responseStatus: integer('response_status'),
+    /** Error message from the last attempt (null on success). */
+    lastError: text('last_error'),
+    deliveredAt: timestamp('delivered_at', { withTimezone: true }),
+    /** When to retry next (null if no retry pending). */
+    nextRetryAt: timestamp('next_retry_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    subscriptionIdIdx: index('webhook_deliveries_subscription_id_idx').on(table.subscriptionId),
+    statusIdx: index('webhook_deliveries_status_idx').on(table.status),
+    sessionIdIdx: index('webhook_deliveries_session_id_idx').on(table.sessionId),
+  }),
+);
+
+/**
  * Drizzle ORM relations.
  */
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -248,6 +326,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   testSessions: many(testSessions),
   variants: many(scenarioVariants),
   events: many(sessionEvents),
+  webhookSubscriptions: many(webhookSubscriptions),
 }));
 
 export const assetsRelations = relations(assets, ({ one }) => ({
@@ -259,12 +338,25 @@ export const testSessionsRelations = relations(testSessions, ({ one, many }) => 
   project: one(projects, { fields: [testSessions.projectId], references: [projects.id] }),
   tenant: one(tenants, { fields: [testSessions.tenantId], references: [tenants.id] }),
   events: many(sessionEvents),
+  deliveries: many(webhookDeliveries),
 }));
 
 export const scenarioVariantsRelations = relations(scenarioVariants, ({ one, many }) => ({
   project: one(projects, { fields: [scenarioVariants.projectId], references: [projects.id] }),
   tenant: one(tenants, { fields: [scenarioVariants.tenantId], references: [tenants.id] }),
   events: many(sessionEvents),
+}));
+
+export const webhookSubscriptionsRelations = relations(webhookSubscriptions, ({ one, many }) => ({
+  owner: one(users, { fields: [webhookSubscriptions.ownerId], references: [users.id] }),
+  project: one(projects, { fields: [webhookSubscriptions.projectId], references: [projects.id] }),
+  tenant: one(tenants, { fields: [webhookSubscriptions.tenantId], references: [tenants.id] }),
+  deliveries: many(webhookDeliveries),
+}));
+
+export const webhookDeliveriesRelations = relations(webhookDeliveries, ({ one }) => ({
+  subscription: one(webhookSubscriptions, { fields: [webhookDeliveries.subscriptionId], references: [webhookSubscriptions.id] }),
+  session: one(testSessions, { fields: [webhookDeliveries.sessionId], references: [testSessions.id] }),
 }));
 
 export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
@@ -290,3 +382,7 @@ export type ScenarioVariant = typeof scenarioVariants.$inferSelect;
 export type NewScenarioVariant = typeof scenarioVariants.$inferInsert;
 export type SessionEvent = typeof sessionEvents.$inferSelect;
 export type NewSessionEvent = typeof sessionEvents.$inferInsert;
+export type WebhookSubscription = typeof webhookSubscriptions.$inferSelect;
+export type NewWebhookSubscription = typeof webhookSubscriptions.$inferInsert;
+export type WebhookDelivery = typeof webhookDeliveries.$inferSelect;
+export type NewWebhookDelivery = typeof webhookDeliveries.$inferInsert;

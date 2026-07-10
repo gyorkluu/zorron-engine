@@ -15,6 +15,7 @@ import { agentRoute } from './modules/agent/agent.route';
 import { marketplaceRoute } from './modules/marketplace/marketplace.route';
 import { tenantRoute } from './modules/tenant/tenant.route';
 import { qualityRoute } from './modules/quality/quality.route';
+import { subscriptionRoute } from './modules/subscription/subscription.route';
 
 /**
  * [Elysia]: assembled application instance with global middleware and routes.
@@ -68,6 +69,7 @@ export function createApp() {
       .use(marketplaceRoute)
       .use(tenantRoute)
       .use(qualityRoute)
+      .use(subscriptionRoute)
       .get('/', () => ({ message: 'Zorron Engine API' }))
   );
 }

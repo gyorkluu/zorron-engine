@@ -216,7 +216,39 @@ export async function saveSession(
     })
     .returning();
 
+  // SCALE-003: fire-and-forget webhook dispatch for "session.completed" event.
+  // Errors are caught to prevent webhook failures from blocking the save.
+  dispatchSessionCompleted(session, project).catch(() => {
+    // Swallow: delivery failures are logged in the deliveries table.
+  });
+
   return toSessionDetail(session);
+}
+
+/**
+ * Dispatches a "session.completed" webhook event to matching subscriptions.
+ *
+ * Imported dynamically to avoid a circular dependency between the agent and
+ * subscription modules.
+ */
+async function dispatchSessionCompleted(
+  session: typeof testSessions.$inferSelect,
+  project: typeof projects.$inferSelect,
+): Promise<void> {
+  const { dispatchEvent } = await import('../subscription/subscription.service');
+  await dispatchEvent({
+    eventType: 'session.completed',
+    projectId: session.projectId,
+    sessionId: session.id,
+    payload: {
+      eventType: 'session.completed',
+      sessionId: session.id,
+      projectId: session.projectId,
+      userIdentifier: session.userIdentifier,
+      settlementResult: session.settlementResult as Record<string, unknown>,
+      timestamp: session.createdAt.toISOString(),
+    },
+  });
 }
 
 /** List test sessions by user identifier or project id. */
