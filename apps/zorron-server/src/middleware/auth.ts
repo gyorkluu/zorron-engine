@@ -9,6 +9,8 @@ import { AppError } from '../shared/errors';
 export interface AuthUser {
   id: string;
   email: string;
+  /** SCALE-001: Tenant this user belongs to (null for platform admins). */
+  tenantId?: string | null;
 }
 
 /**
@@ -40,12 +42,14 @@ export const authPlugin = new Elysia({ name: 'auth' }).derive(
 
       const userId = payload.sub;
       const email = payload.email;
+      const tenantId =
+        typeof payload.tenantId === 'string' ? payload.tenantId : null;
 
       if (typeof userId !== 'string' || typeof email !== 'string') {
         throw new AppError('AUTH_002', 'Invalid access token', 401);
       }
 
-      return { user: { id: userId, email } };
+      return { user: { id: userId, email, tenantId } };
     } catch {
       throw new AppError('AUTH_002', 'Invalid access token', 401);
     }

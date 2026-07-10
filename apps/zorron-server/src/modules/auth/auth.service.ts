@@ -46,12 +46,20 @@ export async function verifyPassword(
 
 /**
  * Issues a short-lived JWT access token.
+ *
+ * SCALE-001: the token carries `tenantId` so downstream routes can scope
+ * queries without an extra DB lookup.
  */
 export async function generateAccessToken(
   userId: string,
   email: string,
+  tenantId?: string | null,
 ): Promise<string> {
-  return new SignJWT({ email })
+  const payload: Record<string, string> = { email };
+  if (tenantId) {
+    payload.tenantId = tenantId;
+  }
+  return new SignJWT(payload)
     .setSubject(userId)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -137,7 +145,7 @@ export async function register(
     nickname,
   });
 
-  const accessToken = await generateAccessToken(user.id, user.email);
+  const accessToken = await generateAccessToken(user.id, user.email, user.tenantId);
   const refreshToken = await generateRefreshToken(user.id);
 
   return { user, accessToken, refreshToken };
@@ -160,7 +168,7 @@ export async function login(
     throw new AppError('AUTH_003', 'Invalid email or password', 401);
   }
 
-  const accessToken = await generateAccessToken(user.id, user.email);
+  const accessToken = await generateAccessToken(user.id, user.email, user.tenantId);
   const refreshToken = await generateRefreshToken(user.id);
 
   return { user, accessToken, refreshToken };
@@ -191,7 +199,7 @@ export async function refreshAccessToken(
     throw new AppError('AUTH_002', 'Invalid refresh token', 401);
   }
 
-  const accessToken = await generateAccessToken(user.id, user.email);
+  const accessToken = await generateAccessToken(user.id, user.email, user.tenantId);
   return { accessToken, refreshToken: newRefreshToken };
 }
 

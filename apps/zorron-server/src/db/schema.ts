@@ -21,6 +21,25 @@ export const users = pgTable('users', {
   nickname: varchar('nickname', { length: 64 }),
   avatarUrl: text('avatar_url'),
   isActive: boolean('is_active').notNull().default(true),
+  /** SCALE-001: Tenant this user belongs to (null for platform admins). */
+  tenantId: uuid('tenant_id'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * Tenants table (SCALE-001).
+ *
+ * Each tenant represents an接入方 (e.g. 情缘杯, 招聘系统, 社区运营) with
+ * isolated projects and test sessions. Users belong to a tenant; their
+ * projects and results are scoped to that tenant.
+ */
+export const tenants = pgTable('tenants', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar('name', { length: 100 }).notNull(),
+  /** URL-safe slug used in API paths. */
+  slug: varchar('slug', { length: 50 }).notNull().unique(),
+  description: text('description'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -47,6 +66,8 @@ export const projects = pgTable(
     forkedFromId: uuid('forked_from_id'),
     /** ECO-004: When the fork was created (null for originals). */
     forkedAt: timestamp('forked_at', { withTimezone: true }),
+    /** SCALE-001: Tenant this project belongs to (null for platform-level). */
+    tenantId: uuid('tenant_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -54,6 +75,7 @@ export const projects = pgTable(
     ownerIdIdx: index('projects_owner_id_idx').on(table.ownerId),
     updatedAtIdx: index('projects_updated_at_idx').on(table.updatedAt),
     forkedFromIdIdx: index('projects_forked_from_id_idx').on(table.forkedFromId),
+    tenantIdIdx: index('projects_tenant_id_idx').on(table.tenantId),
   }),
 );
 
@@ -118,24 +140,34 @@ export const testSessions = pgTable(
     userIdentifier: varchar('user_identifier', { length: 200 }).notNull(),
     settlementResult: jsonb('settlement_result').notNull(),
     metadata: jsonb('metadata'),
+    /** SCALE-001: Tenant this session belongs to (denormalized for fast filtering). */
+    tenantId: uuid('tenant_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => ({
     projectIdIdx: index('test_sessions_project_id_idx').on(table.projectId),
     userIdentifierIdx: index('test_sessions_user_identifier_idx').on(table.userIdentifier),
+    tenantIdIdx: index('test_sessions_tenant_id_idx').on(table.tenantId),
   }),
 );
 
 /**
  * Drizzle ORM relations.
  */
-export const usersRelations = relations(users, ({ many }) => ({
+export const tenantsRelations = relations(tenants, ({ many }) => ({
+  users: many(users),
+  projects: many(projects),
+}));
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  tenant: one(tenants, { fields: [users.tenantId], references: [tenants.id] }),
   projects: many(projects),
   assets: many(assets),
 }));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   owner: one(users, { fields: [projects.ownerId], references: [users.id] }),
+  tenant: one(tenants, { fields: [projects.tenantId], references: [tenants.id] }),
   assets: many(assets),
   testSessions: many(testSessions),
 }));
@@ -147,10 +179,13 @@ export const assetsRelations = relations(assets, ({ one }) => ({
 
 export const testSessionsRelations = relations(testSessions, ({ one }) => ({
   project: one(projects, { fields: [testSessions.projectId], references: [projects.id] }),
+  tenant: one(tenants, { fields: [testSessions.tenantId], references: [tenants.id] }),
 }));
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Tenant = typeof tenants.$inferSelect;
+export type NewTenant = typeof tenants.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type Asset = typeof assets.$inferSelect;
