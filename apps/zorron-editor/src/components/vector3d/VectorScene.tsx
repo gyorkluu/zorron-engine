@@ -1,7 +1,7 @@
 /**
  * VectorScene - canvas-based 3D rendering of the personality vector space.
  *
- * Renders axes (X/Y/Z), sect anchor points and the user's current vector
+ * Renders axes (X/Y/Z), result anchor points and the user's current vector
  * position using a lightweight isometric-style projection on a 2D canvas.
  * The camera can be rotated by dragging horizontally, and zoomed with the
  * wheel. This avoids pulling in a heavy WebGL stack while still giving a
@@ -9,7 +9,7 @@
  */
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import type { AxisId, PersonalityVector, SectAnchor } from '@/types/flow';
+import type { AxisId, PersonalityVector, ResultAnchor } from '@/types/flow';
 import {
   renderVectorSpace,
   DEFAULT_CAMERA,
@@ -21,11 +21,11 @@ export interface VectorSceneProps {
   /** Axis labels keyed by axis id (only the first three are projected). */
   axisLabels: Record<AxisId, string>;
   /** Sect anchors to render. */
-  sects: SectAnchor[];
+  sects: ResultAnchor[];
   /** The user's current vector position. */
   userVector: PersonalityVector;
-  /** Optional highlighted sect id (e.g. the matched settlement sect). */
-  highlightedSectId?: string | null;
+  /** Optional highlighted anchor id (e.g. the matched settlement anchor). */
+  highlightedAnchorId?: string | null;
   /** Pixel width of the canvas. Defaults to 100%. */
   width?: number;
   /** Pixel height of the canvas. Defaults to 320. */
@@ -39,7 +39,7 @@ function VectorSceneImpl({
   axisLabels,
   sects,
   userVector,
-  highlightedSectId = null,
+  highlightedAnchorId = null,
   width,
   height = DEFAULT_HEIGHT,
 }: VectorSceneProps) {
@@ -91,9 +91,9 @@ function VectorSceneImpl({
       axisLabels,
       sects,
       userVector,
-      highlightedSectId,
+      highlightedAnchorId,
     });
-  }, [size, axisLabels, sects, userVector, highlightedSectId]);
+  }, [size, axisLabels, sects, userVector, highlightedAnchorId]);
 
   useEffect(() => {
     draw();

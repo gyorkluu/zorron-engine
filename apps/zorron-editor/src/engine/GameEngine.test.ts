@@ -326,7 +326,7 @@ describe('GameEngine', () => {
     engine.start();
     engine.advanceFromStart();
     const state = engine.selectChoice('c1');
-    expect(state.settlementResult?.sect?.id).toBe('s1');
+    expect(state.settlementResult?.anchor?.id).toBe('s1');
     expect(state.settlementResult?.finalVector).toEqual({ x: 2, y: 2, z: 2 });
   });
 });

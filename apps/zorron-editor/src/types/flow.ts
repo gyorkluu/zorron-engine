@@ -212,13 +212,13 @@ export type VariableValue = string | number | boolean;
 /** Variables map. */
 export type Variables = Record<string, VariableValue>;
 
-/** A sect anchor used by the settlement matcher. */
+/** A result anchor used by the settlement matcher (e.g. a personality archetype). */
 export interface SectResultTexts {
   layerA?: string;
   layerB?: string;
 }
 
-export interface SectAnchor {
+export interface ResultAnchor {
   id: string;
   name: string;
   vector: PersonalityVector;
@@ -227,6 +227,9 @@ export interface SectAnchor {
   coverUrl?: string;
   resultTexts?: SectResultTexts;
 }
+
+/** @deprecated Use ResultAnchor instead. Kept for backward compatibility. */
+export type SectAnchor = ResultAnchor;
 
 /**
  * Vector space configuration stored in project settings.
@@ -239,7 +242,7 @@ export interface SectAnchor {
 export interface VectorSpaceConfig {
   enabled: boolean;
   dimensions: Record<AxisId, string>;
-  sects?: SectAnchor[];
+  sects?: ResultAnchor[];
 }
 
 /** Project-level settings stored inside FlowData. */

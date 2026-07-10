@@ -3,7 +3,7 @@
  *
  * Uses an isometric-style perspective projection on a 2D canvas. This avoids
  * pulling in a heavy WebGL dependency (three.js / @react-three/fiber) while
- * still rendering a readable 3D coordinate system with axes, sect anchors and
+ * still rendering a readable 3D coordinate system with axes, result anchors and
  * the user's current vector position.
  *
  * The projection maps a 3D point `(x, y, z)` to a 2D screen point using a
@@ -156,12 +156,12 @@ export interface VectorSpaceRenderOptions {
   camera: Camera;
   /** Axis labels keyed by axis id (only the first three are projected). */
   axisLabels: Record<AxisId, string>;
-  /** Sect anchors to render. */
+  /** Result anchors to render. */
   sects: Array<{ id: string; name: string; vector: PersonalityVector }>;
   /** The user's current vector position. */
   userVector: PersonalityVector;
-  /** Optional highlighted sect id (e.g. the matched settlement sect). */
-  highlightedSectId?: string | null;
+  /** Optional highlighted anchor id (e.g. the matched settlement anchor). */
+  highlightedAnchorId?: string | null;
   /** Scale factor: world units to pixels per unit. */
   scale?: number;
   /** Axis length in world units. */
@@ -178,7 +178,7 @@ export function renderVectorSpace(options: VectorSpaceRenderOptions): void {
     axisLabels,
     sects,
     userVector,
-    highlightedSectId = null,
+    highlightedAnchorId = null,
     scale = 40,
     axisLength = 5,
   } = options;
@@ -208,10 +208,10 @@ export function renderVectorSpace(options: VectorSpaceRenderOptions): void {
     ctx.fillText(axis.label, axis.end.x + 6, axis.end.y + 4);
   }
 
-  // Draw sect anchors.
+  // Draw result anchors.
   for (const sect of sects) {
     const point = project(sect.vector, camera, origin, scale);
-    const isHighlighted = sect.id === highlightedSectId;
+    const isHighlighted = sect.id === highlightedAnchorId;
     ctx.beginPath();
     ctx.arc(point.x, point.y, isHighlighted ? 7 : 5, 0, Math.PI * 2);
     ctx.fillStyle = isHighlighted ? '#f472b6' : '#a78bfa';

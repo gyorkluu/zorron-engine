@@ -260,7 +260,7 @@ export const SectResultTextsSchema = z.object({
   layerB: z.string().optional(),
 });
 
-export const SectAnchorSchema = z.object({
+export const ResultAnchorSchema = z.object({
   id: z.string(),
   name: z.string(),
   vector: VectorSchema,
@@ -269,6 +269,8 @@ export const SectAnchorSchema = z.object({
   coverUrl: z.string().url().optional(),
   resultTexts: SectResultTextsSchema.optional(),
 });
+/** @deprecated Use ResultAnchorSchema instead. */
+export const SectAnchorSchema = ResultAnchorSchema;
 
 export const VectorSpaceConfigSchema = z.object({
   enabled: z.boolean().default(false),
@@ -280,7 +282,7 @@ export const VectorSpaceConfigSchema = z.object({
     y: '立场',
     z: '性情',
   }),
-  sects: z.array(SectAnchorSchema).optional(),
+  sects: z.array(ResultAnchorSchema).optional(),
 }).default({
   enabled: false,
   dimensions: { x: '处世', y: '立场', z: '性情' },

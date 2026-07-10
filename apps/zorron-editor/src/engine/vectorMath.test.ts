@@ -10,14 +10,14 @@ import {
   magnitude,
   distance,
   quadrant,
-  findNearestSect,
+  findNearestAnchor,
   sum,
   clamp,
   ZERO_VECTOR,
 } from './vectorMath';
-import type { SectAnchor } from '@/types/flow';
+import type { ResultAnchor } from '@/types/flow';
 
-const sects: SectAnchor[] = [
+const sects: ResultAnchor[] = [
   { id: 'a', name: 'Alpha', vector: { x: 1, y: 1, z: 1 }, title: 'A' },
   { id: 'b', name: 'Beta', vector: { x: -1, y: -1, z: -1 }, title: 'B' },
   { id: 'c', name: 'Gamma', vector: { x: 2, y: 2, z: 2 }, title: 'C' },
@@ -66,21 +66,21 @@ describe('vectorMath', () => {
     expect(clamp({ x: -5, y: 3, z: 10 }, 0, 5)).toEqual({ x: 0, y: 3, z: 5 });
   });
 
-  it('finds the nearest sect in the same quadrant', () => {
-    const result = findNearestSect({ x: 1, y: 1, z: 1 }, sects);
-    expect(result.sect?.id).toBe('a');
+  it('finds the nearest anchor in the same quadrant', () => {
+    const result = findNearestAnchor({ x: 1, y: 1, z: 1 }, sects);
+    expect(result.anchor?.id).toBe('a');
     expect(result.distance).toBe(0);
   });
 
   it('falls back to global search when no sect shares the quadrant', () => {
-    const result = findNearestSect({ x: 1, y: 1, z: -1 }, sects);
+    const result = findNearestAnchor({ x: 1, y: 1, z: -1 }, sects);
     // No sect in the "++-" quadrant, so global nearest is Alpha (distance sqrt(2)).
-    expect(result.sect?.id).toBe('a');
+    expect(result.anchor?.id).toBe('a');
   });
 
-  it('returns null sect when the list is empty', () => {
-    const result = findNearestSect({ x: 1, y: 1, z: 1 }, []);
-    expect(result.sect).toBeNull();
+  it('returns null anchor when the list is empty', () => {
+    const result = findNearestAnchor({ x: 1, y: 1, z: 1 }, []);
+    expect(result.anchor).toBeNull();
     expect(result.distance).toBe(Infinity);
   });
 });

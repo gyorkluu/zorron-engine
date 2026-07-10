@@ -14,10 +14,10 @@ import type {
   SceneChoice,
   Variables,
   PersonalityVector,
-  SectAnchor,
+  ResultAnchor,
   SettlementResultMapping,
 } from '@/types/flow';
-import { add, magnitude, distance, quadrant, findNearestSect, ZERO_VECTOR } from './vectorMath';
+import { add, magnitude, distance, quadrant, findNearestAnchor, ZERO_VECTOR } from './vectorMath';
 
 /** Context passed to every processor. */
 export interface ProcessorContext {
@@ -25,7 +25,7 @@ export interface ProcessorContext {
   fragments: Set<string>;
   currentVector: PersonalityVector;
   pendingVector: PersonalityVector;
-  sects: SectAnchor[];
+  sects: ResultAnchor[];
 }
 
 /** Result of evaluating a logic node. */
@@ -103,7 +103,7 @@ export function evaluateSettlement(
   data: SettlementNodeData,
   ctx: ProcessorContext,
 ): {
-  sect: SectAnchor | null;
+  anchor: ResultAnchor | null;
   distance: number;
   magnitude: number;
   finalVector: PersonalityVector;
@@ -113,10 +113,10 @@ export function evaluateSettlement(
   const finalVector = { ...ctx.currentVector };
   const mag = magnitude(finalVector);
   const q = quadrant(finalVector);
-  const { sect, distance: nearest } = findNearestSect(finalVector, ctx.sects);
+  const { anchor, distance: nearest } = findNearestAnchor(finalVector, ctx.sects);
   const mapping = data.resultMapping?.[0];
   return {
-    sect,
+    anchor,
     distance: nearest,
     magnitude: mag,
     finalVector,
@@ -148,4 +148,4 @@ function compare(
 }
 
 /** Re-export vector math for convenience. */
-export { add, magnitude, distance, quadrant, findNearestSect, ZERO_VECTOR };
+export { add, magnitude, distance, quadrant, findNearestAnchor, ZERO_VECTOR };

@@ -35,20 +35,20 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
   const layerB = result.resultTexts?.layerB;
 
   const spriteUrl = useMemo(() => {
-    const sectId = result.sect?.id;
+    const sectId = result.anchor?.id;
     if (!sectId) return undefined;
     const key = `${sectId} - 已编辑.png` as keyof typeof cdnMapping;
     return cdnMapping[key] || `/workspace/sprite/${sectId} - 已编辑.png`;
-  }, [result.sect?.id]);
+  }, [result.anchor?.id]);
 
   const axisLabels = settings.vectorSpace?.dimensions ?? { x: 'X', y: 'Y', z: 'Z' };
   const sects = useMemo(() => {
     const list = settings.vectorSpace?.sects ?? [];
-    if (list.length === 0 && result?.sect) {
-      return [result.sect];
+    if (list.length === 0 && result?.anchor) {
+      return [result.anchor];
     }
     return list;
-  }, [settings.vectorSpace?.sects, result?.sect]);
+  }, [settings.vectorSpace?.sects, result?.anchor]);
 
   const formatVectorValue = (val: number) => {
     const formatted = val.toFixed(2);
@@ -68,9 +68,9 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
 
       <div className="relative flex h-full flex-col items-center overflow-y-auto p-5 text-center sm:p-8">
         <div className="flex w-full max-w-3xl flex-col items-center gap-5">
-          {result.sect && (
+          {result.anchor && (
             <span className="rounded-full border border-pink-400/40 bg-pink-500/10 px-4 py-1 text-sm uppercase tracking-widest text-pink-200">
-              {result.sect.name}
+              {result.anchor.name}
             </span>
           )}
 
@@ -86,7 +86,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
           {spriteUrl && (
             <img
               src={spriteUrl}
-              alt={result.sect?.name ?? ''}
+              alt={result.anchor?.name ?? ''}
               className="max-h-72 w-auto rounded-xl object-contain drop-shadow-2xl sm:max-h-96"
             />
           )}
@@ -123,7 +123,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                 axisLabels={axisLabels}
                 sects={sects}
                 userVector={result.finalVector}
-                highlightedSectId={result.sect?.id ?? null}
+                highlightedAnchorId={result.anchor?.id ?? null}
                 height={240}
               />
               <div className="mt-2 flex flex-wrap gap-2 text-center text-[10px]">

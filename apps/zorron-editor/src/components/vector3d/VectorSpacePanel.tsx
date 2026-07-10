@@ -17,7 +17,7 @@ import { useProjectStore } from '@/stores/projectStore';
 import { usePlayerStore } from '@/stores/playerStore';
 import { useT } from '@/i18n/useT';
 import { VectorScene } from './VectorScene';
-import type { PersonalityVector, SectAnchor } from '@/types/flow';
+import type { PersonalityVector, ResultAnchor } from '@/types/flow';
 import { ZERO_VECTOR } from '@/engine/vectorMath';
 
 /** Props for the VectorSpacePanel. */
@@ -25,7 +25,7 @@ export interface VectorSpacePanelProps {
   /** Override the user vector (e.g. for preview in the editor). */
   userVector?: PersonalityVector;
   /** Override the highlighted sect id (e.g. the matched settlement sect). */
-  highlightedSectId?: string | null;
+  highlightedAnchorId?: string | null;
   /** Compact mode for embedding in the settlement stage. */
   compact?: boolean;
   /** Optional class name. */
@@ -34,7 +34,7 @@ export interface VectorSpacePanelProps {
 
 function VectorSpacePanelImpl({
   userVector,
-  highlightedSectId = null,
+  highlightedAnchorId = null,
   compact = false,
   className,
 }: VectorSpacePanelProps) {
@@ -46,7 +46,7 @@ function VectorSpacePanelImpl({
 
   const vectorSpace = settings.vectorSpace;
   const axisLabels = vectorSpace.dimensions ?? { x: 'X', y: 'Y', z: 'Z' };
-  const sects: SectAnchor[] = vectorSpace.sects ?? [];
+  const sects: ResultAnchor[] = vectorSpace.sects ?? [];
 
   const effectiveVector: PersonalityVector = useMemo(() => {
     if (userVector) return userVector;
@@ -86,7 +86,7 @@ function VectorSpacePanelImpl({
         axisLabels={axisLabels}
         sects={sects}
         userVector={effectiveVector}
-        highlightedSectId={highlightedSectId}
+        highlightedAnchorId={highlightedAnchorId}
         height={compact ? 240 : 320}
       />
       <div className="mt-2 flex flex-wrap gap-2 text-center text-[10px]">

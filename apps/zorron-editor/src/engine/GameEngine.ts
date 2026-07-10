@@ -35,7 +35,7 @@ import {
   type StartNodeData,
   type SceneChoice,
   type PersonalityVector,
-  type SectAnchor,
+  type ResultAnchor,
   type SectResultTexts,
   type SettlementButton,
   type SettlementButtonAction,
@@ -48,7 +48,7 @@ import {
   add,
   magnitude,
   quadrant,
-  findNearestSect,
+  findNearestAnchor,
   ZERO_VECTOR,
 } from './vectorMath';
 
@@ -63,7 +63,7 @@ export interface PlayerChoice {
 
 /** Result of a settlement node evaluation. */
 export interface SettlementResult {
-  sect: SectAnchor | null;
+  anchor: ResultAnchor | null;
   distance: number;
   magnitude: number;
   finalVector: PersonalityVector;
@@ -525,21 +525,21 @@ export class GameEngine {
 
     // Resolve sect anchors from project settings, then match by nearest neighbor.
     const sects = this.settings.vectorSpace?.sects ?? [];
-    const { sect, distance: nearestDistance } = findNearestSect(finalVector, sects);
+    const { anchor, distance: nearestDistance } = findNearestAnchor(finalVector, sects);
 
     // Find a matching result mapping (first whose condition is satisfied, else first).
     const mapping = data.resultMapping?.[0];
 
     const result: SettlementResult = {
-      sect,
+      anchor,
       distance: nearestDistance,
       magnitude: mag,
       finalVector,
       quadrant: playerQuadrant,
-      title: mapping?.title ?? sect?.name ?? 'Settlement',
-      description: mapping?.description ?? sect?.description,
-      coverUrl: mapping?.coverUrl ?? sect?.coverUrl,
-      resultTexts: sect?.resultTexts,
+      title: mapping?.title ?? anchor?.name ?? 'Settlement',
+      description: mapping?.description ?? anchor?.description,
+      coverUrl: mapping?.coverUrl ?? anchor?.coverUrl,
+      resultTexts: anchor?.resultTexts,
       buttons: data.buttons,
       mapping,
     };
@@ -651,4 +651,4 @@ function compare(a: number, op: LogicNodeData['operator'], b: number): boolean {
 }
 
 /** Re-export engine types for consumers. */
-export type { FlowData, FlowNode, FlowEdge, GameNodeData, SectAnchor };
+export type { FlowData, FlowNode, FlowEdge, GameNodeData, ResultAnchor, SectAnchor };

@@ -39,10 +39,10 @@ vi.mock('@/lib/featureFlags', () => ({
 // Mock VectorScene so we don't pull in the 3D canvas / project store.
 vi.mock('@/components/vector3d/VectorScene', () => ({
   VectorScene: (props: {
-    highlightedSectId?: string | null;
+    highlightedAnchorId?: string | null;
   }) => (
     <div data-testid="vector-space-panel-mock">
-      {props.highlightedSectId ?? 'no-highlight'}-true
+      {props.highlightedAnchorId ?? 'no-highlight'}-true
     </div>
   ),
 }));
@@ -50,7 +50,7 @@ vi.mock('@/components/vector3d/VectorScene', () => ({
 /** Build a SettlementResult with sensible defaults. */
 function makeResult(overrides: Partial<SettlementResult> = {}): SettlementResult {
   return {
-    sect: null,
+    anchor: null,
     distance: 0,
     magnitude: 0,
     finalVector: { x: 0, y: 0, z: 0 },
@@ -123,13 +123,13 @@ describe('SettlementStage', () => {
     expect(container.querySelector('img')).toBeNull();
   });
 
-  it('renders the sect badge when a sect is matched', () => {
+  it('renders the anchor badge when an anchor is matched', () => {
     render(
       <SettlementStage
         state={makeState(
           makeResult({
             title: 'T',
-            sect: {
+            anchor: {
               id: 's1',
               name: 'Alpha Sect',
               vector: { x: 1, y: 1, z: 1 },
@@ -211,14 +211,14 @@ describe('SettlementStage', () => {
           makeResult({
             title: 'T',
             finalVector: { x: 1, y: 2, z: 3 },
-            sect: { id: 's1', name: 'S', vector: { x: 1, y: 1, z: 1 }, title: 'S' },
+            anchor: { id: 's1', name: 'S', vector: { x: 1, y: 1, z: 1 }, title: 'S' },
           }),
         )}
       />,
     );
     expect(screen.getByTestId('vector-space-panel-mock')).toBeInTheDocument();
-    // The mock renders "{highlightedSectId}-{compact}". The stage passes
-    // `compact` and the matched sect id.
+    // The mock renders "{highlightedAnchorId}-{compact}". The stage passes
+    // `compact` and the matched anchor id.
     expect(screen.getByText('s1-true')).toBeInTheDocument();
   });
 

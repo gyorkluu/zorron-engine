@@ -12,7 +12,7 @@
  * {@link createZeroVector} with an explicit `axisIds` list).
  */
 
-import type { AxisId, Vector, PersonalityVector, SectAnchor } from '@/types/flow';
+import type { AxisId, Vector, PersonalityVector, ResultAnchor } from '@/types/flow';
 
 /**
  * The empty vector. Adding `{}` to any vector is a no-op, so this serves as
@@ -106,35 +106,35 @@ export function quadrant(v: Vector): string {
 }
 
 /**
- * Find the nearest sect anchor to a vector.
+ * Find the nearest anchor to a vector.
  *
  * Algorithm (ported from the legacy GameEngine):
  * 1. Lock to the player's quadrant first.
- * 2. If no sects share the quadrant, fall back to a global search.
- * 3. Return the sect with the minimum Euclidean distance.
+ * 2. If no anchors share the quadrant, fall back to a global search.
+ * 3. Return the anchor with the minimum Euclidean distance.
  */
-export function findNearestSect(
+export function findNearestAnchor(
   point: Vector,
-  sects: SectAnchor[],
-): { sect: SectAnchor | null; distance: number } {
-  if (sects.length === 0) return { sect: null, distance: Infinity };
+  anchors: ResultAnchor[],
+): { anchor: ResultAnchor | null; distance: number } {
+  if (anchors.length === 0) return { anchor: null, distance: Infinity };
 
   const playerQuadrant = quadrant(point);
-  let candidates = sects.filter((s) => quadrant(s.vector) === playerQuadrant);
+  let candidates = anchors.filter((a) => quadrant(a.vector) === playerQuadrant);
   if (candidates.length === 0) {
-    candidates = sects;
+    candidates = anchors;
   }
 
-  let nearest: SectAnchor | null = null;
+  let nearest: ResultAnchor | null = null;
   let minDistance = Infinity;
-  for (const sect of candidates) {
-    const d = distance(point, sect.vector);
+  for (const anchor of candidates) {
+    const d = distance(point, anchor.vector);
     if (d < minDistance) {
       minDistance = d;
-      nearest = sect;
+      nearest = anchor;
     }
   }
-  return { sect: nearest, distance: minDistance };
+  return { anchor: nearest, distance: minDistance };
 }
 
 /** Sum a list of vectors into a single resultant vector. */

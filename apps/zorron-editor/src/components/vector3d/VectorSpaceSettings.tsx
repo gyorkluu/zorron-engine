@@ -17,7 +17,7 @@ import { useT, tt } from '@/i18n/useT';
 import { Field, TextField, SwitchField } from '@/components/inspector/fields/Field';
 import { VectorEditor } from '@/components/inspector/fields/VectorEditor';
 import { createZeroVector } from '@/engine/vectorMath';
-import type { AxisId, SectAnchor, VectorSpaceConfig, ProjectSettings, Vector } from '@/types/flow';
+import type { AxisId, ResultAnchor, VectorSpaceConfig, ProjectSettings, Vector } from '@/types/flow';
 import { nanoid } from 'nanoid';
 
 /** Props for the VectorSpaceSettings. */
@@ -54,7 +54,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
 
   /** Update a single sect anchor by id. */
   const updateSect = useCallback(
-    (id: string, patch: Partial<SectAnchor>) => {
+    (id: string, patch: Partial<ResultAnchor>) => {
       const sects = (vectorSpace.sects ?? []).map((s) =>
         s.id === id ? { ...s, ...patch } : s,
       );
@@ -67,7 +67,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
   const addSect = useCallback(() => {
     const sects = vectorSpace.sects ?? [];
     const axisIds = Object.keys(vectorSpace.dimensions);
-    const newSect: SectAnchor = {
+    const newSect: ResultAnchor = {
       id: `sect_${nanoid(6)}`,
       name: tt('vector3d.sects.default', { n: sects.length + 1 }),
       vector: createZeroVector(axisIds),
