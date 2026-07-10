@@ -14,6 +14,8 @@ import type {
   SaveSessionRequest,
   SessionDetail,
   ListSessionsQuery,
+  BenchmarkRequest,
+  BenchmarkResponse,
 } from './agent.schema';
 
 /** Context shape injected by auth middleware. */
@@ -96,4 +98,12 @@ export async function listSessions(
   query: ListSessionsQuery,
 ) {
   return service.listSessions(query);
+}
+
+/** POST /api/agent/benchmark - measure simulation throughput (SCALE-004). */
+export function benchmark(
+  _ctx: AgentContext,
+  body: BenchmarkRequest,
+): BenchmarkResponse {
+  return service.benchmark(body);
 }

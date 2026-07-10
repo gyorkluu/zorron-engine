@@ -277,6 +277,31 @@ export const ListSessionsResponseSchema = z.object({
   }),
 });
 
+// ── Benchmark (SCALE-004) ───────────────────────────────────
+
+export const BenchmarkRequestSchema = z.object({
+  /** Pre-built FlowData to benchmark. */
+  flowData: z.record(z.unknown()),
+  /** Simulation config to use for the benchmark. */
+  simulation: SimulationConfigSchema.optional(),
+});
+
+export const BenchmarkResponseSchema = z.object({
+  runs: z.number(),
+  coldMs: z.number(),
+  cachedMs: z.number(),
+  speedup: z.number(),
+  perRunMs: z.number(),
+  opsPerSecond: z.number(),
+  cacheStats: z.object({
+    size: z.number(),
+    maxEntries: z.number(),
+    hits: z.number(),
+    misses: z.number(),
+    hitRate: z.number(),
+  }),
+});
+
 // ── Type Exports ────────────────────────────────────────────
 
 export type ScenarioIntent = z.infer<typeof ScenarioIntentSchema>;
@@ -292,3 +317,5 @@ export type SaveSessionRequest = z.infer<typeof SaveSessionRequestSchema>;
 export type SessionDetail = z.infer<typeof SessionDetailSchema>;
 export type ListSessionsQuery = z.infer<typeof ListSessionsQuerySchema>;
 export type ListSessionsResponse = z.infer<typeof ListSessionsResponseSchema>;
+export type BenchmarkRequest = z.infer<typeof BenchmarkRequestSchema>;
+export type BenchmarkResponse = z.infer<typeof BenchmarkResponseSchema>;

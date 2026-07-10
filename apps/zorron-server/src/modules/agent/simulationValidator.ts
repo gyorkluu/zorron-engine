@@ -86,10 +86,26 @@ interface AdjEntry {
   handle: string | null;
 }
 
-function buildAdjacencyList(flow: FlowDataLike): Map<string, AdjEntry[]> {
+/**
+ * SCALE-004: Pre-computed lookup structures for O(1) access during simulation.
+ *
+ * Previously `getNodeById` used Array.find (O(n) per call). With 200 runs and
+ * multiple lookups per run, this was the dominant cost. The nodeMap provides
+ * constant-time lookups.
+ */
+interface FlowIndex {
+  adj: Map<string, AdjEntry[]>;
+  nodeMap: Map<string, FlowNode>;
+  startNode: FlowNode | null;
+}
+
+function buildFlowIndex(flow: FlowDataLike): FlowIndex {
   const adj = new Map<string, AdjEntry[]>();
+  const nodeMap = new Map<string, FlowNode>();
+
   for (const node of flow.nodes) {
     adj.set(node.id, []);
+    nodeMap.set(node.id, node);
   }
   for (const edge of flow.edges) {
     if (!adj.has(edge.source)) adj.set(edge.source, []);
@@ -98,15 +114,11 @@ function buildAdjacencyList(flow: FlowDataLike): Map<string, AdjEntry[]> {
       handle: edge.sourceHandle ?? null,
     });
   }
-  return adj;
-}
 
-function findStartNode(flow: FlowDataLike): FlowNode | null {
-  return flow.nodes.find((n) => n.type === 'start') ?? flow.nodes[0] ?? null;
-}
+  const startNode =
+    flow.nodes.find((n) => n.type === 'start') ?? flow.nodes[0] ?? null;
 
-function getNodeById(flow: FlowDataLike, id: string): FlowNode | undefined {
-  return flow.nodes.find((n) => n.id === id);
+  return { adj, nodeMap, startNode };
 }
 
 // ── Validation ──
@@ -118,8 +130,8 @@ export function validateFlow(
   const { runs = 200, seed = 'validator', maxSteps = 200 } = options;
   const issues: ValidationIssue[] = [];
 
-  const adj = buildAdjacencyList(flow);
-  const startNode = findStartNode(flow);
+  // SCALE-004: pre-compute index for O(1) lookups.
+  const { adj, nodeMap, startNode } = buildFlowIndex(flow);
 
   // ── 1. Structural checks ──
 
@@ -199,7 +211,7 @@ export function validateFlow(
   const rng = new SeededRandom(seed);
 
   for (let run = 0; run < runs; run++) {
-    const result = simulateRun(flow, adj, startNode.id, rng, maxSteps);
+    const result = simulateRun(adj, nodeMap, startNode.id, rng, maxSteps);
     if (result.timedOut) {
       timedOuts++;
     }
@@ -232,6 +244,7 @@ export function validateFlow(
   }
 
   // ── 3. Coverage ──
+
   const nodeCoverage = flow.nodes.length > 0 ? reachable.size / flow.nodes.length : 0;
   if (nodeCoverage < 0.9) {
     issues.push({
@@ -260,8 +273,8 @@ interface RunResult {
 }
 
 function simulateRun(
-  flow: FlowDataLike,
   adj: Map<string, AdjEntry[]>,
+  nodeMap: Map<string, FlowNode>,
   startId: string,
   rng: SeededRandom,
   maxSteps: number,
@@ -277,7 +290,8 @@ function simulateRun(
 
   while (currentId && steps < maxSteps) {
     steps++;
-    const node = getNodeById(flow, currentId);
+    // SCALE-004: O(1) node lookup via pre-computed map (was Array.find).
+    const node = nodeMap.get(currentId);
     if (!node) {
       return { reachedSettlement: false, settlementId: null, timedOut: false };
     }

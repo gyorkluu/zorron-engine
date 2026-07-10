@@ -11,6 +11,7 @@ import { projects, testSessions } from '../../db/schema';
 import { AppError } from '../../shared/errors';
 import { buildFlow } from './flowBuilder';
 import { validateFlow, type SimulationResult } from './simulationValidator';
+import { validationCache } from './validationCache';
 import { findPreset } from './scenarioPresets';
 import type {
   ScenarioIntent,
@@ -21,6 +22,8 @@ import type {
   SessionDetail,
   ListSessionsQuery,
   SimulationConfig,
+  BenchmarkRequest,
+  BenchmarkResponse,
 } from './agent.schema';
 
 // ── Types ──
@@ -70,12 +73,15 @@ export async function compile(
   // 1. Build FlowData from intent.
   const flowData = buildFlow(intent);
 
-  // 2. Validate with simulation.
-  const simResult = validateFlow(flowData as unknown as Parameters<typeof validateFlow>[0], {
-    runs: simConfig?.runs ?? 200,
-    seed: simConfig?.seed,
-    maxSteps: simConfig?.maxStepsPerRun ?? 200,
-  });
+  // 2. Validate with simulation (SCALE-004: cached for identical flows).
+  const simResult = validationCache.get(
+    flowData as unknown as Parameters<typeof validateFlow>[0],
+    {
+      runs: simConfig?.runs ?? 200,
+      seed: simConfig?.seed,
+      maxSteps: simConfig?.maxStepsPerRun ?? 200,
+    },
+  );
 
   // 3. Determine status: success if no error-severity issues.
   const hasErrors = simResult.issues.some((i) => i.severity === 'error');
@@ -298,5 +304,51 @@ function toSessionDetail(row: typeof testSessions.$inferSelect): SessionDetail {
     settlementResult: row.settlementResult as Record<string, unknown>,
     metadata: (row.metadata as Record<string, unknown> | null) ?? null,
     createdAt: row.createdAt.toISOString(),
+  };
+}
+
+// ── Benchmark (SCALE-004) ──
+
+/**
+ * Benchmarks simulation throughput for a given flow.
+ *
+ * Measures both the cold path (uncached, full Monte Carlo) and the warm path
+ * (cached, O(1) lookup) to quantify the cache benefit. Returns cache stats for
+ * observability and capacity planning.
+ */
+export function benchmark(req: BenchmarkRequest): BenchmarkResponse {
+  const runs = req.simulation?.runs ?? 200;
+  const seed = req.simulation?.seed ?? 'benchmark';
+  const maxSteps = req.simulation?.maxStepsPerRun ?? 200;
+
+  const flow = req.flowData as unknown as Parameters<typeof validateFlow>[0];
+  const options = { runs, seed, maxSteps };
+
+  // Clear cache to measure a true cold path.
+  validationCache.clear();
+
+  const t0 = performance.now();
+  validationCache.get(flow, options);
+  const t1 = performance.now();
+  const coldMs = t1 - t0;
+
+  // Warm path: identical inputs → cache hit.
+  const t2 = performance.now();
+  validationCache.get(flow, options);
+  const t3 = performance.now();
+  const cachedMs = t3 - t2;
+
+  const speedup = cachedMs > 0 ? coldMs / cachedMs : Infinity;
+  const perRunMs = coldMs / runs;
+  const opsPerSecond = coldMs > 0 ? 1000 / coldMs : Infinity;
+
+  return {
+    runs,
+    coldMs,
+    cachedMs,
+    speedup,
+    perRunMs,
+    opsPerSecond,
+    cacheStats: validationCache.getStats(),
   };
 }

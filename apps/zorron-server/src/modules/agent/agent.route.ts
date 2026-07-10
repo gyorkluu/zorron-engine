@@ -11,6 +11,8 @@ import {
   SessionDetailSchema,
   ListSessionsQuerySchema,
   ListSessionsResponseSchema,
+  BenchmarkRequestSchema,
+  BenchmarkResponseSchema,
 } from './agent.schema';
 
 /**
@@ -92,5 +94,13 @@ export const agentRoute = new Elysia({ prefix: '/api/agent' })
     ({ params, user }) => controller.publish({ user: user! }, params.id),
     {
       response: PublishResponseSchema,
+    },
+  )
+  .post(
+    '/benchmark',
+    ({ body, user }) => controller.benchmark({ user: user! }, body),
+    {
+      body: BenchmarkRequestSchema,
+      response: BenchmarkResponseSchema,
     },
   );
