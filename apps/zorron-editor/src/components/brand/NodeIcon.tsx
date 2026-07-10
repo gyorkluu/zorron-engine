@@ -1,27 +1,6 @@
 import { memo } from 'react';
-import {
-  Play,
-  MessageSquare,
-  GitBranch,
-  Settings2,
-  Calculator,
-  Trophy,
-  Video,
-  ExternalLink,
-  type LucideIcon,
-} from 'lucide-react';
 import type { NodeType } from '@/types/flow';
-
-const NODE_ICONS: Record<NodeType, LucideIcon> = {
-  start: Play,
-  scene: MessageSquare,
-  logic: GitBranch,
-  setter: Settings2,
-  calculator: Calculator,
-  settlement: Trophy,
-  video: Video,
-  link: ExternalLink,
-};
+import { getNodeIcon } from '@/engine/nodeRegistry';
 
 export interface NodeIconProps {
   type: NodeType;
@@ -30,10 +9,9 @@ export interface NodeIconProps {
 }
 
 function NodeIconImpl({ type, size = 14, className = '' }: NodeIconProps) {
-  const Icon = NODE_ICONS[type];
+  const Icon = getNodeIcon(type);
+  if (!Icon) return null;
   return <Icon size={size} className={className} strokeWidth={2.25} />;
 }
 
 export const NodeIcon = memo(NodeIconImpl);
-
-export { NODE_ICONS };

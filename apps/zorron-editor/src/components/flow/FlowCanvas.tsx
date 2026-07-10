@@ -25,10 +25,11 @@ import { ZorronEdge } from './edges/ZorronEdge';
 import { ContextMenu, type ContextMenuState } from './ContextMenu';
 import { NodeSearch } from './NodeSearch';
 import { EmptyStateIllustration } from '@/components/brand/EmptyStateIllustration';
-import { NODE_TYPE_ACCENTS, type NodeType } from '@/types/flow';
+import { type NodeType } from '@/types/flow';
+import { getTerminalTypes, getNodeAccent } from '@/engine/nodeRegistry';
 import { cn } from '@/lib/utils';
 
-const TERMINAL_TYPES: ReadonlySet<NodeType> = new Set(['settlement', 'link']);
+const TERMINAL_TYPES = getTerminalTypes();
 const edgeTypes = { zorron: ZorronEdge };
 
 export interface FlowCanvasProps {
@@ -155,7 +156,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     setContextMenu({ x: event.clientX, y: event.clientY, nodeId: null });
   }, []);
 
-  const minimapNodeColor = useCallback((n: Node) => NODE_TYPE_ACCENTS[n.type as NodeType] ?? '#64748b', []);
+  const minimapNodeColor = useCallback((n: Node) => getNodeAccent(n.type as NodeType), []);
   const flowNodes = useMemo(() => nodes, [nodes]);
   const flowEdges = useMemo(() => edges, [edges]);
 

@@ -6,8 +6,6 @@
  */
 
 import type { Node, Edge, XYPosition } from '@xyflow/react';
-import { tt } from '@/i18n/useT';
-import type { TranslationKey } from '@/i18n/translations';
 
 /** Supported narrative node types in Zorron Engine. */
 export type NodeType =
@@ -19,77 +17,6 @@ export type NodeType =
   | 'settlement'
   | 'video'
   | 'link';
-
-/** All node types as an array for UI iteration. */
-export const NODE_TYPES: NodeType[] = [
-  'start',
-  'scene',
-  'logic',
-  'setter',
-  'calculator',
-  'settlement',
-  'video',
-  'link',
-];
-
-/** Translation keys for each node type's label and description. */
-export const NODE_TYPE_LABEL_KEYS: Record<NodeType, TranslationKey> = {
-  start: 'node.start.label',
-  scene: 'node.scene.label',
-  logic: 'node.logic.label',
-  setter: 'node.setter.label',
-  calculator: 'node.calculator.label',
-  settlement: 'node.settlement.label',
-  video: 'node.video.label',
-  link: 'node.link.label',
-};
-
-export const NODE_TYPE_DESC_KEYS: Record<NodeType, TranslationKey> = {
-  start: 'node.start.desc',
-  scene: 'node.scene.desc',
-  logic: 'node.logic.desc',
-  setter: 'node.setter.desc',
-  calculator: 'node.calculator.desc',
-  settlement: 'node.settlement.desc',
-  video: 'node.video.desc',
-  link: 'node.link.desc',
-};
-
-/** Human-readable labels for each node type, used in the palette and inspector. */
-export const NODE_TYPE_LABELS: Record<NodeType, string> = {
-  start: tt('node.start.label'),
-  scene: tt('node.scene.label'),
-  logic: tt('node.logic.label'),
-  setter: tt('node.setter.label'),
-  calculator: tt('node.calculator.label'),
-  settlement: tt('node.settlement.label'),
-  video: tt('node.video.label'),
-  link: tt('node.link.label'),
-};
-
-/** Short descriptions for the node palette. */
-export const NODE_TYPE_DESCRIPTIONS: Record<NodeType, string> = {
-  start: tt('node.start.desc'),
-  scene: tt('node.scene.desc'),
-  logic: tt('node.logic.desc'),
-  setter: tt('node.setter.desc'),
-  calculator: tt('node.calculator.desc'),
-  settlement: tt('node.settlement.desc'),
-  video: tt('node.video.desc'),
-  link: tt('node.link.desc'),
-};
-
-/** Accent color per node type for canvas visuals. */
-export const NODE_TYPE_ACCENTS: Record<NodeType, string> = {
-  start: '#22d3ee',
-  scene: '#a78bfa',
-  logic: '#f59e0b',
-  setter: '#34d399',
-  calculator: '#60a5fa',
-  settlement: '#f472b6',
-  video: '#fb7185',
-  link: '#94a3b8',
-};
 
 /** Interaction modes for scene choices. */
 export type InteractionType = 'tap' | 'hold' | 'slash';
@@ -326,28 +253,6 @@ export function createEmptyFlowData(): FlowData {
     },
     version: '1.0.0',
   };
-}
-
-/** Default data factory per node type. Returns the initial `data` payload for a new node. */
-export function createDefaultNodeData(type: NodeType): GameNodeData {
-  switch (type) {
-    case 'start':
-      return { label: tt('node.default.start'), title: tt('node.default.newStory'), intro: '' };
-    case 'scene':
-      return { label: tt('node.default.scene'), dialogue: '', choices: [] };
-    case 'logic':
-      return { label: tt('node.default.logic'), condition: '', checkType: 'variable' };
-    case 'setter':
-      return { label: tt('node.default.setter'), assignments: [] };
-    case 'calculator':
-      return { label: tt('node.default.calculator'), vector: { x: 0, y: 0, z: 0 } };
-    case 'settlement':
-      return { label: tt('node.default.settlement'), resultMapping: [] };
-    case 'video':
-      return { label: tt('node.default.video'), videoUrl: '', autoPlay: true, skipAllowed: true };
-    case 'link':
-      return { label: tt('node.default.link'), url: '', title: '' };
-  }
 }
 
 /** Type guard: narrow a FlowNode's data to a specific node data shape. */

@@ -5,6 +5,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useEditorStore } from './editorStore';
 import type { FlowNode } from '@/types/flow';
+// Register node definitions so `addNode` can resolve default data through the
+// registry. Imported here (not in setup.ts) so other test files that mock
+// `@/i18n/useT` keep an untouched module graph for their mocks.
+import '@/components/flow/nodes/definitions';
 
 function makeNode(id: string, type: FlowNode['type'] = 'scene'): FlowNode {
   return {

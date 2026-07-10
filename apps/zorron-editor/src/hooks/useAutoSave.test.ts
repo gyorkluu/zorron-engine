@@ -13,6 +13,10 @@ import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { downloadJson } from '@/utils/fileIO';
 import type { FlowData } from '@/types/flow';
+// Register node definitions so `addNode` can resolve default data through the
+// registry. Imported here (not in setup.ts) so other test files that mock
+// `@/i18n/useT` keep an untouched module graph for their mocks.
+import '@/components/flow/nodes/definitions';
 
 // Mock the project service so save/load don't hit the network.
 vi.mock('@/services/project.service', () => ({

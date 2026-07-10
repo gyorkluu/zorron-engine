@@ -14,7 +14,8 @@
 import { memo, useMemo } from 'react';
 import type { SimulationReport } from '@/engine/simulator';
 import { useEditorStore } from '@/stores/editorStore';
-import { NODE_TYPE_LABELS } from '@/types/flow';
+import { type NodeType } from '@/types/flow';
+import { getNodeLabelKey } from '@/engine/nodeRegistry';
 import { downloadJson } from '@/utils/fileIO';
 import { useT } from '@/i18n/useT';
 
@@ -70,19 +71,19 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
       .map((n) => {
         const hits = report.nodeHits[n.id] ?? 0;
         const rate = report.nodeHitRates[n.id] ?? 0;
+        const labelKey = getNodeLabelKey(n.type as NodeType);
         return {
           id: n.id,
           label:
             (n.data as { label?: string }).label ??
-            NODE_TYPE_LABELS[n.type as keyof typeof NODE_TYPE_LABELS] ??
-            n.type,
+            (labelKey ? t(labelKey) : n.type),
           type: n.type,
           hits,
           rate,
         };
       })
       .sort((a, b) => b.hits - a.hits);
-  }, [nodes, report.nodeHits, report.nodeHitRates]);
+  }, [nodes, report.nodeHits, report.nodeHitRates, t]);
 
   /** Export the report as JSON. */
   const handleExport = () => {

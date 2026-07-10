@@ -1,28 +1,12 @@
 /**
  * Node type registry - maps node types to their React components.
  *
- * Used by React Flow's `nodeTypes` prop. Centralized so the FlowCanvas and
- * tests can share the same mapping.
+ * Built from the NodeDefinition registry. Importing `./definitions` registers
+ * all built-in node types as a side effect before the map is built.
  */
-
 import type { NodeTypes } from '@xyflow/react';
-import { StartNode } from './StartNode';
-import { SceneNode } from './SceneNode';
-import { LogicNode } from './LogicNode';
-import { SetterNode } from './SetterNode';
-import { CalculatorNode } from './CalculatorNode';
-import { SettlementNode } from './SettlementNode';
-import { VideoNode } from './VideoNode';
-import { LinkNode } from './LinkNode';
+import './definitions';
+import { buildReactFlowNodeTypes } from '@/engine/nodeRegistry';
 
-/** React Flow node type -> component mapping for all 8 node types. */
-export const nodeTypes: NodeTypes = {
-  start: StartNode,
-  scene: SceneNode,
-  logic: LogicNode,
-  setter: SetterNode,
-  calculator: CalculatorNode,
-  settlement: SettlementNode,
-  video: VideoNode,
-  link: LinkNode,
-};
+/** React Flow node type → component mapping, derived from the registry. */
+export const nodeTypes: NodeTypes = buildReactFlowNodeTypes();

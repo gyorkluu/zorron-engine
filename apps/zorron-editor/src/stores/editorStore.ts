@@ -28,9 +28,8 @@ import {
   type NodeType,
   type FlowNode,
   type GameNodeData,
-  NODE_TYPE_LABELS,
-  createDefaultNodeData,
 } from '@/types/flow';
+import { createDefaultNodeData } from '@/engine/nodeRegistry';
 
 /** Maximum history entries kept for undo/redo. */
 const MAX_HISTORY = 50;
@@ -344,6 +343,3 @@ export function useSelectedNode(): FlowNode | null {
     return (state.nodes.find((n) => n.id === state.selectedNodeId) as FlowNode) ?? null;
   });
 }
-
-/** Re-export node type labels for convenience. */
-export { NODE_TYPE_LABELS };

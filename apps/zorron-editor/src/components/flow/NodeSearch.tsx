@@ -12,13 +12,12 @@ import { useEffect, useMemo, useRef, useState, memo } from 'react';
 import { useT } from '@/i18n/useT';
 import { useEditorStore } from '@/stores/editorStore';
 import {
-  NODE_TYPE_LABEL_KEYS,
-  NODE_TYPE_ACCENTS,
   type FlowNode,
   type GameNodeData,
   type SceneNodeData,
   type NodeType,
 } from '@/types/flow';
+import { getNodeAccent, getNodeLabelKey } from '@/engine/nodeRegistry';
 
 /** Props for the NodeSearch overlay. */
 export interface NodeSearchProps {
@@ -172,7 +171,8 @@ function NodeSearchImpl({ onClose }: NodeSearchProps) {
           ) : (
             results.map((r, index) => {
               const isActive = index === activeIndex;
-              const accent = NODE_TYPE_ACCENTS[r.type];
+              const accent = getNodeAccent(r.type);
+              const labelKey = getNodeLabelKey(r.type);
               return (
                 <button
                   key={r.node.id}
@@ -197,7 +197,7 @@ function NodeSearchImpl({ onClose }: NodeSearchProps) {
                         className="flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium"
                         style={{ background: `${accent}22`, color: accent }}
                       >
-                        {t(NODE_TYPE_LABEL_KEYS[r.type])}
+                        {labelKey ? t(labelKey) : r.type}
                       </span>
                     </div>
                     {r.dialogue ? (

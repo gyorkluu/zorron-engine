@@ -7,13 +7,8 @@
 
 import { memo } from 'react';
 import { Blocks, Sparkles } from 'lucide-react';
-import {
-  NODE_TYPES,
-  NODE_TYPE_LABEL_KEYS,
-  NODE_TYPE_DESC_KEYS,
-  NODE_TYPE_ACCENTS,
-  type NodeType,
-} from '@/types/flow';
+import { type NodeType } from '@/types/flow';
+import { getAllNodeDefinitions, type NodeDefinition } from '@/engine/nodeRegistry';
 import { useT } from '@/i18n/useT';
 import { NodeIcon } from '@/components/brand/NodeIcon';
 
@@ -22,24 +17,24 @@ export interface NodePaletteProps {
 }
 
 function PaletteItem({
-  type,
+  def,
   onCreate,
 }: {
-  type: NodeType;
+  def: NodeDefinition;
   onCreate?: (type: NodeType) => void;
 }) {
   const { t } = useT();
-  const accent = NODE_TYPE_ACCENTS[type];
-  const label = t(NODE_TYPE_LABEL_KEYS[type]);
+  const accent = def.accent;
+  const label = t(def.labelKey);
   return (
     <button
       type="button"
       draggable
       onDragStart={(e) => {
-        e.dataTransfer.setData('application/zorron-node-type', type);
+        e.dataTransfer.setData('application/zorron-node-type', def.type);
         e.dataTransfer.effectAllowed = 'copy';
       }}
-      onClick={() => onCreate?.(type)}
+      onClick={() => onCreate?.(def.type)}
       className="group relative flex w-full cursor-grab items-start gap-2.5 rounded-xl border border-slate-800/50 bg-gradient-to-br from-slate-800/25 to-slate-900/25 p-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-600/60 hover:from-slate-800/40 hover:to-slate-900/40 hover:shadow-lg active:cursor-grabbing active:scale-[0.98]"
     >
       <div
@@ -50,7 +45,7 @@ function PaletteItem({
           boxShadow: `0 0 16px ${accent}15, inset 0 1px 0 ${accent}20`,
         }}
       >
-        <NodeIcon type={type} size={16} />
+        <NodeIcon type={def.type} size={16} />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
@@ -59,7 +54,7 @@ function PaletteItem({
           </p>
         </div>
         <p className="line-clamp-2 text-[10.5px] leading-tight text-slate-400 mt-0.5">
-          {t(NODE_TYPE_DESC_KEYS[type])}
+          {t(def.descKey)}
         </p>
       </div>
       <div
@@ -83,8 +78,8 @@ function NodePaletteImpl({ onCreateNode }: NodePaletteProps) {
         </h2>
       </div>
       <div className="flex-1 space-y-1.5 overflow-y-auto p-2.5 scrollbar-thin">
-        {NODE_TYPES.map((type) => (
-          <PaletteItem key={type} type={type} onCreate={onCreateNode} />
+        {getAllNodeDefinitions().map((def) => (
+          <PaletteItem key={def.type} def={def} onCreate={onCreateNode} />
         ))}
       </div>
       <div className="m-2.5 mt-0 flex items-start gap-2 rounded-lg border border-cyan-500/10 bg-gradient-to-r from-cyan-500/8 to-indigo-500/5 p-2.5">

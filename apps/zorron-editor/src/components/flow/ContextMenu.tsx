@@ -11,12 +11,7 @@
 import { useEffect, useMemo, useRef, memo, type ReactNode } from 'react';
 import { useT } from '@/i18n/useT';
 import { useEditorStore } from '@/stores/editorStore';
-import {
-  NODE_TYPES,
-  NODE_TYPE_LABEL_KEYS,
-  NODE_TYPE_ACCENTS,
-  type NodeType,
-} from '@/types/flow';
+import { getAllNodeDefinitions } from '@/engine/nodeRegistry';
 
 /** Context menu position and target. */
 export interface ContextMenuState {
@@ -187,18 +182,18 @@ function ContextMenuImpl({ state, onClose }: ContextMenuProps) {
           <MenuDivider />
           <MenuLabel>{t('ctx.add')}</MenuLabel>
           <div className="flex flex-col">
-            {NODE_TYPES.map((type: NodeType) => (
+            {getAllNodeDefinitions().map((def) => (
               <button
-                key={type}
+                key={def.type}
                 type="button"
-                onClick={run(() => addNode(type, { x: state.x, y: state.y }))}
+                onClick={run(() => addNode(def.type, { x: state.x, y: state.y }))}
                 className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-slate-200 transition-colors hover:bg-slate-700/60"
               >
                 <span
                   className="h-2 w-2 flex-shrink-0 rounded-full"
-                  style={{ background: NODE_TYPE_ACCENTS[type] }}
+                  style={{ background: def.accent }}
                 />
-                <span>{t(NODE_TYPE_LABEL_KEYS[type])}</span>
+                <span>{t(def.labelKey)}</span>
               </button>
             ))}
           </div>

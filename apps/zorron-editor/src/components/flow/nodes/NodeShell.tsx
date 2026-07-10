@@ -9,11 +9,9 @@
 import { memo, type ReactNode } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { cn } from '@/lib/utils';
-import {
-  NODE_TYPE_ACCENTS,
-  NODE_TYPE_LABELS,
-  type NodeType,
-} from '@/types/flow';
+import { type NodeType } from '@/types/flow';
+import { getNodeAccent, getNodeLabelKey } from '@/engine/nodeRegistry';
+import { useT } from '@/i18n/useT';
 import { NodeIcon } from '@/components/brand/NodeIcon';
 
 export interface NodeShellProps {
@@ -41,8 +39,10 @@ function NodeShellImpl({
   icon,
   subtitle,
 }: NodeShellProps) {
-  const accent = NODE_TYPE_ACCENTS[type];
-  const title = label || NODE_TYPE_LABELS[type];
+  const { t } = useT();
+  const accent = getNodeAccent(type);
+  const labelKey = getNodeLabelKey(type);
+  const title = label || (labelKey ? t(labelKey) : type);
 
   return (
     <div
