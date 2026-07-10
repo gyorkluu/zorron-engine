@@ -156,6 +156,11 @@ export class GameEngine {
   private listeners: Set<StateListener> = new Set();
   private state: GameState = createInitialState();
 
+  /** Whether the vector space is enabled in project settings. */
+  private get isVectorEnabled(): boolean {
+    return this.settings.vectorSpace?.enabled ?? false;
+  }
+
   constructor(flowData: FlowData) {
     this.nodes = flowData.nodes ?? [];
     this.edges = flowData.edges ?? [];
@@ -199,7 +204,8 @@ export class GameEngine {
     if (!choice) return this.state;
 
     // Accumulate pending vector delta (applied at the next calculator node).
-    if (choice.vector) {
+    // Skipped when the vector space is disabled in project settings.
+    if (this.isVectorEnabled && choice.vector) {
       this.pendingVector = add(this.pendingVector, choice.vector);
     }
     // Collect fragment if dropped by this choice.
@@ -499,13 +505,13 @@ export class GameEngine {
 
   private processCalculator(node: FlowNode): void {
     const data = node.data as CalculatorNodeData;
-    // Apply pending vector deltas when any axis is non-zero.
-    if (Object.values(this.pendingVector).some((v) => v !== 0)) {
+    // Apply pending vector deltas when vectors are enabled and any axis is non-zero.
+    if (this.isVectorEnabled && Object.values(this.pendingVector).some((v) => v !== 0)) {
       this.currentVector = add(this.currentVector, this.pendingVector);
       this.pendingVector = { ...ZERO_VECTOR };
     }
-    // Optionally store the vector into a target variable.
-    if (data.targetVariable) {
+    // Optionally store the vector magnitude into a target variable.
+    if (this.isVectorEnabled && data.targetVariable) {
       this.variables[data.targetVariable] = magnitude(this.currentVector);
     }
     const nextId = this.findTargetNodeId(node.id, null);
@@ -523,8 +529,9 @@ export class GameEngine {
     const mag = magnitude(finalVector);
     const playerQuadrant = quadrant(finalVector);
 
-    // Resolve result anchors from project settings.
-    const anchors = this.settings.vectorSpace?.sects ?? [];
+    // Resolve result anchors from project settings. When the vector space is
+    // disabled, pass an empty anchor list so no anchor matching occurs.
+    const anchors = this.isVectorEnabled ? (this.settings.vectorSpace?.sects ?? []) : [];
 
     // Use the settlement strategy registry to match the player state to an anchor.
     const strategy = settlementStrategyRegistry.resolve(data.strategy);

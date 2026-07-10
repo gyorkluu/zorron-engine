@@ -27,6 +27,8 @@ export interface ProcessorContext {
   currentVector: PersonalityVector;
   pendingVector: PersonalityVector;
   sects: ResultAnchor[];
+  /** Whether the vector space is enabled. When false, vector deltas are ignored. */
+  vectorEnabled: boolean;
 }
 
 /** Result of evaluating a logic node. */
@@ -73,12 +75,12 @@ export function applyCalculator(
   let pendingVector = { ...ctx.pendingVector };
   const variables = { ...ctx.variables };
 
-  // Apply pending deltas when any axis is non-zero.
-  if (Object.values(pendingVector).some((v) => v !== 0)) {
+  // Apply pending deltas when vectors are enabled and any axis is non-zero.
+  if (ctx.vectorEnabled && Object.values(pendingVector).some((v) => v !== 0)) {
     currentVector = add(currentVector, pendingVector);
     pendingVector = { ...ZERO_VECTOR };
   }
-  if (data.targetVariable) {
+  if (ctx.vectorEnabled && data.targetVariable) {
     variables[data.targetVariable] = magnitude(currentVector);
   }
   return { currentVector, pendingVector, variables };
@@ -89,7 +91,7 @@ export function applyChoice(
   choice: SceneChoice,
   ctx: ProcessorContext,
 ): { pendingVector: PersonalityVector; fragments: Set<string> } {
-  const pendingVector = choice.vector
+  const pendingVector = (ctx.vectorEnabled && choice.vector)
     ? add(ctx.pendingVector, choice.vector)
     : { ...ctx.pendingVector };
   const fragments = new Set(ctx.fragments);
@@ -122,7 +124,7 @@ export function evaluateSettlement(
     quadrant: q,
     variables: { ...ctx.variables },
     fragments: new Set(ctx.fragments),
-    anchors: ctx.sects,
+    anchors: ctx.vectorEnabled ? ctx.sects : [],
     nodeData: data,
   });
 

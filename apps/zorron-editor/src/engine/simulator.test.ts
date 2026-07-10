@@ -71,7 +71,7 @@ function branchingFlow(): FlowData {
     nodes,
     edges,
     variables: {},
-    settings: { vectorSpace: { enabled: false, dimensions: { x: 'x', y: 'y', z: 'z' } } },
+    settings: { vectorSpace: { enabled: true, dimensions: { x: 'x', y: 'y', z: 'z' } } },
     version: '1.0.0',
   };
 }

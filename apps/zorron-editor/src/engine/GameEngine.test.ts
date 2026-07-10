@@ -143,6 +143,7 @@ describe('GameEngine', () => {
 
   it('applies pending vector deltas at the calculator node', () => {
     const flow = basicFlow();
+    flow.settings.vectorSpace!.enabled = true;
     flow.nodes = [
       node('start', 'start', { label: 'Start' }),
       node('scene', 'scene', {
@@ -328,5 +329,49 @@ describe('GameEngine', () => {
     const state = engine.selectChoice('c1');
     expect(state.settlementResult?.anchor?.id).toBe('s1');
     expect(state.settlementResult?.finalVector).toEqual({ x: 2, y: 2, z: 2 });
+  });
+
+  it('skips vector accumulation when vectorSpace.enabled is false', () => {
+    const flow = basicFlow();
+    flow.settings.vectorSpace = {
+      enabled: false,
+      dimensions: { x: 'x', y: 'y', z: 'z' },
+      sects: [
+        { id: 's1', name: 'Sect A', vector: { x: 1, y: 1, z: 1 }, title: 'A' },
+      ],
+    };
+    flow.nodes = [
+      node('start', 'start', { label: 'Start' }),
+      node('scene', 'scene', {
+        label: 'Scene',
+        dialogue: 'Pick',
+        choices: [
+          { id: 'c1', text: 'Vec', interaction: 'tap', vector: { x: 5, y: 5, z: 5 } },
+        ],
+      }),
+      node('calc', 'calculator', { label: 'Calc', vector: {}, targetVariable: 'power' }),
+      node('end', 'settlement', {
+        label: 'End',
+        resultMapping: [{ resultId: 'r1', title: 'Done' }],
+      }),
+    ];
+    flow.edges = [
+      edge('e1', 'start', 'scene'),
+      edge('e2', 'scene', 'calc', 'c1'),
+      edge('e3', 'calc', 'end'),
+    ];
+    flow.variables = { power: 0 };
+    const engine = new GameEngine(flow);
+    engine.start();
+    engine.advanceFromStart();
+    const state = engine.selectChoice('c1');
+    // Vectors were not accumulated: finalVector is empty.
+    expect(state.settlementResult?.finalVector).toEqual({});
+    // No anchor matched since the vector space is disabled.
+    expect(state.settlementResult?.anchor).toBeNull();
+    // Target variable was not updated (magnitude not computed).
+    expect(state.variables.power).toBe(0);
+    // Title comes from resultMapping, not anchor.
+    expect(state.settlementResult?.title).toBe('Done');
   });
 });
