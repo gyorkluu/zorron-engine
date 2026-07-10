@@ -4,6 +4,7 @@
 
 import * as service from './agent.service';
 import { SCENARIO_TYPES, NODE_CAPABILITIES, SETTLEMENT_STRATEGIES } from './scenarioTypes';
+import { SCENARIO_PRESETS, findPreset } from './scenarioPresets';
 import type {
   CompileRequest,
   CompileResponse,
@@ -30,6 +31,27 @@ export function getNodeCapabilities() {
     nodes: NODE_CAPABILITIES,
     settlementStrategies: SETTLEMENT_STRATEGIES,
   };
+}
+
+/** GET /api/agent/presets - list all built-in scenario presets. */
+export function getPresets() {
+  return {
+    presets: SCENARIO_PRESETS.map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      type: p.type,
+    })),
+  };
+}
+
+/** GET /api/agent/presets/:id - get a preset's full ScenarioIntent template. */
+export function getPreset(id: string) {
+  const preset = findPreset(id);
+  if (!preset) {
+    return null;
+  }
+  return preset;
 }
 
 /** POST /api/agent/compile */

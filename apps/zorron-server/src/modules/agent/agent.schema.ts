@@ -125,19 +125,29 @@ export const ScenarioIntentSchema = z.object({
 
 // ── API Request / Response Schemas ─────────────────────────
 
-export const CompileRequestSchema = z.object({
-  intent: ScenarioIntentSchema,
-  /** If provided, iterate on an existing project's flow data. */
-  projectId: z.string().uuid().optional(),
-  /** Override simulation config for validation. */
-  simulation: z
-    .object({
-      runs: z.number().int().min(10).max(5000).default(200),
-      seed: z.string().optional(),
-      maxStepsPerRun: z.number().int().min(10).max(1000).default(200),
-    })
-    .optional(),
+/** Shared simulation config schema used by CompileRequest and IterateRequest. */
+export const SimulationConfigSchema = z.object({
+  runs: z.number().int().min(10).max(5000).default(200),
+  seed: z.string().optional(),
+  maxStepsPerRun: z.number().int().min(10).max(1000).default(200),
 });
+
+export const CompileRequestSchema = z
+  .object({
+    /** ScenarioIntent to compile. Optional if presetId is provided. */
+    intent: ScenarioIntentSchema.optional(),
+    /** Preset id to use as a base template. Optional if intent is provided. */
+    presetId: z.string().optional(),
+    /** Partial overrides applied on top of the preset intent (shallow merge). */
+    overrides: z.record(z.string(), z.unknown()).optional(),
+    /** If provided, iterate on an existing project's flow data. */
+    projectId: z.string().uuid().optional(),
+    /** Override simulation config for validation. */
+    simulation: SimulationConfigSchema.optional(),
+  })
+  .refine((data) => data.intent || data.presetId, {
+    message: 'Either intent or presetId must be provided',
+  });
 
 export const ValidationIssueSchema = z.object({
   severity: z.enum(['error', 'warning', 'info']),
@@ -168,7 +178,7 @@ export const IterateRequestSchema = z.object({
   intent: ScenarioIntentSchema,
   /** Issues from the previous compile to address. */
   issues: z.array(ValidationIssueSchema).optional(),
-  simulation: CompileRequestSchema.shape.simulation.optional(),
+  simulation: SimulationConfigSchema.optional(),
 });
 
 export const PublishRequestSchema = z.object({
@@ -218,6 +228,7 @@ export const ListSessionsResponseSchema = z.object({
 
 export type ScenarioIntent = z.infer<typeof ScenarioIntentSchema>;
 export type ScenarioStep = z.infer<typeof ScenarioStepSchema>;
+export type SimulationConfig = z.infer<typeof SimulationConfigSchema>;
 export type ScenarioSettlement = z.infer<typeof ScenarioSettlementSchema>;
 export type CompileRequest = z.infer<typeof CompileRequestSchema>;
 export type CompileResponse = z.infer<typeof CompileResponseSchema>;

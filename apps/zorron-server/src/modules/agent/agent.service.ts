@@ -11,6 +11,7 @@ import { projects, testSessions } from '../../db/schema';
 import { AppError } from '../../shared/errors';
 import { buildFlow } from './flowBuilder';
 import { validateFlow, type SimulationResult } from './simulationValidator';
+import { findPreset } from './scenarioPresets';
 import type {
   ScenarioIntent,
   CompileRequest,
@@ -19,6 +20,7 @@ import type {
   SaveSessionRequest,
   SessionDetail,
   ListSessionsQuery,
+  SimulationConfig,
 } from './agent.schema';
 
 // ── Types ──
@@ -30,12 +32,40 @@ interface AuthUser {
 
 // ── Compile ──
 
+/** Resolve the effective ScenarioIntent from presetId, intent, and overrides. */
+function resolveIntent(req: CompileRequest): ScenarioIntent {
+  // Case 1: presetId provided (with optional overrides).
+  if (req.presetId) {
+    const preset = findPreset(req.presetId);
+    if (!preset) {
+      throw new AppError('PRESET_001', `Preset not found: ${req.presetId}`, 404);
+    }
+    const base = preset.intent;
+    // Shallow merge: overrides replace top-level fields of the preset intent.
+    if (req.overrides && Object.keys(req.overrides).length > 0) {
+      return { ...base, ...req.overrides } as ScenarioIntent;
+    }
+    return base;
+  }
+
+  // Case 2: intent provided directly (Phase 2 compatible).
+  if (req.intent) {
+    return req.intent;
+  }
+
+  // refine() in the schema should prevent this, but guard just in case.
+  throw new AppError('AGENT_001', 'Either intent or presetId must be provided', 400);
+}
+
 /** Compile a ScenarioIntent into validated FlowData. */
 export async function compile(
   user: AuthUser,
   req: CompileRequest,
 ): Promise<CompileResponse> {
-  const { intent, projectId, simulation: simConfig } = req;
+  const { projectId, simulation: simConfig } = req;
+
+  // 0. Resolve effective intent (from presetId + overrides, or direct intent).
+  const intent = resolveIntent(req);
 
   // 1. Build FlowData from intent.
   const flowData = buildFlow(intent);
@@ -106,7 +136,7 @@ export async function iterate(
     projectId: string;
     intent: ScenarioIntent;
     issues?: ValidationIssue[];
-    simulation?: CompileRequest['simulation'];
+    simulation?: SimulationConfig;
   },
 ): Promise<CompileResponse> {
   // Verify the project exists and belongs to the user.

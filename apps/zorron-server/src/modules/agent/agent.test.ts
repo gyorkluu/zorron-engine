@@ -26,6 +26,7 @@ import {
   NODE_CAPABILITIES,
   SETTLEMENT_STRATEGIES,
 } from './scenarioTypes';
+import { SCENARIO_PRESETS, findPreset } from './scenarioPresets';
 
 // ── Helpers ────────────────────────────────────────────────
 
@@ -568,7 +569,72 @@ describe('ScenarioTypes metadata', () => {
   });
 });
 
-// ── 4. Schema Validation Tests ─────────────────────────────
+// ── 4. Scenario Presets Tests (ECO-001) ────────────────────
+
+describe('ScenarioPresets (ECO-001)', () => {
+  it('defines at least 5 built-in presets', () => {
+    expect(SCENARIO_PRESETS.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('each preset has a valid ScenarioIntent', () => {
+    for (const preset of SCENARIO_PRESETS) {
+      expect(preset.id).toBeTruthy();
+      expect(preset.name).toBeTruthy();
+      expect(preset.description).toBeTruthy();
+      expect(preset.type).toBeTruthy();
+      // The intent must pass schema validation.
+      const result = ScenarioIntentSchema.safeParse(preset.intent);
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it('covers all 5 main scenario types', () => {
+    const presetTypes = SCENARIO_PRESETS.map((p) => p.type);
+    expect(presetTypes).toContain('personality-test');
+    expect(presetTypes).toContain('game-social-card');
+    expect(presetTypes).toContain('quiz');
+    expect(presetTypes).toContain('survey');
+    expect(presetTypes).toContain('story-adventure');
+  });
+
+  it('findPreset returns the preset by id', () => {
+    const preset = findPreset('preset-personality-test');
+    expect(preset).toBeDefined();
+    expect(preset?.type).toBe('personality-test');
+  });
+
+  it('findPreset returns undefined for unknown id', () => {
+    expect(findPreset('nonexistent')).toBeUndefined();
+  });
+
+  it('each preset intent compiles to a valid flow with no errors', () => {
+    for (const preset of SCENARIO_PRESETS) {
+      const flow = buildFlow(preset.intent) as unknown as Parameters<typeof validateFlow>[0];
+      const result = validateFlow(flow, { runs: 50, seed: preset.id });
+      const errors = result.issues.filter((i) => i.severity === 'error');
+      expect(errors).toHaveLength(0);
+    }
+  });
+
+  it('personality-test preset has 3D dimensions and 3 anchors', () => {
+    const preset = findPreset('preset-personality-test');
+    expect(preset?.intent.dimensions).toBeDefined();
+    expect(Object.keys(preset!.intent.dimensions!)).toHaveLength(3);
+    expect(preset?.intent.anchors).toHaveLength(3);
+  });
+
+  it('story-adventure preset has branching with nextStep references', () => {
+    const preset = findPreset('preset-story-adventure');
+    const steps = preset?.intent.steps ?? [];
+    // At least one step should use nextStep branching.
+    const hasBranching = steps.some(
+      (s) => s.choices?.some((c) => c.nextStep !== undefined),
+    );
+    expect(hasBranching).toBe(true);
+  });
+});
+
+// ── 5. Schema Validation Tests ─────────────────────────────
 
 describe('Zod schema validation', () => {
   it('accepts a valid ScenarioIntent', () => {
@@ -641,6 +707,28 @@ describe('Zod schema validation', () => {
     if (result.success) {
       expect(result.data.settlement.visualBlocks).toEqual(['badge', 'title', 'layered-texts']);
     }
+  });
+
+  it('accepts CompileRequest with presetId instead of intent (ECO-001)', () => {
+    const result = CompileRequestSchema.safeParse({
+      presetId: 'preset-personality-test',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects CompileRequest with neither intent nor presetId', () => {
+    const result = CompileRequestSchema.safeParse({
+      simulation: { runs: 100 },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts CompileRequest with presetId + overrides (ECO-001)', () => {
+    const result = CompileRequestSchema.safeParse({
+      presetId: 'preset-quiz',
+      overrides: { title: '自定义知识竞赛' },
+    });
+    expect(result.success).toBe(true);
   });
 });
 
@@ -852,5 +940,55 @@ describe('AgentService.compile (mocked DB)', () => {
 
     expect(result.status).toBe('success');
     expect(result.projectId).toBe('existing-uuid');
+  });
+
+  it('compiles a preset by id without providing intent (ECO-001)', async () => {
+    const { __mockReturning } = await import('../../config/database') as unknown as {
+      __mockReturning: ReturnType<typeof vi.fn>;
+    };
+    __mockReturning.mockResolvedValue([{ id: 'preset-project-uuid' }]);
+
+    const { compile } = await import('./agent.service');
+    const result = await compile(
+      { id: 'user-1', email: 'a@b.c' },
+      { presetId: 'preset-personality-test' },
+    );
+
+    expect(result.status).toBe('success');
+    expect(result.projectId).toBe('preset-project-uuid');
+    // The flow should contain the preset's title.
+    expect((result.flowData as { settings: { title: string } }).settings.title).toBe('人格测试');
+  });
+
+  it('throws PRESET_001 when presetId is not found (ECO-001)', async () => {
+    const { compile } = await import('./agent.service');
+    await expect(
+      compile(
+        { id: 'user-1', email: 'a@b.c' },
+        { presetId: 'nonexistent-preset' },
+      ),
+    ).rejects.toThrow(/Preset not found/);
+  });
+
+  it('applies overrides on top of preset intent (ECO-001)', async () => {
+    const { __mockReturning } = await import('../../config/database') as unknown as {
+      __mockReturning: ReturnType<typeof vi.fn>;
+    };
+    __mockReturning.mockResolvedValue([{ id: 'overridden-uuid' }]);
+
+    const { compile } = await import('./agent.service');
+    const result = await compile(
+      { id: 'user-1', email: 'a@b.c' },
+      {
+        presetId: 'preset-personality-test',
+        overrides: { title: 'MBTI 职场人格测试' },
+      },
+    );
+
+    expect(result.status).toBe('success');
+    // The title should be overridden.
+    expect((result.flowData as { settings: { title: string } }).settings.title).toBe('MBTI 职场人格测试');
+    // But the steps should still come from the preset.
+    expect((result.flowData as { nodes: unknown[] }).nodes.length).toBeGreaterThan(2);
   });
 });

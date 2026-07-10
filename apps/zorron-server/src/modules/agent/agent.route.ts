@@ -30,6 +30,21 @@ export const agentRoute = new Elysia({ prefix: '/api/agent' })
     '/node-capabilities',
     () => controller.getNodeCapabilities(),
   )
+  .get(
+    '/presets',
+    () => controller.getPresets(),
+  )
+  .get(
+    '/presets/:id',
+    ({ params, set }) => {
+      const preset = controller.getPreset(params.id);
+      if (!preset) {
+        set.status = 404;
+        return { code: 'PRESET_001', message: 'Preset not found' };
+      }
+      return preset;
+    },
+  )
   // ── Session endpoints (public for external consumption) ──
   .post(
     '/sessions',
