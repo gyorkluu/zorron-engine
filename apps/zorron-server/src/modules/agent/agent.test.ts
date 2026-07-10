@@ -359,6 +359,187 @@ describe('FlowBuilder.buildFlow', () => {
     (intent.steps[0] as { kind: string }).kind = 'unknown-kind';
     expect(() => buildFlow(intent)).toThrow(/Unknown step kind/);
   });
+
+  // ── ECO-003: New node types ──
+
+  it('builds minigame node with gameUrl and scoreVariable (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'game-social-card',
+      title: 'Reaction Test',
+      steps: [
+        {
+          id: 'mg1',
+          kind: 'minigame',
+          gameUrl: 'https://example.com/game.html',
+          gameType: 'reaction',
+          scoreVariable: 'reactionScore',
+          duration: 30,
+          skipAllowed: false,
+        },
+      ],
+      settlement: makeSettlement('threshold'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ id: string; type: string; data: Record<string, unknown> }>;
+      variables: Record<string, unknown>;
+    };
+    const mg = flow.nodes.find((n) => n.id === 'mg1');
+    expect(mg?.type).toBe('minigame');
+    expect(mg?.data.gameUrl).toBe('https://example.com/game.html');
+    expect(mg?.data.gameType).toBe('reaction');
+    expect(mg?.data.scoreVariable).toBe('reactionScore');
+    expect(mg?.data.skipAllowed).toBe(false);
+    // scoreVariable initialized to 0.
+    expect(flow.variables.reactionScore).toBe(0);
+  });
+
+  it('builds rating node with slider config and variable (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'survey',
+      title: 'Rate your experience',
+      steps: [
+        {
+          id: 'r1',
+          kind: 'rating',
+          question: 'How was the experience?',
+          min: 1,
+          max: 5,
+          step: 1,
+          variable: 'experienceScore',
+          minLabel: '差',
+          maxLabel: '好',
+        },
+      ],
+      settlement: makeSettlement('variable-map'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ id: string; type: string; data: Record<string, unknown> }>;
+      variables: Record<string, unknown>;
+    };
+    const r = flow.nodes.find((n) => n.id === 'r1');
+    expect(r?.type).toBe('rating');
+    expect(r?.data.question).toBe('How was the experience?');
+    expect(r?.data.min).toBe(1);
+    expect(r?.data.max).toBe(5);
+    expect(r?.data.minLabel).toBe('差');
+    expect(r?.data.maxLabel).toBe('好');
+    // variable initialized to min.
+    expect(flow.variables.experienceScore).toBe(1);
+  });
+
+  it('builds multi-select node with options and tagMode (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'survey',
+      title: 'Pick your interests',
+      steps: [
+        {
+          id: 'ms1',
+          kind: 'multi-select',
+          question: 'Which games do you play?',
+          options: [
+            { id: 'rpg', label: 'RPG' },
+            { id: 'fps', label: 'FPS' },
+            { id: 'moba', label: 'MOBA' },
+          ],
+          minSelected: 1,
+          maxSelected: 2,
+          variable: 'interests',
+          tagMode: true,
+        },
+      ],
+      settlement: makeSettlement('variable-map'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ id: string; type: string; data: Record<string, unknown> }>;
+      variables: Record<string, unknown>;
+    };
+    const ms = flow.nodes.find((n) => n.id === 'ms1');
+    expect(ms?.type).toBe('multi-select');
+    expect(ms?.data.question).toBe('Which games do you play?');
+    expect(ms?.data.options).toHaveLength(3);
+    expect(ms?.data.minSelected).toBe(1);
+    expect(ms?.data.maxSelected).toBe(2);
+    expect(ms?.data.tagMode).toBe(true);
+    // variable initialized to empty string.
+    expect(flow.variables.interests).toBe('');
+  });
+
+  it('builds media node with image type (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'custom',
+      title: 'Image Gallery',
+      steps: [
+        {
+          id: 'img1',
+          kind: 'media',
+          mediaType: 'image',
+          url: 'https://example.com/pic.jpg',
+          altText: 'A scenic view',
+          caption: 'Sunset over mountains',
+        },
+      ],
+      settlement: makeSettlement('variable-map'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ id: string; type: string; data: Record<string, unknown> }>;
+    };
+    const m = flow.nodes.find((n) => n.id === 'img1');
+    expect(m?.type).toBe('media');
+    expect(m?.data.mediaType).toBe('image');
+    expect(m?.data.url).toBe('https://example.com/pic.jpg');
+    expect(m?.data.altText).toBe('A scenic view');
+    expect(m?.data.caption).toBe('Sunset over mountains');
+    expect(m?.data.autoPlay).toBe(false);
+  });
+
+  it('builds media node with audio type and autoPlay (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'custom',
+      title: 'Audio Player',
+      steps: [
+        {
+          id: 'aud1',
+          kind: 'media',
+          mediaType: 'audio',
+          url: 'https://example.com/song.mp3',
+          autoPlay: true,
+          loop: true,
+        },
+      ],
+      settlement: makeSettlement('variable-map'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      nodes: Array<{ id: string; type: string; data: Record<string, unknown> }>;
+    };
+    const m = flow.nodes.find((n) => n.id === 'aud1');
+    expect(m?.type).toBe('media');
+    expect(m?.data.mediaType).toBe('audio');
+    expect(m?.data.autoPlay).toBe(true);
+    expect(m?.data.loop).toBe(true);
+  });
+
+  it('wires new node types sequentially to next step (ECO-003)', () => {
+    const intent: ScenarioIntent = {
+      type: 'custom',
+      title: 'Mixed New Types',
+      steps: [
+        { id: 'mg1', kind: 'minigame', gameUrl: 'https://g.html', scoreVariable: 's' },
+        { id: 'r1', kind: 'rating', question: 'Q', variable: 'v' },
+        { id: 'ms1', kind: 'multi-select', question: 'Q2', options: [{ id: 'a', label: 'A' }] },
+        { id: 'img1', kind: 'media', mediaType: 'image', url: 'https://i.jpg' },
+      ],
+      settlement: makeSettlement('variable-map'),
+    };
+    const flow = buildFlow(intent) as unknown as {
+      edges: Array<{ source: string; target: string }>;
+    };
+    // start → mg1 → r1 → ms1 → img1 → settlement.
+    expect(flow.edges.find((e) => e.source === 'start_0')?.target).toBe('mg1');
+    expect(flow.edges.find((e) => e.source === 'mg1')?.target).toBe('r1');
+    expect(flow.edges.find((e) => e.source === 'r1')?.target).toBe('ms1');
+    expect(flow.edges.find((e) => e.source === 'ms1')?.target).toBe('img1');
+    expect(flow.edges.find((e) => e.source === 'img1')?.target).toBe('settlement_0');
+  });
 });
 
 // ── 2. SimulationValidator Tests ───────────────────────────
@@ -547,14 +728,26 @@ describe('ScenarioTypes metadata', () => {
     }
   });
 
-  it('defines exactly 8 node capabilities', () => {
-    expect(NODE_CAPABILITIES).toHaveLength(8);
+  it('defines exactly 12 node capabilities', () => {
+    expect(NODE_CAPABILITIES).toHaveLength(12);
     const types = NODE_CAPABILITIES.map((n) => n.type);
     expect(types).toEqual(
       expect.arrayContaining([
         'start', 'scene', 'logic', 'setter', 'calculator', 'settlement', 'video', 'link',
+        'minigame', 'rating', 'multi-select', 'media',
       ]),
     );
+  });
+
+  it('marks minigame/rating/multi-select/media as non-terminal (ECO-003)', () => {
+    const minigame = NODE_CAPABILITIES.find((n) => n.type === 'minigame');
+    const rating = NODE_CAPABILITIES.find((n) => n.type === 'rating');
+    const multiSelect = NODE_CAPABILITIES.find((n) => n.type === 'multi-select');
+    const media = NODE_CAPABILITIES.find((n) => n.type === 'media');
+    expect(minigame?.isTerminal).toBe(false);
+    expect(rating?.isTerminal).toBe(false);
+    expect(multiSelect?.isTerminal).toBe(false);
+    expect(media?.isTerminal).toBe(false);
   });
 
   it('marks settlement and link as terminal nodes', () => {

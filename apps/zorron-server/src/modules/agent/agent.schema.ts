@@ -24,7 +24,7 @@ export const ScenarioTypeSchema = z.enum([
 export const ScenarioStepSchema = z.object({
   /** Stable identifier used for branching references. */
   id: z.string(),
-  kind: z.enum(['scene', 'video', 'setter', 'logic', 'calculator']),
+  kind: z.enum(['scene', 'video', 'setter', 'logic', 'calculator', 'minigame', 'rating', 'multi-select', 'media']),
 
   // ── scene fields ──
   dialogue: z.string().optional(),
@@ -75,6 +75,44 @@ export const ScenarioStepSchema = z.object({
 
   // ── calculator fields ──
   targetVariable: z.string().optional(),
+
+  // ── minigame fields (ECO-003) ──
+  gameUrl: z.string().optional(),
+  gameType: z.string().optional(),
+  scoreVariable: z.string().optional(),
+  duration: z.number().positive().optional(),
+
+  // ── rating fields (ECO-003) ──
+  question: z.string().optional(),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  step: z.number().positive().optional(),
+  minLabel: z.string().optional(),
+  maxLabel: z.string().optional(),
+  /** Variable to store rating/multi-select result. */
+  variable: z.string().optional(),
+
+  // ── multi-select fields (ECO-003) ──
+  options: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+      }),
+    )
+    .optional(),
+  minSelected: z.number().int().min(0).optional(),
+  maxSelected: z.number().int().min(1).optional(),
+  tagMode: z.boolean().optional(),
+
+  // ── media fields (ECO-003) ──
+  mediaType: z.enum(['image', 'audio']).optional(),
+  url: z.string().optional(),
+  altText: z.string().optional(),
+  caption: z.string().optional(),
+  autoPlay: z.boolean().optional(),
+  loop: z.boolean().optional(),
+
   /** Default next step (for non-branching kinds). Omit = next sequential step. */
   nextStep: z.string().optional(),
 });

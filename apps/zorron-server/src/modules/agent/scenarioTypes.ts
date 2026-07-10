@@ -151,6 +151,34 @@ export const NODE_CAPABILITIES: NodeCapabilityInfo[] = [
     isTerminal: true,
     fields: ['url', 'title', 'description'],
   },
+  {
+    type: 'minigame',
+    label: '小游戏',
+    description: 'Embeds an H5 minigame (reaction test, puzzle, etc.) and stores the score to a variable.',
+    isTerminal: false,
+    fields: ['gameUrl', 'gameType', 'scoreVariable', 'duration', 'skipAllowed'],
+  },
+  {
+    type: 'rating',
+    label: '评分',
+    description: 'A slider/rating input that writes the value to a variable.',
+    isTerminal: false,
+    fields: ['question', 'min', 'max', 'step', 'variable', 'minLabel', 'maxLabel'],
+  },
+  {
+    type: 'multi-select',
+    label: '多选',
+    description: 'Pick multiple tags/options from a list. Supports survey-style tag mapping.',
+    isTerminal: false,
+    fields: ['question', 'options', 'minSelected', 'maxSelected', 'variable', 'tagMode'],
+  },
+  {
+    type: 'media',
+    label: '媒体',
+    description: 'Displays an image or plays audio with optional caption.',
+    isTerminal: false,
+    fields: ['mediaType', 'url', 'altText', 'caption', 'autoPlay', 'loop'],
+  },
 ];
 
 /** Available settlement strategies. */

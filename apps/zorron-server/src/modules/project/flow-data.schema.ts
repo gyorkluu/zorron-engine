@@ -20,6 +20,10 @@ export const NodeTypeSchema = z.enum([
   'settlement',
   'video',
   'link',
+  'minigame',
+  'rating',
+  'multi-select',
+  'media',
 ]);
 
 export const BaseNodeDataSchema = z.object({ label: z.string().optional() });
@@ -180,6 +184,64 @@ export const LinkNodeDataSchema = BaseNodeDataSchema.extend({
   openInNewTab: z.boolean().optional(),
 });
 
+// ── ECO-003: New node types ────────────────────────────────
+
+/** Minigame node: embeds an H5 minigame (e.g. reaction test, puzzle). */
+export const MinigameNodeDataSchema = BaseNodeDataSchema.extend({
+  gameUrl: z.string(),
+  gameType: z.string().optional(),
+  /** Variable name to store the resulting score. */
+  scoreVariable: z.string().optional(),
+  /** Optional time limit in seconds. */
+  duration: z.number().positive().optional(),
+  /** Whether the minigame can be skipped. */
+  skipAllowed: z.boolean().default(false),
+});
+
+/** Rating node: a slider/rating input that writes to a variable. */
+export const RatingNodeDataSchema = BaseNodeDataSchema.extend({
+  question: z.string(),
+  min: z.number().default(0),
+  max: z.number().default(10),
+  step: z.number().positive().default(1),
+  /** Variable name to store the rating value. */
+  variable: z.string().optional(),
+  /** Optional labels for the slider endpoints. */
+  minLabel: z.string().optional(),
+  maxLabel: z.string().optional(),
+});
+
+/** Multi-select node: pick multiple tags/options from a list. */
+export const MultiSelectNodeDataSchema = BaseNodeDataSchema.extend({
+  question: z.string(),
+  options: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+      }),
+    )
+    .default([]),
+  minSelected: z.number().int().min(0).default(0),
+  maxSelected: z.number().int().min(1).optional(),
+  /** Variable name to store the selected option ids. */
+  variable: z.string().optional(),
+  /** Whether selected options map to tags (for survey settlement). */
+  tagMode: z.boolean().default(false),
+});
+
+/** Media node: displays an image or plays audio. */
+export const MediaNodeDataSchema = BaseNodeDataSchema.extend({
+  mediaType: z.enum(['image', 'audio']),
+  url: z.string(),
+  altText: z.string().optional(),
+  caption: z.string().optional(),
+  autoPlay: z.boolean().default(false),
+  loop: z.boolean().default(false),
+  /** Optional duration in seconds (for audio). */
+  duration: z.number().positive().optional(),
+});
+
 /**
  * Discriminated union of node schemas keyed on the `type` field.
  *
@@ -251,6 +313,38 @@ export const GameNodeSchema = z.discriminatedUnion('type', [
     type: z.literal('link'),
     position: PositionSchema,
     data: LinkNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('minigame'),
+    position: PositionSchema,
+    data: MinigameNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('rating'),
+    position: PositionSchema,
+    data: RatingNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('multi-select'),
+    position: PositionSchema,
+    data: MultiSelectNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('media'),
+    position: PositionSchema,
+    data: MediaNodeDataSchema,
     width: z.number().optional(),
     height: z.number().optional(),
   }),

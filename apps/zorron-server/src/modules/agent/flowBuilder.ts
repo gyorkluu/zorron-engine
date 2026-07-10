@@ -105,7 +105,7 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
   const hasDimensions = intent.dimensions && Object.keys(intent.dimensions).length > 0;
   const variables: Record<string, string | number | boolean> = {};
 
-  // Collect initial variables from setter steps.
+  // Collect initial variables from setter steps and output variables.
   for (const step of intent.steps) {
     if (step.kind === 'setter' && step.assignments) {
       for (const a of step.assignments) {
@@ -118,6 +118,24 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
     if (step.kind === 'calculator' && step.targetVariable) {
       if (!(step.targetVariable in variables)) {
         variables[step.targetVariable] = 0;
+      }
+    }
+    // Minigame steps write a score to scoreVariable (ECO-003).
+    if (step.kind === 'minigame' && step.scoreVariable) {
+      if (!(step.scoreVariable in variables)) {
+        variables[step.scoreVariable] = 0;
+      }
+    }
+    // Rating steps write the rating value to variable (ECO-003).
+    if (step.kind === 'rating' && step.variable) {
+      if (!(step.variable in variables)) {
+        variables[step.variable] = step.min ?? 0;
+      }
+    }
+    // Multi-select steps write selected option ids to variable (ECO-003).
+    if (step.kind === 'multi-select' && step.variable) {
+      if (!(step.variable in variables)) {
+        variables[step.variable] = '';
       }
     }
   }
@@ -218,6 +236,71 @@ function buildStepNode(step: ScenarioStep, stepId: string, index: number): Built
           label: step.id,
           vector: {},
           targetVariable: step.targetVariable,
+        },
+      };
+
+    case 'minigame':
+      return {
+        id: stepId,
+        type: 'minigame',
+        position,
+        data: {
+          label: step.id,
+          gameUrl: step.gameUrl ?? '',
+          gameType: step.gameType,
+          scoreVariable: step.scoreVariable,
+          duration: step.duration,
+          skipAllowed: step.skipAllowed ?? false,
+        },
+      };
+
+    case 'rating':
+      return {
+        id: stepId,
+        type: 'rating',
+        position,
+        data: {
+          label: step.id,
+          question: step.question ?? '',
+          min: step.min ?? 0,
+          max: step.max ?? 10,
+          step: step.step ?? 1,
+          variable: step.variable,
+          minLabel: step.minLabel,
+          maxLabel: step.maxLabel,
+        },
+      };
+
+    case 'multi-select':
+      return {
+        id: stepId,
+        type: 'multi-select',
+        position,
+        data: {
+          label: step.id,
+          question: step.question ?? '',
+          options: step.options ?? [],
+          minSelected: step.minSelected ?? 0,
+          maxSelected: step.maxSelected,
+          variable: step.variable,
+          tagMode: step.tagMode ?? false,
+        },
+      };
+
+    case 'media':
+      return {
+        id: stepId,
+        type: 'media',
+        position,
+        data: {
+          label: step.id,
+          mediaType: step.mediaType ?? 'image',
+          url: step.url ?? '',
+          altText: step.altText,
+          caption: step.caption,
+          autoPlay: step.autoPlay ?? false,
+          loop: step.loop ?? false,
+          duration: step.duration,
         },
       };
 
