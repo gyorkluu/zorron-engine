@@ -221,20 +221,33 @@ export interface RatingNodeData extends BaseNodeData {
   min: number;
   max: number;
   step?: number;
-  /** Question prompt displayed to the user. */
+  /** Question prompt displayed to the user (canonical field). */
+  question?: string;
+  /** Legacy alias for `question`. */
   prompt?: string;
+  /** Optional labels for the slider endpoints. */
+  minLabel?: string;
+  maxLabel?: string;
 }
 
 /** Multi-select node data — user selects multiple options. */
 export interface MultiSelectNodeData extends BaseNodeData {
   /** Variable to store selected option ids (comma-separated). */
   variable?: string;
+  /** Question prompt displayed to the user. */
+  question?: string;
   /** Available options. */
   options: Array<{ id: string; label: string; description?: string }>;
-  /** Minimum selections required. */
+  /** Minimum selections required (canonical backend field). */
+  minSelected?: number;
+  /** Maximum selections allowed (canonical backend field). */
+  maxSelected?: number;
+  /** Legacy alias for minSelected. */
   minSelect?: number;
-  /** Maximum selections allowed (0 = unlimited). */
+  /** Legacy alias for maxSelected. */
   maxSelect?: number;
+  /** Whether selected options map to tags (for survey settlement). */
+  tagMode?: boolean;
 }
 
 /** Media node data — display image/audio/video then advance. */

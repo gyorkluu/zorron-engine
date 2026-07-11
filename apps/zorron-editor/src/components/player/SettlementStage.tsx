@@ -11,6 +11,7 @@ import { useT } from '@/i18n/useT';
 import { useProjectStore } from '@/stores/projectStore';
 import type { GameState } from '@/engine/GameEngine';
 import { VectorScene } from '@/components/vector3d/VectorScene';
+import { SocialCardSummary } from './SocialCardSummary';
 import cdnMapping from '@/assets/cdn-mapping.json';
 import { featureFlags } from '@/lib/featureFlags';
 
@@ -70,6 +71,11 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
 
       <div className="relative flex h-full flex-col items-center overflow-y-auto p-5 text-center sm:p-8">
         <div className="flex w-full max-w-3xl flex-col items-center gap-5">
+          {/* Custom visual block: JX3 social card summary. */}
+          {result.visualBlocks?.some((b) => b.type === 'social-card-summary') && result.variables && (
+            <SocialCardSummary variables={result.variables} />
+          )}
+
           {result.anchor && (
             <span className="rounded-full border border-pink-400/40 bg-pink-500/10 px-4 py-1 text-sm uppercase tracking-widest text-pink-200">
               {result.anchor.name}

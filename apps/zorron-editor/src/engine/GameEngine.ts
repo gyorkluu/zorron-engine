@@ -83,6 +83,10 @@ export interface SettlementResult {
   buttons?: SettlementButton[];
   /** Matched result mapping entry (for dev/debug). */
   mapping?: SettlementResultMapping;
+  /** Visual blocks declared on the settlement node (for dynamic rendering). */
+  visualBlocks?: Array<{ type: string; props?: Record<string, unknown> }>;
+  /** Snapshot of all variables at settlement time (for custom blocks). */
+  variables?: Variables;
 }
 
 /** Snapshot of the engine state exposed to subscribers. */
@@ -601,6 +605,8 @@ export class GameEngine {
       resultTexts: output.anchor?.resultTexts,
       buttons: data.buttons,
       mapping: output.mapping,
+      visualBlocks: (data as unknown as { visualBlocks?: Array<{ type: string; props?: Record<string, unknown> }> }).visualBlocks,
+      variables: { ...this.variables },
     };
     this.lastSettlementResult = result;
 
@@ -706,7 +712,7 @@ export class GameEngine {
         min: data.min,
         max: data.max,
         step: data.step,
-        prompt: data.prompt,
+        prompt: data.question ?? data.prompt,
         variable: data.variable,
       },
       choices: [],
@@ -744,8 +750,8 @@ export class GameEngine {
       currentNodeType: 'multi-select',
       multiSelect: {
         options: data.options,
-        minSelect: data.minSelect,
-        maxSelect: data.maxSelect,
+        minSelect: data.minSelected ?? data.minSelect,
+        maxSelect: data.maxSelected ?? data.maxSelect,
         variable: data.variable,
       },
       choices: [],
@@ -760,8 +766,8 @@ export class GameEngine {
     const node = this.getNode(this.currentNodeId);
     if (!node || node.type !== 'multi-select') return this.state;
     const data = node.data as MultiSelectNodeData;
-    const min = data.minSelect ?? 0;
-    const max = data.maxSelect ?? 0;
+    const min = data.minSelected ?? data.minSelect ?? 0;
+    const max = data.maxSelected ?? data.maxSelect ?? 0;
     if (optionIds.length < min) return this.state;
     if (max > 0 && optionIds.length > max) return this.state;
     if (data.variable) {

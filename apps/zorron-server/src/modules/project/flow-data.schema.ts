@@ -206,7 +206,11 @@ export const MinigameNodeDataSchema = BaseNodeDataSchema.extend({
 
 /** Rating node: a slider/rating input that writes to a variable. */
 export const RatingNodeDataSchema = BaseNodeDataSchema.extend({
-  question: z.string(),
+  /** Question prompt displayed to the user (required by contract, but legacy
+   * frontend may use `prompt` instead — accept both). */
+  question: z.string().optional(),
+  /** Legacy alias for `question` (kept for frontend compatibility). */
+  prompt: z.string().optional(),
   min: z.number().default(0),
   max: z.number().default(10),
   step: z.number().positive().default(1),
@@ -219,17 +223,25 @@ export const RatingNodeDataSchema = BaseNodeDataSchema.extend({
 
 /** Multi-select node: pick multiple tags/options from a list. */
 export const MultiSelectNodeDataSchema = BaseNodeDataSchema.extend({
-  question: z.string(),
+  /** Question prompt (required by contract, but legacy frontend may omit it). */
+  question: z.string().optional(),
   options: z
     .array(
       z.object({
         id: z.string(),
         label: z.string(),
+        description: z.string().optional(),
       }),
     )
     .default([]),
+  /** Minimum selections required. Backend canonical field. */
   minSelected: z.number().int().min(0).default(0),
+  /** Maximum selections allowed. Backend canonical field. */
   maxSelected: z.number().int().min(1).optional(),
+  /** Legacy alias for minSelected (frontend naming). */
+  minSelect: z.number().int().min(0).optional(),
+  /** Legacy alias for maxSelected (frontend naming). */
+  maxSelect: z.number().int().min(1).optional(),
   /** Variable name to store the selected option ids. */
   variable: z.string().optional(),
   /** Whether selected options map to tags (for survey settlement). */
