@@ -156,7 +156,7 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
             {interests.map((tag, i) => (
               <span
                 key={i}
-                className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-200"
+                className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs text-teal-200"
               >
                 {tag}
               </span>

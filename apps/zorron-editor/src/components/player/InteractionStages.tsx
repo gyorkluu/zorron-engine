@@ -2,9 +2,9 @@
  * InteractionStages - rendering for the four interactive node types:
  * minigame, rating, multi-select, and media.
  *
- * Each stage reads its slice from `GameState` and delegates mutations to the
- * player store. Stages are intentionally minimal — they exist so the player
- * never hits a blank screen when the flow reaches one of these nodes.
+ * Unified dark theme: bg-slate-950, teal accent, consistent typography and
+ * spacing across all stages. MultiSelectStage uses a compact tag-chip grid
+ * instead of full-width vertical buttons to handle many options gracefully.
  */
 
 import { memo, useState, useEffect } from 'react';
@@ -12,6 +12,39 @@ import { useT } from '@/i18n/useT';
 import { usePlayerStore } from '@/stores/playerStore';
 import { resolveMediaUrl } from '@/lib/media';
 import type { GameState } from '@/engine/GameEngine';
+
+// ── Shared layout wrapper ─────────────────────────────────────────────
+
+/** Unified stage container: dark bg, centered, scrollable, teal accent. */
+function StageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-6 overflow-y-auto bg-slate-950 p-6 text-center sm:p-8">
+      {children}
+    </div>
+  );
+}
+
+/** Unified primary button: teal accent. */
+function PrimaryButton({
+  children,
+  disabled,
+  onClick,
+}: {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className="rounded-lg border border-teal-500/40 bg-teal-500/15 px-6 py-2.5 text-sm font-medium text-teal-200 transition-colors hover:border-teal-400/60 hover:bg-teal-500/25 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800/50 disabled:text-slate-500"
+    >
+      {children}
+    </button>
+  );
+}
 
 // ── Minigame ──────────────────────────────────────────────────────────
 
@@ -28,11 +61,11 @@ function MinigameStageImpl({ state }: MinigameStageProps) {
   if (!mg) return null;
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-slate-950 p-8 text-center">
-      <h2 className="text-2xl font-bold text-slate-100">{t('player.minigame')}</h2>
+    <StageShell>
+      <h2 className="text-xl font-bold text-slate-100 sm:text-2xl">{t('player.minigame')}</h2>
       <iframe
         src={mg.gameUrl}
-        className="h-[60vh] w-full max-w-3xl rounded-lg border border-slate-700"
+        className="h-[55vh] w-full max-w-3xl rounded-lg border border-slate-700/60"
         title="minigame"
       />
       <div className="flex items-center gap-4">
@@ -42,18 +75,14 @@ function MinigameStageImpl({ state }: MinigameStageProps) {
             type="number"
             value={score}
             onChange={(e) => setScore(Number(e.target.value))}
-            className="ml-2 w-24 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-slate-100"
+            className="ml-2 w-24 rounded-md border border-slate-600 bg-slate-900 px-2 py-1 text-slate-100"
           />
         </label>
-        <button
-          type="button"
-          onClick={() => submitMinigame(score)}
-          className="rounded-full bg-emerald-500/20 px-6 py-3 text-sm font-medium text-emerald-200 hover:bg-emerald-500/30"
-        >
+        <PrimaryButton onClick={() => submitMinigame(score)}>
           {t('player.submit')}
-        </button>
+        </PrimaryButton>
       </div>
-    </div>
+    </StageShell>
   );
 }
 
@@ -77,12 +106,16 @@ function RatingStageImpl({ state }: RatingStageProps) {
 
   if (!rt) return null;
   const step = rt.step ?? 1;
+  const minLabel = rt.minLabel ?? String(rt.min);
+  const maxLabel = rt.maxLabel ?? String(rt.max);
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-8 bg-slate-950 p-8 text-center">
-      {rt.prompt && <h2 className="text-2xl font-bold text-slate-100">{rt.prompt}</h2>}
+    <StageShell>
+      {rt.prompt && (
+        <h2 className="text-lg font-bold text-slate-100 sm:text-xl">{rt.prompt}</h2>
+      )}
       <div className="flex flex-col items-center gap-3">
-        <span className="text-5xl font-bold text-cyan-300">{value}</span>
+        <span className="text-5xl font-bold text-teal-300">{value}</span>
         <input
           type="range"
           min={rt.min}
@@ -90,27 +123,23 @@ function RatingStageImpl({ state }: RatingStageProps) {
           step={step}
           value={value}
           onChange={(e) => setValue(Number(e.target.value))}
-          className="w-72 accent-cyan-400"
+          className="w-72 accent-teal-400"
         />
         <div className="flex w-72 justify-between text-xs text-slate-500">
-          <span>{rt.min}</span>
-          <span>{rt.max}</span>
+          <span>{minLabel}</span>
+          <span>{maxLabel}</span>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => submitRating(value)}
-        className="rounded-full bg-cyan-500/20 px-6 py-3 text-sm font-medium text-cyan-200 hover:bg-cyan-500/30"
-      >
+      <PrimaryButton onClick={() => submitRating(value)}>
         {t('player.submit')}
-      </button>
-    </div>
+      </PrimaryButton>
+    </StageShell>
   );
 }
 
 export const RatingStage = memo(RatingStageImpl);
 
-// ── Multi-Select ──────────────────────────────────────────────────────
+// ── Multi-Select ─────────────────────────────────────────────────────
 
 interface MultiSelectStageProps {
   state: GameState;
@@ -121,6 +150,11 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
   const submitMultiSelect = usePlayerStore((s) => s.submitMultiSelect);
   const ms = state.multiSelect;
   const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  // Reset selection when the node changes.
+  useEffect(() => {
+    setSelected(new Set());
+  }, [ms]);
 
   if (!ms) return null;
 
@@ -140,16 +174,26 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
     });
   };
 
+  const countLabel = [
+    min > 0 ? `${t('player.minSelect')}: ${min}` : '',
+    max > 0 ? `${t('player.maxSelect')}: ${max}` : '',
+    `${t('player.score')}: ${selected.size}`,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-slate-950 p-8 text-center">
-      <h2 className="text-2xl font-bold text-slate-100">{t('player.chooseOptions')}</h2>
-      {(min > 0 || max > 0) && (
-        <p className="text-sm text-slate-500">
-          {min > 0 && `${t('player.minSelect')}: ${min} `}
-          {max > 0 && `${t('player.maxSelect')}: ${max}`}
-        </p>
-      )}
-      <div className="flex w-full max-w-md flex-col gap-2">
+    <StageShell>
+      {/* Question prompt from node data, fallback to generic title */}
+      <h2 className="text-lg font-bold text-slate-100 sm:text-xl">
+        {ms.question ?? t('player.chooseOptions')}
+      </h2>
+
+      {/* Selection count / min-max indicator */}
+      <p className="text-sm text-slate-400">{countLabel}</p>
+
+      {/* Tag-chip grid: auto-wraps, compact, scrollable when many */}
+      <div className="flex max-h-[50vh] w-full max-w-2xl flex-wrap justify-center gap-2 overflow-y-auto">
         {ms.options.map((opt) => {
           const checked = selected.has(opt.id);
           return (
@@ -157,42 +201,26 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
               key={opt.id}
               type="button"
               onClick={() => toggle(opt.id)}
-              className={`flex items-start gap-3 rounded-lg border p-4 text-left transition-colors ${
-                checked
-                  ? 'border-violet-500 bg-violet-500/10'
-                  : 'border-slate-700 bg-slate-900 hover:border-slate-500'
-              }`}
+              className={`
+                rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-150
+                ${
+                  checked
+                    ? 'border-teal-400/60 bg-teal-500/20 text-teal-100'
+                    : 'border-slate-700/60 bg-slate-900/60 text-slate-300 hover:border-teal-500/40 hover:bg-teal-500/5 hover:text-teal-200'
+                }
+              `}
             >
-              <span
-                className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border ${
-                  checked ? 'border-violet-400 bg-violet-500' : 'border-slate-600'
-                }`}
-              >
-                {checked && (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
-              </span>
-              <span>
-                <span className="block text-sm font-medium text-slate-200">{opt.label}</span>
-                {opt.description && (
-                  <span className="mt-1 block text-xs text-slate-500">{opt.description}</span>
-                )}
-              </span>
+              {opt.label}
+              {checked && <span className="ml-1.5 text-teal-300">✓</span>}
             </button>
           );
         })}
       </div>
-      <button
-        type="button"
-        disabled={!canSubmit}
-        onClick={() => submitMultiSelect([...selected])}
-        className="rounded-full bg-violet-500/20 px-6 py-3 text-sm font-medium text-violet-200 hover:bg-violet-500/30 disabled:cursor-not-allowed disabled:opacity-40"
-      >
+
+      <PrimaryButton disabled={!canSubmit} onClick={() => submitMultiSelect([...selected])}>
         {t('player.submit')}
-      </button>
-    </div>
+      </PrimaryButton>
+    </StageShell>
   );
 }
 
@@ -213,12 +241,17 @@ function MediaStageImpl({ state }: MediaStageProps) {
   const url = resolveMediaUrl(md.url);
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-6 bg-slate-950 p-8 text-center">
+    <StageShell>
       {md.mediaType === 'image' && url && (
-        <img src={url} alt="" className="max-h-[70vh] max-w-full rounded-lg object-contain" />
+        <img src={url} alt="" className="max-h-[65vh] max-w-full rounded-lg object-contain" />
       )}
       {md.mediaType === 'audio' && url && (
-        <audio src={url} controls autoPlay={md.autoAdvance} onEnded={() => md.autoAdvance && advanceFromMedia()} />
+        <audio
+          src={url}
+          controls
+          autoPlay={md.autoAdvance}
+          onEnded={() => md.autoAdvance && advanceFromMedia()}
+        />
       )}
       {md.mediaType === 'video' && url && (
         <video
@@ -226,19 +259,15 @@ function MediaStageImpl({ state }: MediaStageProps) {
           controls
           autoPlay={md.autoAdvance}
           onEnded={() => md.autoAdvance && advanceFromMedia()}
-          className="max-h-[70vh] max-w-full rounded-lg"
+          className="max-h-[65vh] max-w-full rounded-lg"
         />
       )}
       {!md.autoAdvance && (
-        <button
-          type="button"
-          onClick={() => advanceFromMedia()}
-          className="rounded-full bg-slate-700/40 px-6 py-3 text-sm font-medium text-slate-200 hover:bg-slate-700/60"
-        >
+        <PrimaryButton onClick={() => advanceFromMedia()}>
           {t('player.continue')}
-        </button>
+        </PrimaryButton>
       )}
-    </div>
+    </StageShell>
   );
 }
 

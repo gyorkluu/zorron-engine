@@ -77,7 +77,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
           )}
 
           {result.anchor && (
-            <span className="rounded-full border border-pink-400/40 bg-pink-500/10 px-4 py-1 text-sm uppercase tracking-widest text-pink-200">
+            <span className="rounded-full border border-teal-400/40 bg-teal-500/10 px-4 py-1 text-sm uppercase tracking-widest text-teal-200">
               {result.anchor.name}
             </span>
           )}
@@ -185,7 +185,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                   key={btn.id}
                   type="button"
                   onClick={() => onSettlementButton(btn.id)}
-                  className="rounded-full bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-2.5 text-sm font-medium text-white shadow-lg hover:from-pink-500 hover:to-rose-400"
+                  className="rounded-lg border border-teal-500/40 bg-teal-500/15 px-6 py-2.5 text-sm font-medium text-teal-200 transition-colors hover:border-teal-400/60 hover:bg-teal-500/25"
                 >
                   {btn.label}
                 </button>

@@ -1,9 +1,10 @@
 /**
  * SceneStage - renders a scene node: background, focus object, character,
- * dialogue and choices with ancient-Chinese visual styling and mobile adaptation.
+ * dialogue and choices.
  *
- * Ported from the legacy Vue Player.vue while keeping the React implementation
- * framework-agnostic (media is driven by GameState).
+ * Unified dark theme: bg-slate-950, teal accent, consistent typography with
+ * all other Stage components. Keeps typewriter effect and atmospheric media
+ * layers (background / character / focus object).
  */
 
 import { memo } from 'react';
@@ -35,67 +36,72 @@ function SceneStageImpl({ state }: SceneStageProps) {
   const focusObjectUrl = resolveMediaUrl(scene?.focusObject, scene?.isFocusObjectRemote);
 
   return (
-    <div className="zorron-scene relative h-full w-full overflow-hidden bg-slate-950 font-serif text-[#f5f0e6]">
+    <div className="relative h-full w-full overflow-hidden bg-slate-950 text-slate-100">
       {/* Background layer */}
-      <div className="scene-bg-layer absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0">
         {backgroundUrl ? (
           <img
             src={backgroundUrl}
             alt=""
-            className="scene-bg-img h-full w-full object-cover"
+            className="h-full w-full object-cover"
           />
         ) : null}
-        <div className="scene-bg-overlay absolute inset-0" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/75 to-slate-950/90" />
       </div>
 
       {/* Focus object / item layer */}
       {focusObjectUrl && (
-        <div className="scene-focus-layer absolute left-1/2 top-[30%] z-[2] w-[200px] -translate-x-1/2 -translate-y-1/2 sm:top-[32%] sm:w-[260px] md:w-[300px]">
+        <div className="absolute left-1/2 top-[28%] z-[2] w-[180px] -translate-x-1/2 -translate-y-1/2 sm:w-[240px] md:w-[280px]">
           <img
             src={focusObjectUrl}
             alt=""
-            className="scene-focus-img h-full w-full object-contain drop-shadow-[0_0_25px_rgba(212,175,55,0.4)]"
+            className="h-full w-full object-contain drop-shadow-[0_0_20px_rgba(45,212,191,0.3)]"
           />
         </div>
       )}
 
-      {/* Choices layer */}
-      <div
-        className={`scene-choices-layer absolute left-1/2 top-[50%] z-[5] -translate-x-1/2 -translate-y-1/2 ${focusObjectUrl ? 'mt-20 sm:mt-28 md:mt-36' : ''}`}>
-        {done && state.choices.length > 0 && <ChoiceLayer choices={state.choices} />}
-      </div>
+      {/* Main content: dialogue + choices, scrollable when many options */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-end overflow-y-auto p-3 sm:p-4 md:p-6">
+        {/* Choices layer — grows upward from bottom, above dialogue */}
+        {done && state.choices.length > 0 && (
+          <div className={`mb-3 w-full max-w-lg sm:max-w-xl md:max-w-2xl ${focusObjectUrl ? 'mt-12' : ''} ${state.choices.length > 8 ? 'mt-auto mb-auto pt-4' : ''}`}>
+            <ChoiceLayer choices={state.choices} />
+          </div>
+        )}
 
-      {/* Dialogue + character layer */}
-      <div className="scene-dialogue-layer absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-end p-3 sm:p-4 md:bottom-6 md:p-6">
-        <div className="scene-dialogue-wrapper relative flex w-full max-w-[380px] items-end justify-center sm:max-w-[520px] md:max-w-[700px]">
-          {/* Character portrait */}
-          {characterUrl && (
-            <div className="scene-character-container pointer-events-none relative z-[11] -mb-2 -mr-10 h-[140px] sm:-mr-12 sm:h-[180px] md:-mr-20 md:h-[280px] lg:h-[340px]">
-              <div className="scene-character-glow absolute bottom-0 left-1/2 h-[180px] w-[110px] -translate-x-1/2 sm:h-[220px] sm:w-[140px] md:h-[320px] md:w-[200px]" />
-              <img
-                src={characterUrl}
-                alt=""
-                className="scene-character-img relative h-full w-auto object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.3)]"
-              />
-            </div>
-          )}
-
-          {/* Dialogue box */}
-          <div
-            onClick={skip}
-            className="scene-dialogue-box relative z-10 w-full cursor-pointer rounded-sm border border-[rgba(212,175,55,0.15)] bg-gradient-to-br from-[rgba(20,18,15,0.92)] to-[rgba(30,25,20,0.88)] p-4 backdrop-blur-md sm:p-5 md:p-7"
-          >
-            {scene?.speaker && (
-              <div className="scene-speaker-nameplate absolute -top-4 left-3 inline-flex items-center rounded-sm bg-gradient-to-br from-[rgba(201,64,67,0.9)] to-[rgba(180,50,53,0.9)] px-4 py-1.5 text-xs font-semibold tracking-[3px] text-[#f5f0e6] sm:-top-5 sm:px-5 sm:text-[13px] md:left-6">
-                {scene.speaker}
+        {/* Dialogue + character layer */}
+        <div className="flex w-full max-w-lg flex-col items-center justify-end sm:max-w-xl md:max-w-2xl">
+          <div className="relative flex w-full items-end justify-center">
+            {/* Character portrait */}
+            {characterUrl && (
+              <div className="pointer-events-none relative z-[11] -mb-2 -mr-8 h-[120px] sm:-mr-10 sm:h-[160px] md:-mr-16 md:h-[220px] lg:h-[280px]">
+                <img
+                  src={characterUrl}
+                  alt=""
+                  className="relative h-full w-auto object-contain drop-shadow-[0_0_16px_rgba(45,212,191,0.25)]"
+                />
               </div>
             )}
-            <p className="min-h-[3.5rem] text-sm leading-relaxed text-[#e8e0d0] text-shadow-sm sm:text-base sm:leading-relaxed md:text-lg md:leading-[2]">
-              {displayed}
-              {!done && <span className="ml-0.5 animate-pulse">▌</span>}
-            </p>
-            <div className="scene-continue-indicator absolute bottom-3 right-4 md:bottom-4 md:right-6">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#d4af37] shadow-[0_0_10px_rgba(212,175,55,0.6)] animate-bounce" />
+
+            {/* Dialogue box */}
+            <div
+              onClick={skip}
+              className="relative z-10 w-full cursor-pointer rounded-xl border border-slate-700/60 bg-slate-900/80 p-4 backdrop-blur-md sm:p-5"
+            >
+              {scene?.speaker && (
+                <div className="absolute -top-3 left-3 inline-flex items-center rounded-md bg-teal-500/90 px-3 py-1 text-xs font-medium tracking-wide text-slate-950 sm:-top-3 sm:px-4">
+                  {scene.speaker}
+                </div>
+              )}
+              <p className="min-h-[2.5rem] text-sm leading-relaxed text-slate-200 sm:text-base">
+                {displayed}
+                {!done && <span className="ml-0.5 animate-pulse text-teal-400">▌</span>}
+              </p>
+              {!done && (
+                <div className="absolute bottom-3 right-4">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.5)] animate-bounce" />
+                </div>
+              )}
             </div>
           </div>
         </div>

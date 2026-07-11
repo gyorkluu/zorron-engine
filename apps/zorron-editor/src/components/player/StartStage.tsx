@@ -39,7 +39,7 @@ function StartStageImpl({ state }: StartStageProps) {
       <button
         type="button"
         onClick={advance}
-        className="relative rounded-full bg-cyan-500/20 px-8 py-3 text-sm font-medium text-cyan-200 hover:bg-cyan-500/30"
+        className="relative rounded-lg border border-teal-500/40 bg-teal-500/15 px-8 py-3 text-sm font-medium text-teal-200 transition-colors hover:border-teal-400/60 hover:bg-teal-500/25"
       >
         {t('player.begin')}
       </button>

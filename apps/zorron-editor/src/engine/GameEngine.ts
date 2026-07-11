@@ -130,6 +130,7 @@ export interface GameState {
   rating: { min: number; max: number; step?: number; prompt?: string; variable?: string } | null;
   /** Present when the engine reached a multi-select node (waits for selection submission). */
   multiSelect: {
+    question?: string;
     options: Array<{ id: string; label: string; description?: string }>;
     minSelect?: number;
     maxSelect?: number;
@@ -749,6 +750,7 @@ export class GameEngine {
       currentNodeId: node.id,
       currentNodeType: 'multi-select',
       multiSelect: {
+        question: data.question,
         options: data.options,
         minSelect: data.minSelected ?? data.minSelect,
         maxSelect: data.maxSelected ?? data.maxSelect,
