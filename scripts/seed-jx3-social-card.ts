@@ -541,6 +541,7 @@ const flowData: FlowData = {
   settings: {
     title: '剑网3游戏社交名片',
     description: '基于题目设计的游戏社交名片测试',
+    theme: 'ancient',
   },
   version: '1.0.0',
 };

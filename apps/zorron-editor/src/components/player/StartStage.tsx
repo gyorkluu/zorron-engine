@@ -1,5 +1,8 @@
 /**
  * StartStage - intro screen for the start node.
+ *
+ * Uses semantic `.player-*` classes so it adapts to the active theme
+ * (modern teal-dark or ancient gold-ink).
  */
 
 import { memo } from 'react';
@@ -19,7 +22,7 @@ function StartStageImpl({ state }: StartStageProps) {
   if (!start) return null;
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center gap-6 bg-slate-950 p-8 text-center">
+    <div className="player-bg relative flex h-full w-full flex-col items-center justify-center gap-6 p-8 text-center">
       {start.coverUrl && (
         <img
           src={start.coverUrl}
@@ -27,19 +30,19 @@ function StartStageImpl({ state }: StartStageProps) {
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/90" />
       <div className="relative space-y-4">
         {start.title && (
-          <h1 className="text-4xl font-bold text-slate-100 sm:text-5xl">{start.title}</h1>
+          <h1 className="player-text text-4xl font-bold sm:text-5xl">{start.title}</h1>
         )}
         {start.intro && (
-          <p className="max-w-md text-slate-300">{start.intro}</p>
+          <p className="player-text-muted max-w-md">{start.intro}</p>
         )}
       </div>
       <button
         type="button"
         onClick={advance}
-        className="relative rounded-lg border border-teal-500/40 bg-teal-500/15 px-8 py-3 text-sm font-medium text-teal-200 transition-colors hover:border-teal-400/60 hover:bg-teal-500/25"
+        className="player-btn relative px-8 py-3 text-sm font-medium"
       >
         {t('player.begin')}
       </button>

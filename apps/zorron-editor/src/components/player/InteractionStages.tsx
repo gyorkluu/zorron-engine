@@ -2,9 +2,10 @@
  * InteractionStages - rendering for the four interactive node types:
  * minigame, rating, multi-select, and media.
  *
- * Unified dark theme: bg-slate-950, teal accent, consistent typography and
- * spacing across all stages. MultiSelectStage uses a compact tag-chip grid
- * instead of full-width vertical buttons to handle many options gracefully.
+ * Uses `.player-*` semantic classes (theme-aware) so the same component
+ * re-skins automatically under modern / ancient / future themes.
+ * MultiSelectStage uses a compact tag-chip grid instead of full-width
+ * vertical buttons to handle many options gracefully.
  */
 
 import { memo, useState, useEffect } from 'react';
@@ -15,16 +16,16 @@ import type { GameState } from '@/engine/GameEngine';
 
 // ── Shared layout wrapper ─────────────────────────────────────────────
 
-/** Unified stage container: dark bg, centered, scrollable, teal accent. */
+/** Unified stage container — theme-aware bg, centered, scrollable. */
 function StageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-6 overflow-y-auto bg-slate-950 p-6 text-center sm:p-8">
+    <div className="player-bg player-font player-text flex h-full w-full flex-col items-center justify-center gap-6 overflow-y-auto p-6 text-center sm:p-8">
       {children}
     </div>
   );
 }
 
-/** Unified primary button: teal accent. */
+/** Unified primary button — theme-aware accent. */
 function PrimaryButton({
   children,
   disabled,
@@ -39,7 +40,7 @@ function PrimaryButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="rounded-lg border border-teal-500/40 bg-teal-500/15 px-6 py-2.5 text-sm font-medium text-teal-200 transition-colors hover:border-teal-400/60 hover:bg-teal-500/25 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800/50 disabled:text-slate-500"
+      className="player-btn px-6 py-2.5 text-sm font-medium"
     >
       {children}
     </button>
@@ -62,20 +63,21 @@ function MinigameStageImpl({ state }: MinigameStageProps) {
 
   return (
     <StageShell>
-      <h2 className="text-xl font-bold text-slate-100 sm:text-2xl">{t('player.minigame')}</h2>
+      <h2 className="text-xl font-bold sm:text-2xl">{t('player.minigame')}</h2>
       <iframe
         src={mg.gameUrl}
-        className="h-[55vh] w-full max-w-3xl rounded-lg border border-slate-700/60"
+        className="player-card h-[55vh] w-full max-w-3xl"
         title="minigame"
       />
       <div className="flex items-center gap-4">
-        <label className="text-sm text-slate-400">
+        <label className="player-text-muted text-sm">
           {t('player.score')}:
           <input
             type="number"
             value={score}
             onChange={(e) => setScore(Number(e.target.value))}
-            className="ml-2 w-24 rounded-md border border-slate-600 bg-slate-900 px-2 py-1 text-slate-100"
+            className="player-surface player-border player-text ml-2 w-24 rounded-md px-2 py-1"
+            style={{ color: 'hsl(var(--p-text))' }}
           />
         </label>
         <PrimaryButton onClick={() => submitMinigame(score)}>
@@ -112,10 +114,10 @@ function RatingStageImpl({ state }: RatingStageProps) {
   return (
     <StageShell>
       {rt.prompt && (
-        <h2 className="text-lg font-bold text-slate-100 sm:text-xl">{rt.prompt}</h2>
+        <h2 className="text-lg font-bold sm:text-xl">{rt.prompt}</h2>
       )}
       <div className="flex flex-col items-center gap-3">
-        <span className="text-5xl font-bold text-teal-300">{value}</span>
+        <span className="player-accent-text text-5xl font-bold">{value}</span>
         <input
           type="range"
           min={rt.min}
@@ -123,9 +125,10 @@ function RatingStageImpl({ state }: RatingStageProps) {
           step={step}
           value={value}
           onChange={(e) => setValue(Number(e.target.value))}
-          className="w-72 accent-teal-400"
+          className="w-72"
+          style={{ accentColor: 'hsl(var(--p-accent))' }}
         />
-        <div className="flex w-72 justify-between text-xs text-slate-500">
+        <div className="player-text-muted flex w-72 justify-between text-xs">
           <span>{minLabel}</span>
           <span>{maxLabel}</span>
         </div>
@@ -185,12 +188,12 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
   return (
     <StageShell>
       {/* Question prompt from node data, fallback to generic title */}
-      <h2 className="text-lg font-bold text-slate-100 sm:text-xl">
+      <h2 className="text-lg font-bold sm:text-xl">
         {ms.question ?? t('player.chooseOptions')}
       </h2>
 
       {/* Selection count / min-max indicator */}
-      <p className="text-sm text-slate-400">{countLabel}</p>
+      <p className="player-text-muted text-sm">{countLabel}</p>
 
       {/* Tag-chip grid: auto-wraps, compact, scrollable when many */}
       <div className="flex max-h-[50vh] w-full max-w-2xl flex-wrap justify-center gap-2 overflow-y-auto">
@@ -201,17 +204,14 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
               key={opt.id}
               type="button"
               onClick={() => toggle(opt.id)}
-              className={`
-                rounded-lg border px-4 py-2 text-sm font-medium transition-all duration-150
-                ${
-                  checked
-                    ? 'border-teal-400/60 bg-teal-500/20 text-teal-100'
-                    : 'border-slate-700/60 bg-slate-900/60 text-slate-300 hover:border-teal-500/40 hover:bg-teal-500/5 hover:text-teal-200'
-                }
-              `}
+              className={`player-radius-sm relative px-4 py-2 text-sm font-medium transition-all duration-150 ${
+                checked ? 'player-choice-active' : 'player-choice'
+              }`}
             >
               {opt.label}
-              {checked && <span className="ml-1.5 text-teal-300">✓</span>}
+              {checked && (
+                <span className="player-accent-text ml-1.5">✓</span>
+              )}
             </button>
           );
         })}
@@ -243,7 +243,7 @@ function MediaStageImpl({ state }: MediaStageProps) {
   return (
     <StageShell>
       {md.mediaType === 'image' && url && (
-        <img src={url} alt="" className="max-h-[65vh] max-w-full rounded-lg object-contain" />
+        <img src={url} alt="" className="player-radius max-h-[65vh] max-w-full object-contain" />
       )}
       {md.mediaType === 'audio' && url && (
         <audio
@@ -259,7 +259,7 @@ function MediaStageImpl({ state }: MediaStageProps) {
           controls
           autoPlay={md.autoAdvance}
           onEnded={() => md.autoAdvance && advanceFromMedia()}
-          className="max-h-[65vh] max-w-full rounded-lg"
+          className="player-radius max-h-[65vh] max-w-full"
         />
       )}
       {!md.autoAdvance && (

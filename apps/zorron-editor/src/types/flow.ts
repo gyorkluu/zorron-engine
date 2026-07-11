@@ -314,12 +314,17 @@ export interface VectorSpaceConfig {
   sects?: ResultAnchor[];
 }
 
+/** Player UI theme presets. */
+export type PlayerTheme = 'modern' | 'ancient';
+
 /** Project-level settings stored inside FlowData. */
 export interface ProjectSettings {
   title?: string;
   description?: string;
   coverUrl?: string;
   bgmUrl?: string;
+  /** Player UI theme — defaults to 'modern' when unset. */
+  theme?: PlayerTheme;
   /** Optional — non-vector scenarios don't need vector space config. */
   vectorSpace?: VectorSpaceConfig;
 }

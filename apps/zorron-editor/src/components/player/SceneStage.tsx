@@ -2,9 +2,9 @@
  * SceneStage - renders a scene node: background, focus object, character,
  * dialogue and choices.
  *
- * Unified dark theme: bg-slate-950, teal accent, consistent typography with
- * all other Stage components. Keeps typewriter effect and atmospheric media
- * layers (background / character / focus object).
+ * Uses `.player-*` semantic classes so the entire scene re-skins when the
+ * player theme changes (modern teal-dark / ancient gold-ink). Keeps the
+ * typewriter effect and atmospheric media layers.
  */
 
 import { memo } from 'react';
@@ -36,17 +36,13 @@ function SceneStageImpl({ state }: SceneStageProps) {
   const focusObjectUrl = resolveMediaUrl(scene?.focusObject, scene?.isFocusObjectRemote);
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-slate-950 text-slate-100">
+    <div className="player-bg relative h-full w-full overflow-hidden">
       {/* Background layer */}
       <div className="absolute inset-0 z-0">
         {backgroundUrl ? (
-          <img
-            src={backgroundUrl}
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          <img src={backgroundUrl} alt="" className="h-full w-full object-cover" />
         ) : null}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/75 to-slate-950/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/70 to-black/90" />
       </div>
 
       {/* Focus object / item layer */}
@@ -55,14 +51,14 @@ function SceneStageImpl({ state }: SceneStageProps) {
           <img
             src={focusObjectUrl}
             alt=""
-            className="h-full w-full object-contain drop-shadow-[0_0_20px_rgba(45,212,191,0.3)]"
+            className="h-full w-full object-contain drop-shadow-[0_0_20px_hsl(var(--p-accent)/0.3)]"
           />
         </div>
       )}
 
       {/* Main content: dialogue + choices, scrollable when many options */}
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-end overflow-y-auto p-3 sm:p-4 md:p-6">
-        {/* Choices layer — grows upward from bottom, above dialogue */}
+        {/* Choices layer */}
         {done && state.choices.length > 0 && (
           <div className={`mb-3 w-full max-w-lg sm:max-w-xl md:max-w-2xl ${focusObjectUrl ? 'mt-12' : ''} ${state.choices.length > 8 ? 'mt-auto mb-auto pt-4' : ''}`}>
             <ChoiceLayer choices={state.choices} />
@@ -78,7 +74,7 @@ function SceneStageImpl({ state }: SceneStageProps) {
                 <img
                   src={characterUrl}
                   alt=""
-                  className="relative h-full w-auto object-contain drop-shadow-[0_0_16px_rgba(45,212,191,0.25)]"
+                  className="relative h-full w-auto object-contain drop-shadow-[0_0_16px_hsl(var(--p-accent)/0.25)]"
                 />
               </div>
             )}
@@ -86,20 +82,23 @@ function SceneStageImpl({ state }: SceneStageProps) {
             {/* Dialogue box */}
             <div
               onClick={skip}
-              className="relative z-10 w-full cursor-pointer rounded-xl border border-slate-700/60 bg-slate-900/80 p-4 backdrop-blur-md sm:p-5"
+              className="player-card relative z-10 w-full cursor-pointer p-4 backdrop-blur-md sm:p-5"
             >
               {scene?.speaker && (
-                <div className="absolute -top-3 left-3 inline-flex items-center rounded-md bg-teal-500/90 px-3 py-1 text-xs font-medium tracking-wide text-slate-950 sm:-top-3 sm:px-4">
+                <div className="player-btn absolute -top-3 left-3 inline-flex items-center px-3 py-1 text-xs font-medium tracking-wide sm:px-4">
                   {scene.speaker}
                 </div>
               )}
-              <p className="min-h-[2.5rem] text-sm leading-relaxed text-slate-200 sm:text-base">
+              <p className="player-text min-h-[2.5rem] text-sm leading-relaxed sm:text-base">
                 {displayed}
-                {!done && <span className="ml-0.5 animate-pulse text-teal-400">▌</span>}
+                {!done && <span className="player-accent-text ml-0.5 animate-pulse">▌</span>}
               </p>
               {!done && (
                 <div className="absolute bottom-3 right-4">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.5)] animate-bounce" />
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full animate-bounce"
+                    style={{ backgroundColor: 'hsl(var(--p-accent))', boxShadow: '0 0 8px hsl(var(--p-accent) / 0.5)' }}
+                  />
                 </div>
               )}
             </div>

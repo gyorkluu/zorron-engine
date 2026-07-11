@@ -3,7 +3,12 @@
  *
  * Renders the player's final variables as a structured "business card" with
  * sections for basic info, game level, rank tier, MBTI personality, game-view
- * tier, interests, and zodiac.
+ * tier, interests, and zodiac. Uses `.player-*` semantic classes so the card
+ * re-skins automatically under modern / ancient themes.
+ *
+ * Note: MBTI category colors and game-view tier colors are informational
+ * (they encode meaning) and therefore remain as fixed Tailwind colors
+ * rather than theme-driven accents.
  */
 
 import { memo } from 'react';
@@ -29,7 +34,7 @@ const MBTI_DESCRIPTIONS: Record<string, string> = {
   ESFP: '表演者 · 享乐主义',
 };
 
-/** MBTI category colors. */
+/** MBTI category colors — informational (fixed, not theme-driven). */
 const MBTI_CATEGORY: Record<string, { color: string; label: string }> = {
   INTJ: { color: 'text-purple-300', label: '分析家' },
   INTP: { color: 'text-purple-300', label: '分析家' },
@@ -84,16 +89,23 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
   const interests = String(v.interests ?? '').split(',').filter(Boolean);
 
   return (
-    <div className="w-full space-y-4 text-left">
-      {/* Header */}
-      <div className="rounded-xl border border-teal-500/40 bg-gradient-to-br from-teal-900/30 to-slate-900/50 p-5 text-center">
-        <h2 className="text-2xl font-bold text-teal-200">游戏社交名片</h2>
-        <p className="mt-1 text-xs text-slate-400">剑网3 · 专属名片已生成</p>
+    <div className="player-font w-full space-y-4 text-left">
+      {/* Header — theme-aware accent card */}
+      <div
+        className="player-card p-5 text-center"
+        style={{
+          background:
+            'linear-gradient(135deg, hsl(var(--p-accent) / 0.18), hsl(var(--p-surface) / 0.5))',
+          borderColor: 'hsl(var(--p-accent-border))',
+        }}
+      >
+        <h2 className="player-accent-text text-2xl font-bold">游戏社交名片</h2>
+        <p className="player-text-muted mt-1 text-xs">剑网3 · 专属名片已生成</p>
       </div>
 
       {/* Basic info */}
-      <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-4">
-        <h3 className="mb-3 text-sm font-bold text-teal-300">基本信息</h3>
+      <div className="player-card p-4">
+        <h3 className="player-accent-text mb-3 text-sm font-bold">基本信息</h3>
         <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <InfoRow label="区服" value={String(v.server ?? '—')} />
           <InfoRow label="心法" value={String(v.mindset ?? '—')} />
@@ -104,8 +116,8 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       </div>
 
       {/* Game level */}
-      <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-4">
-        <h3 className="mb-3 text-sm font-bold text-teal-300">游戏水平</h3>
+      <div className="player-card p-4">
+        <h3 className="player-accent-text mb-3 text-sm font-bold">游戏水平</h3>
         <div className="grid grid-cols-3 gap-3 text-center">
           <LevelBar label="PVP" value={Number(v.pvp_level ?? 0)} color="bg-rose-500" />
           <LevelBar label="PVE" value={Number(v.pve_level ?? 0)} color="bg-blue-500" />
@@ -114,16 +126,16 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       </div>
 
       {/* Rank tier */}
-      <div className="rounded-lg border border-amber-500/40 bg-amber-950/20 p-4">
-        <h3 className="mb-2 text-sm font-bold text-amber-300">段位</h3>
-        <div className="text-lg font-bold text-amber-200">
+      <div className="player-card p-4" style={{ borderColor: 'hsl(43 74% 49% / 0.4)' }}>
+        <h3 className="player-accent-text mb-2 text-sm font-bold">段位</h3>
+        <div className="player-accent-text text-lg font-bold">
           {getRankTierLabel(String(v.rank_tier ?? '—'))}
         </div>
       </div>
 
       {/* MBTI personality */}
       {mbti && (
-        <div className="rounded-lg border border-purple-500/40 bg-purple-950/20 p-4">
+        <div className="player-card p-4" style={{ borderColor: 'hsl(280 60% 60% / 0.4)' }}>
           <h3 className="mb-2 text-sm font-bold text-purple-300">MBTI 人格画像</h3>
           <div className="flex items-baseline gap-3">
             <span className="text-3xl font-bold text-purple-200">{mbti}</span>
@@ -138,25 +150,30 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       )}
 
       {/* Game view tier */}
-      <div className="rounded-lg border border-orange-500/40 bg-orange-950/20 p-4">
+      <div className="player-card p-4" style={{ borderColor: 'hsl(30 80% 50% / 0.4)' }}>
         <h3 className="mb-2 text-sm font-bold text-orange-300">游戏观等级</h3>
         <div className="flex items-baseline gap-3">
-          <span className="text-2xl font-bold text-orange-200">
+          <span className={`text-2xl font-bold ${tier.color}`}>
             {tier.emoji} {tier.label}
           </span>
-          <span className="text-sm text-orange-400">{gameViewScore} / 25 分</span>
+          <span className="player-text-muted text-sm">{gameViewScore} / 25 分</span>
         </div>
       </div>
 
       {/* Interests */}
       {interests.length > 0 && (
-        <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-4">
-          <h3 className="mb-3 text-sm font-bold text-teal-300">兴趣标签</h3>
+        <div className="player-card p-4">
+          <h3 className="player-accent-text mb-3 text-sm font-bold">兴趣标签</h3>
           <div className="flex flex-wrap gap-2">
             {interests.map((tag, i) => (
               <span
                 key={i}
-                className="rounded-full border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-xs text-teal-200"
+                className="player-radius-full px-3 py-1 text-xs"
+                style={{
+                  border: '1px solid hsl(var(--p-accent-border))',
+                  backgroundColor: 'hsl(var(--p-accent-soft))',
+                  color: 'hsl(var(--p-accent-text))',
+                }}
               >
                 {tag}
               </span>
@@ -166,9 +183,9 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       )}
 
       {/* Zodiac */}
-      <div className="rounded-lg border border-slate-700/60 bg-slate-900/50 p-4">
-        <h3 className="mb-3 text-sm font-bold text-teal-300">星座</h3>
-        <div className="text-lg font-bold text-slate-200">
+      <div className="player-card p-4">
+        <h3 className="player-accent-text mb-3 text-sm font-bold">星座</h3>
+        <div className="player-text text-lg font-bold">
           {String(v.zodiac ?? '—')}
         </div>
       </div>
@@ -180,8 +197,8 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs text-slate-500">{label}</span>
-      <span className="text-sm font-medium text-slate-200">{value}</span>
+      <span className="player-text-muted text-xs">{label}</span>
+      <span className="player-text text-sm font-medium">{value}</span>
     </div>
   );
 }
@@ -191,9 +208,12 @@ function LevelBar({ label, value, color }: { label: string; value: number; color
   const pct = Math.min(100, Math.max(0, (value / 10) * 100));
   return (
     <div>
-      <div className="mb-1 text-xs text-slate-400">{label}</div>
-      <div className="text-lg font-bold text-slate-100">{value}<span className="text-xs text-slate-500">/10</span></div>
-      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+      <div className="player-text-muted mb-1 text-xs">{label}</div>
+      <div className="player-text text-lg font-bold">
+        {value}
+        <span className="player-text-muted text-xs">/10</span>
+      </div>
+      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: 'hsl(var(--p-surface-hover))' }}>
         <div className={`h-full ${color} transition-all`} style={{ width: `${pct}%` }} />
       </div>
     </div>

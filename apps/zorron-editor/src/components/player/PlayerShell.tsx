@@ -35,6 +35,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
   const selectSettlementButton = usePlayerStore((s) => s.selectSettlementButton);
   const stop = usePlayerStore((s) => s.stop);
   const globalBgmUrl = resolveMediaUrl(flowData.settings?.bgmUrl);
+  const theme = flowData.settings?.theme ?? 'modern';
 
   // Boot the engine on mount or when flowData changes.
   useEffect(() => {
@@ -75,7 +76,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
 
   if (!isRunning || !state) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-slate-950 text-slate-400">
+      <div data-theme={theme} className="player-bg player-font flex h-full w-full items-center justify-center text-slate-400">
         {t('player.loading')}
       </div>
     );
@@ -83,7 +84,8 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
 
   return (
     <div
-      className="relative h-full w-full overflow-hidden bg-slate-950"
+      data-theme={theme}
+      className="player-bg player-font relative h-full w-full overflow-hidden"
       onClick={unlockAudio}
       role="button"
       tabIndex={0}

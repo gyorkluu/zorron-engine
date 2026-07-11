@@ -1,5 +1,132 @@
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════════════════
+ * Player Theme System
+ *
+ * Semantic CSS variables that switch via [data-theme] on the player root.
+ * Themes: modern (default teal dark) · ancient (古风金墨)
+ * Components use `.player-*` utility classes (defined below) instead of
+ * hardcoded Tailwind colors, so a single attribute swap re-skins the UI.
+ * ════════════════════════════════════════════════════════════════════ */
+
+:root,
+[data-theme="modern"] {
+  --p-bg: 222 47% 5%;
+  --p-surface: 222 47% 9%;
+  --p-surface-hover: 222 40% 14%;
+  --p-border: 217 33% 22%;
+  --p-border-hover: 173 80% 40%;
+  --p-text: 210 40% 96%;
+  --p-text-muted: 215 20% 55%;
+  --p-accent: 173 80% 45%;
+  --p-accent-soft: 173 80% 45% / 0.15;
+  --p-accent-border: 173 80% 45% / 0.4;
+  --p-accent-text: 178 84% 75%;
+  --p-font: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --p-radius: 0.5rem;
+  --p-radius-sm: 0.375rem;
+  --p-radius-full: 9999px;
+}
+
+[data-theme="ancient"] {
+  --p-bg: 30 12% 6%;
+  --p-surface: 32 10% 10%;
+  --p-surface-hover: 35 14% 14%;
+  --p-border: 38 28% 22%;
+  --p-border-hover: 43 74% 49%;
+  --p-text: 40 34% 90%;
+  --p-text-muted: 38 14% 52%;
+  --p-accent: 43 74% 49%;
+  --p-accent-soft: 43 74% 49% / 0.12;
+  --p-accent-border: 43 74% 49% / 0.38;
+  --p-accent-text: 43 80% 62%;
+  --p-font: "LXGW WenKai", "Noto Serif SC", "Source Han Serif SC", "SimSun", serif;
+  --p-radius: 0.25rem;
+  --p-radius-sm: 0.15rem;
+  --p-radius-full: 9999px;
+}
+
+/* ── Semantic player utility classes ── */
+.player-bg { background-color: hsl(var(--p-bg)); }
+.player-surface { background-color: hsl(var(--p-surface)); }
+.player-surface-hover:hover { background-color: hsl(var(--p-surface-hover)); }
+.player-border { border-color: hsl(var(--p-border)); }
+.player-border-hover:hover { border-color: hsl(var(--p-border-hover)); }
+.player-text { color: hsl(var(--p-text)); }
+.player-text-muted { color: hsl(var(--p-text-muted)); }
+.player-accent-text { color: hsl(var(--p-accent-text)); }
+.player-accent-bg { background-color: hsl(var(--p-accent-soft)); }
+.player-accent-border { border-color: hsl(var(--p-accent-border)); }
+.player-font { font-family: var(--p-font); }
+.player-radius { border-radius: var(--p-radius); }
+.player-radius-sm { border-radius: var(--p-radius-sm); }
+.player-radius-full { border-radius: var(--p-radius-full); }
+
+/* Primary action button — theme-aware. */
+.player-btn {
+  border: 1px solid hsl(var(--p-accent-border));
+  background-color: hsl(var(--p-accent-soft));
+  color: hsl(var(--p-accent-text));
+  border-radius: var(--p-radius);
+  transition: all 0.2s ease;
+}
+.player-btn:hover:not(:disabled) {
+  border-color: hsl(var(--p-accent));
+  background-color: hsl(var(--p-accent) / 0.2);
+}
+.player-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: hsl(var(--p-border));
+  background-color: hsl(var(--p-surface));
+  color: hsl(var(--p-text-muted));
+}
+
+/* Card / panel surface. */
+.player-card {
+  background-color: hsl(var(--p-surface) / 0.6);
+  border: 1px solid hsl(var(--p-border) / 0.6);
+  border-radius: var(--p-radius);
+}
+
+/* Choice button base — theme-aware. */
+.player-choice {
+  border: 1px solid hsl(var(--p-border) / 0.6);
+  background-color: hsl(var(--p-surface) / 0.7);
+  color: hsl(var(--p-text));
+  border-radius: var(--p-radius);
+  transition: all 0.2s ease;
+}
+.player-choice:hover {
+  border-color: hsl(var(--p-accent) / 0.5);
+  background-color: hsl(var(--p-accent) / 0.06);
+  color: hsl(var(--p-accent-text));
+}
+.player-choice-active {
+  border-color: hsl(var(--p-accent) / 0.6);
+  background-color: hsl(var(--p-accent) / 0.18);
+  color: hsl(var(--p-accent-text));
+}
+
+/* ── Ancient theme: decorative flourishes ── */
+[data-theme="ancient"] .player-card {
+  box-shadow: inset 0 1px 0 hsl(var(--p-accent) / 0.08);
+}
+[data-theme="ancient"] .player-choice::before {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  width: 0.75rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, hsl(var(--p-accent) / 0.4));
+  transform: translateY(-50%);
+  transition: width 0.3s ease;
+}
+[data-theme="ancient"] .player-choice:hover::before {
+  width: 1.25rem;
+}
+
 @theme {
   /* ── Dark theme tokens (matches actual component styling) ── */
   --color-background: 222 47% 5%;

@@ -6,9 +6,8 @@
  * - 5-8 choices: 2-column grid
  * - 9+ choices: 3-column compact grid
  *
- * Visual style: unified dark theme with teal accent, matching all other
- * Stage components. Keeps ancient-Chinese decorative lines as a subtle
- * flourish on hover.
+ * Uses `.player-choice` semantic class so colors follow the active theme
+ * (modern teal-dark or ancient gold-ink).
  */
 
 import { memo, useState } from 'react';
@@ -68,23 +67,21 @@ function ChoiceButton({
       type="button"
       {...handlers}
       className={`
-        group relative w-full overflow-visible rounded-lg border px-4 py-3
-        text-center transition-all duration-200
-        border-slate-700/60 bg-slate-900/70 backdrop-blur-sm
-        text-sm font-medium tracking-wide text-slate-200
-        hover:border-teal-500/50 hover:bg-teal-500/10 hover:text-teal-100
+        player-choice group relative w-full overflow-visible px-4 py-3
+        text-center font-medium
         ${compact ? 'py-2 text-xs' : 'sm:px-6 sm:py-3.5 sm:text-base'}
       `}
     >
       {/* Hold progress bar */}
       {interaction === 'hold' && holdProgress > 0 && (
         <span
-          className="absolute inset-y-0 left-0 rounded-l-lg bg-teal-500/25"
-          style={{ width: `${holdProgress * 100}%` }}
+          className="absolute inset-y-0 left-0 rounded-l-sm"
+          style={{
+            width: `${holdProgress * 100}%`,
+            backgroundColor: 'hsl(var(--p-accent) / 0.25)',
+          }}
         />
       )}
-      {/* Subtle decorative line on hover */}
-      <span className="pointer-events-none absolute left-2 top-1/2 hidden h-px w-3 -translate-y-1/2 bg-gradient-to-r from-transparent to-teal-400/40 transition-all group-hover:w-5 sm:block" />
       <span className="relative z-10 flex items-center justify-center gap-2 whitespace-normal break-words text-center">
         <span className="flex-1">{choice.text}</span>
       </span>
