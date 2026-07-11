@@ -12,6 +12,7 @@
 import type { ScenarioIntent, ScenarioStep } from './agent.schema';
 import type { FlowData } from '../project/flow-data.schema';
 import { resolveVisualBlocks } from './visualBlocks';
+import { SCENARIO_TYPES } from './scenarioTypes';
 
 // ── Types (mirrors frontend types/flow.ts, kept local to avoid cross-app deps) ──
 
@@ -32,6 +33,18 @@ interface BuiltEdge {
 
 const SETTLEMENT_NODE_ID = 'settlement_0';
 const START_NODE_ID = 'start_0';
+
+/**
+ * Resolve the default settlement strategy for a scenario type.
+ *
+ * Non-vector scenarios get 'count-tally' (or their registered default) instead
+ * of the old global default 'vector-nearest'. This ensures 3D vector logic is
+ * only invoked for scenarios that actually use the vector space.
+ */
+function resolveDefaultStrategy(scenarioType: string | undefined): string {
+  const meta = SCENARIO_TYPES.find((t) => t.type === scenarioType);
+  return meta?.defaultStrategy ?? 'count-tally';
+}
 
 /** Build a complete FlowData from a ScenarioIntent. */
 export function buildFlow(intent: ScenarioIntent): FlowData {
@@ -63,9 +76,10 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
   // ── 3. Settlement node ──
   // Resolve visual block ids/configs into concrete blocks (ECO-002).
   const resolvedBlocks = resolveVisualBlocks(intent.settlement.visualBlocks);
+  const strategy = intent.settlement.strategy ?? resolveDefaultStrategy(intent.type);
   const settlementData: Record<string, unknown> = {
     label: '结算',
-    strategy: intent.settlement.strategy,
+    strategy,
     strategyConfig: intent.settlement.strategyConfig ?? {},
     resultMapping:
       intent.settlement.resultMapping ??
@@ -149,7 +163,10 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
       description: intent.description,
       vectorSpace: {
         enabled: hasDimensions ?? false,
-        dimensions: intent.dimensions ?? { x: 'x', y: 'y', z: 'z' },
+        // When vector space is disabled, dimensions is empty — not a fake 3D
+        // space. This prevents non-vector scenarios from carrying meaningless
+        // axis labels.
+        dimensions: hasDimensions ? intent.dimensions! : {},
         sects: intent.anchors ?? [],
       },
     },

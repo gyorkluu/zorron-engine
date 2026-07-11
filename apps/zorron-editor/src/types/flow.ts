@@ -131,7 +131,8 @@ export interface SetterNodeData extends BaseNodeData {
 
 /** Calculator node data. */
 export interface CalculatorNodeData extends BaseNodeData {
-  vector: PersonalityVector;
+  /** Pending vector deltas. Optional — non-vector scenarios don't use this. */
+  vector?: PersonalityVector;
   targetVariable?: string;
   description?: string;
 }
@@ -255,7 +256,8 @@ export interface ProjectSettings {
   description?: string;
   coverUrl?: string;
   bgmUrl?: string;
-  vectorSpace: VectorSpaceConfig;
+  /** Optional — non-vector scenarios don't need vector space config. */
+  vectorSpace?: VectorSpaceConfig;
 }
 
 /** A node in the flow graph (React Flow compatible). */
@@ -279,12 +281,7 @@ export function createEmptyFlowData(): FlowData {
     nodes: [],
     edges: [],
     variables: {},
-    settings: {
-      vectorSpace: {
-        enabled: false,
-        dimensions: { x: '处世', y: '立场', z: '性情' },
-      },
-    },
+    settings: {},
     version: '1.0.0',
   };
 }

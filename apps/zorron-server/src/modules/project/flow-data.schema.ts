@@ -99,7 +99,8 @@ export const SetterNodeDataSchema = BaseNodeDataSchema.extend({
 });
 
 export const CalculatorNodeDataSchema = BaseNodeDataSchema.extend({
-  vector: VectorSchema.default({}),
+  /** Pending vector deltas. Optional — non-vector scenarios don't use this. */
+  vector: VectorSchema.optional(),
   targetVariable: z.string().optional(),
   description: z.string().optional(),
 });
@@ -139,7 +140,12 @@ export const SettlementVariableModifierSchema = z.object({
 
 export const SettlementNodeDataSchema = BaseNodeDataSchema.extend({
   resultMapping: z.array(SettlementResultMappingSchema).default([]),
-  strategy: z.string().default('vector-nearest'),
+  /**
+   * Settlement strategy id. No global default — the FlowBuilder resolves a
+   * strategy based on the scenario type. This prevents non-vector scenarios
+   * from accidentally using 'vector-nearest'.
+   */
+  strategy: z.string().optional(),
   strategyConfig: z.record(z.string(), z.unknown()).optional(),
   buttons: z.array(SettlementButtonSchema).default([]),
   modifiers: z.array(SettlementVariableModifierSchema).default([]),
@@ -384,17 +390,13 @@ export const SectAnchorSchema = ResultAnchorSchema;
 export const VectorSpaceConfigSchema = z.object({
   enabled: z.boolean().default(false),
   // dimensions maps axis id -> human-readable label. Number of keys defines
-  // vector space dimensionality (2, 3, 4, ...). Defaults to the legacy 3-axis
-  // space so existing projects without explicit dimensions keep working.
-  dimensions: z.record(z.string(), z.string()).default({
-    x: '处世',
-    y: '立场',
-    z: '性情',
-  }),
+  // vector space dimensionality (2, 3, 4, ...). Empty by default — scenarios
+  // that need vectors must explicitly declare their dimensions.
+  dimensions: z.record(z.string(), z.string()).default({}),
   sects: z.array(ResultAnchorSchema).optional(),
 }).default({
   enabled: false,
-  dimensions: { x: '处世', y: '立场', z: '性情' },
+  dimensions: {},
 });
 
 export const ProjectSettingsSchema = z.object({
@@ -402,7 +404,7 @@ export const ProjectSettingsSchema = z.object({
   description: z.string().optional(),
   coverUrl: z.string().optional(),
   bgmUrl: z.string().optional(),
-  vectorSpace: VectorSpaceConfigSchema,
+  vectorSpace: VectorSpaceConfigSchema.optional(),
 });
 
 export const FlowDataSchema = z.object({

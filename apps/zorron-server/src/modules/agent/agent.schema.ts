@@ -120,7 +120,12 @@ export const ScenarioStepSchema = z.object({
 // ── Settlement Config ───────────────────────────────────────
 
 export const ScenarioSettlementSchema = z.object({
-  strategy: z.string().default('vector-nearest'),
+  /**
+   * Settlement strategy id. When omitted, the FlowBuilder resolves a sensible
+   * default based on the scenario type (see scenarioTypes.ts), so non-vector
+   * scenarios no longer get a vector strategy by accident.
+   */
+  strategy: z.string().optional(),
   strategyConfig: z.record(z.string(), z.unknown()).optional(),
   resultMapping: z
     .array(

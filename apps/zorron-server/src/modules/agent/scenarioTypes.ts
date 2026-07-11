@@ -80,7 +80,7 @@ export const SCENARIO_TYPES: ScenarioTypeInfo[] = [
     description:
       'Fully custom scenario. Agent specifies all dimensions, anchors, steps, and settlement config.',
     usesVectorSpace: false,
-    defaultStrategy: 'vector-nearest',
+    defaultStrategy: 'count-tally',
     recommendedVisualBlocks: ['badge', 'title', 'text-only'],
   },
 ];

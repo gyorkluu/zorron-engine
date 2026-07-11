@@ -236,9 +236,20 @@ class SettlementStrategyRegistry {
     return this.strategies.get(id);
   }
 
-  /** Resolve a strategy by id, falling back to vector-nearest. */
+  /**
+   * Resolve a strategy by id.
+   *
+   * Falls back to 'count-tally' (not 'vector-nearest') when the id is missing
+   * or unregistered. This ensures non-vector scenarios don't accidentally
+   * invoke vector logic. Callers that explicitly need vector-nearest should
+   * pass the id explicitly.
+   */
   resolve(id: string | undefined): SettlementStrategy {
-    return this.strategies.get(id ?? 'vector-nearest') ?? vectorNearestStrategy;
+    return (
+      this.strategies.get(id ?? 'count-tally') ??
+      this.strategies.get('count-tally') ??
+      vectorNearestStrategy
+    );
   }
 
   /** List all registered strategies. */

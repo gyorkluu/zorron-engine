@@ -41,14 +41,16 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
     return cdnMapping[key] || `/workspace/sprite/${sectId} - 已编辑.png`;
   }, [result.anchor?.id]);
 
-  const axisLabels = settings.vectorSpace?.dimensions ?? { x: 'X', y: 'Y', z: 'Z' };
+  const isVectorEnabled = settings.vectorSpace?.enabled ?? false;
+  const axisLabels = settings.vectorSpace?.dimensions ?? {};
   const sects = useMemo(() => {
+    if (!isVectorEnabled) return [];
     const list = settings.vectorSpace?.sects ?? [];
     if (list.length === 0 && result?.anchor) {
       return [result.anchor];
     }
     return list;
-  }, [settings.vectorSpace?.sects, result?.anchor]);
+  }, [settings.vectorSpace?.sects, result?.anchor, isVectorEnabled]);
 
   const formatVectorValue = (val: number) => {
     const formatted = val.toFixed(2);
@@ -108,8 +110,8 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
             </div>
           )}
 
-          {/* Interactive 3D vector radar. */}
-          {featureFlags.vector3d && sects.length > 0 && (
+          {/* Interactive 3D vector radar — only when vectorSpace is enabled. */}
+          {isVectorEnabled && featureFlags.vector3d && sects.length > 0 && (
             <div className="w-full max-w-md rounded-xl border border-slate-800 bg-slate-950/60 p-3">
               <div className="mb-2 flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -122,7 +124,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
               <VectorScene
                 axisLabels={axisLabels}
                 sects={sects}
-                userVector={result.finalVector}
+                userVector={result.finalVector ?? {}}
                 highlightedAnchorId={result.anchor?.id ?? null}
                 height={240}
               />
@@ -131,7 +133,7 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                   <div key={axisId} className="min-w-[4rem] flex-1 rounded-md bg-slate-900/60 p-1.5">
                     <div className={AXIS_LABEL_COLORS[i] ?? 'text-slate-400'}>{label}</div>
                     <div className="font-mono text-cyan-300">
-                      {formatVectorValue(result.finalVector[axisId] ?? 0)}
+                      {formatVectorValue(result.finalVector?.[axisId] ?? 0)}
                     </div>
                   </div>
                 ))}
@@ -139,32 +141,35 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
             </div>
           )}
 
-          {/* Flat vector readout shown when 3D space is disabled. */}
-          {!featureFlags.vector3d && (
+          {/* Flat vector readout — only when vectorSpace is enabled but 3D feature flag is off. */}
+          {isVectorEnabled && !featureFlags.vector3d && (
             <div className="mt-2 flex flex-wrap gap-2 text-center text-xs">
               {Object.entries(axisLabels).map(([axisId, label]) => (
                 <div key={axisId} className="min-w-[4rem] flex-1 rounded-md bg-slate-900/60 p-2">
                   <div className="text-slate-400 font-semibold mb-1">{label}</div>
                   <span className="font-mono text-cyan-300">
-                    {formatVectorValue(result.finalVector[axisId] ?? 0)}
+                    {formatVectorValue(result.finalVector?.[axisId] ?? 0)}
                   </span>
                 </div>
               ))}
             </div>
           )}
 
-          <div className="flex gap-3 text-xs text-slate-500">
-            <span>
-              {t('player.magnitude')} {result.magnitude.toFixed(2)}
-            </span>
-            <span>
-              {t('player.quadrant')} {result.quadrant}
-            </span>
-            <span>
-              {t('player.distance')}{' '}
-              {result.distance === Infinity ? '—' : result.distance.toFixed(2)}
-            </span>
-          </div>
+          {/* Vector stats (magnitude/quadrant/distance) — only when vectorSpace is enabled. */}
+          {isVectorEnabled && (
+            <div className="flex gap-3 text-xs text-slate-500">
+              <span>
+                {t('player.magnitude')} {(result.magnitude ?? 0).toFixed(2)}
+              </span>
+              <span>
+                {t('player.quadrant')} {result.quadrant ?? ''}
+              </span>
+              <span>
+                {t('player.distance')}{' '}
+                {result.distance === Infinity ? '—' : result.distance.toFixed(2)}
+              </span>
+            </div>
+          )}
 
           {/* Settlement action buttons (e.g. 查看结局 / 彩蛋按钮). */}
           {result.buttons && result.buttons.length > 0 && onSettlementButton && (

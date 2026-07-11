@@ -14,6 +14,7 @@
 import { memo, useMemo } from 'react';
 import type { SimulationReport } from '@/engine/simulator';
 import { useEditorStore } from '@/stores/editorStore';
+import { useProjectStore } from '@/stores/projectStore';
 import { type NodeType } from '@/types/flow';
 import { getNodeLabelKey } from '@/engine/nodeRegistry';
 import { downloadJson } from '@/utils/fileIO';
@@ -49,7 +50,8 @@ const BAR_COLORS = [
 function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
   const { t } = useT();
   const nodes = useEditorStore((s) => s.nodes);
-  const axisLabels = useProjectStore((s) => s.settings.vectorSpace.dimensions);
+  const isVectorEnabled = useProjectStore((s) => s.settings.vectorSpace?.enabled ?? false);
+  const axisLabels = useProjectStore((s) => s.settings.vectorSpace?.dimensions ?? {});
   const axisIds = useMemo(
     () => Object.keys(report.meanVector),
     [report.meanVector],
@@ -160,7 +162,8 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
         )}
       </div>
 
-      {/* Vector statistics */}
+      {/* Vector statistics — only shown when vectorSpace is enabled. */}
+      {isVectorEnabled && (
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
         <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
           {t('sim.vectorStats')}
@@ -186,6 +189,7 @@ function SimulationReportImpl({ report, onClose }: SimulationReportProps) {
           ))}
         </div>
       </div>
+      )}
 
       {/* Node hit rates */}
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">

@@ -65,9 +65,10 @@ export interface PlayerChoice {
 export interface SettlementResult {
   anchor: ResultAnchor | null;
   distance: number;
-  magnitude: number;
-  finalVector: PersonalityVector;
-  quadrant: string;
+  /** Vector-specific fields — only populated when vectorSpace is enabled. */
+  magnitude?: number;
+  finalVector?: PersonalityVector;
+  quadrant?: string;
   /** Matched result mapping title/description from the settlement node. */
   title: string;
   description?: string;
@@ -86,7 +87,8 @@ export interface GameState {
   currentNodeType: NodeType | null;
   history: string[];
   variables: Variables;
-  vector: PersonalityVector;
+  /** Vector state — only populated when vectorSpace is enabled. */
+  vector?: PersonalityVector;
   fragments: string[];
   choices: PlayerChoice[];
   isFinished: boolean;
@@ -126,7 +128,7 @@ function createInitialState(): GameState {
     currentNodeType: null,
     history: [],
     variables: {},
-    vector: { ...ZERO_VECTOR },
+    // vector is only populated when vectorSpace is enabled (set in constructor).
     fragments: [],
     choices: [],
     isFinished: false,
@@ -165,9 +167,7 @@ export class GameEngine {
     this.nodes = flowData.nodes ?? [];
     this.edges = flowData.edges ?? [];
     this.variables = { ...(flowData.variables ?? {}) };
-    this.settings = flowData.settings ?? {
-      vectorSpace: { enabled: false, dimensions: { x: '处世', y: '立场', z: '性情' } },
-    };
+    this.settings = flowData.settings ?? {};
   }
 
   /** Start the narrative. Returns the initial state. */
@@ -525,9 +525,12 @@ export class GameEngine {
 
   private processSettlement(node: FlowNode): void {
     const data = node.data as SettlementNodeData;
-    const finalVector = { ...this.currentVector };
-    const mag = magnitude(finalVector);
-    const playerQuadrant = quadrant(finalVector);
+
+    // Vector-specific computation is skipped when vectorSpace is disabled.
+    // Non-vector scenarios don't need magnitude/quadrant/finalVector.
+    const finalVector = this.isVectorEnabled ? { ...this.currentVector } : {};
+    const mag = this.isVectorEnabled ? magnitude(finalVector) : 0;
+    const playerQuadrant = this.isVectorEnabled ? quadrant(finalVector) : '';
 
     // Resolve result anchors from project settings. When the vector space is
     // disabled, pass an empty anchor list so no anchor matching occurs.
@@ -548,9 +551,12 @@ export class GameEngine {
     const result: SettlementResult = {
       anchor: output.anchor,
       distance: output.distance,
-      magnitude: mag,
-      finalVector,
-      quadrant: playerQuadrant,
+      // Only populate vector fields when vectorSpace is enabled.
+      ...(this.isVectorEnabled && {
+        magnitude: mag,
+        finalVector,
+        quadrant: playerQuadrant,
+      }),
       title: output.mapping?.title ?? output.anchor?.name ?? 'Settlement',
       description: output.mapping?.description ?? output.anchor?.description,
       coverUrl: output.mapping?.coverUrl ?? output.anchor?.coverUrl,
