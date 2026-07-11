@@ -185,13 +185,14 @@ export function validateFlow(
     }
   }
 
-  // 1d. Settlement reachability
+  // 1d. Settlement reachability (warning, not error — scenarios without
+  // settlement are valid for pure narrative / media gallery flows).
   const settlementNodes = flow.nodes.filter((n) => n.type === 'settlement');
   if (settlementNodes.length === 0) {
     issues.push({
-      severity: 'error',
+      severity: 'warning',
       code: 'NO_SETTLEMENT',
-      message: 'Flow has no settlement node.',
+      message: 'Flow has no settlement node. This is valid for narrative-only or media gallery scenarios, but means no computed settlement will be shown.',
     });
   }
   const reachableSettlements = settlementNodes.filter((s) => reachable.has(s.id));

@@ -107,7 +107,7 @@ export const WebhookPayloadSchema = z.object({
   sessionId: UuidSchema.nullable(),
   projectId: UuidSchema,
   userIdentifier: z.string(),
-  settlementResult: z.record(z.unknown()),
+  settlementResult: z.record(z.unknown()).nullable(),
   timestamp: TimestampSchema,
 });
 

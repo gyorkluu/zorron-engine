@@ -16,7 +16,11 @@ export type NodeType =
   | 'calculator'
   | 'settlement'
   | 'video'
-  | 'link';
+  | 'link'
+  | 'minigame'
+  | 'rating'
+  | 'multi-select'
+  | 'media';
 
 /** Interaction modes for scene choices. */
 export type InteractionType = 'tap' | 'hold' | 'slash';
@@ -200,6 +204,49 @@ export interface LinkNodeData extends BaseNodeData {
   description?: string;
 }
 
+/** Minigame node data — interactive game embedded in the flow. */
+export interface MinigameNodeData extends BaseNodeData {
+  /** URL to the minigame HTML/iframe, or inline game config. */
+  gameUrl: string;
+  /** Variable to store the resulting score. */
+  scoreVariable?: string;
+  /** Minimum score required to advance (0 = any score). */
+  passingScore?: number;
+}
+
+/** Rating node data — user rates on a scale. */
+export interface RatingNodeData extends BaseNodeData {
+  /** Variable to store the rating value. */
+  variable?: string;
+  min: number;
+  max: number;
+  step?: number;
+  /** Question prompt displayed to the user. */
+  prompt?: string;
+}
+
+/** Multi-select node data — user selects multiple options. */
+export interface MultiSelectNodeData extends BaseNodeData {
+  /** Variable to store selected option ids (comma-separated). */
+  variable?: string;
+  /** Available options. */
+  options: Array<{ id: string; label: string; description?: string }>;
+  /** Minimum selections required. */
+  minSelect?: number;
+  /** Maximum selections allowed (0 = unlimited). */
+  maxSelect?: number;
+}
+
+/** Media node data — display image/audio/video then advance. */
+export interface MediaNodeData extends BaseNodeData {
+  mediaType: 'image' | 'audio' | 'video';
+  url: string;
+  /** Auto-advance after media ends (for audio/video). */
+  autoAdvance?: boolean;
+  /** Duration in ms before auto-advancing (for images). 0 = manual continue. */
+  durationMs?: number;
+}
+
 /** Discriminated union of all node data payloads. */
 export type GameNodeData =
   | StartNodeData
@@ -209,7 +256,11 @@ export type GameNodeData =
   | CalculatorNodeData
   | SettlementNodeData
   | VideoNodeData
-  | LinkNodeData;
+  | LinkNodeData
+  | MinigameNodeData
+  | RatingNodeData
+  | MultiSelectNodeData
+  | MediaNodeData;
 
 /** Variable value type stored in the flow. */
 export type VariableValue = string | number | boolean;

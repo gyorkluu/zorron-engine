@@ -20,6 +20,10 @@ import {
   Trophy,
   Video,
   ExternalLink,
+  Gamepad2,
+  Star,
+  ListChecks,
+  ImageIcon,
 } from 'lucide-react';
 import { tt } from '@/i18n/useT';
 import { registerNode } from '@/engine/nodeRegistry';
@@ -31,6 +35,7 @@ import { CalculatorNode } from './CalculatorNode';
 import { SettlementNode } from './SettlementNode';
 import { VideoNode } from './VideoNode';
 import { LinkNode } from './LinkNode';
+import { MinigameNode, RatingNode, MultiSelectNode, MediaNode } from './InteractionNodes';
 import {
   StartForm,
   SceneForm,
@@ -40,6 +45,10 @@ import {
   SettlementForm,
   VideoForm,
   LinkForm,
+  MinigameForm,
+  RatingForm,
+  MultiSelectForm,
+  MediaForm,
 } from '@/components/inspector/nodeForms';
 
 registerNode({
@@ -159,5 +168,71 @@ registerNode({
     label: tt('node.default.link'),
     url: '',
     title: '',
+  }),
+});
+
+registerNode({
+  type: 'minigame',
+  labelKey: 'node.minigame.label',
+  descKey: 'node.minigame.desc',
+  icon: Gamepad2,
+  accent: '#10b981',
+  CanvasComponent: MinigameNode,
+  InspectorForm: MinigameForm,
+  createDefault: () => ({
+    label: tt('node.default.minigame'),
+    gameUrl: '',
+    scoreVariable: '',
+    passingScore: 0,
+  }),
+});
+
+registerNode({
+  type: 'rating',
+  labelKey: 'node.rating.label',
+  descKey: 'node.rating.desc',
+  icon: Star,
+  accent: '#06b6d4',
+  CanvasComponent: RatingNode,
+  InspectorForm: RatingForm,
+  createDefault: () => ({
+    label: tt('node.default.rating'),
+    min: 1,
+    max: 5,
+    step: 1,
+    prompt: '',
+  }),
+});
+
+registerNode({
+  type: 'multi-select',
+  labelKey: 'node.multiSelect.label',
+  descKey: 'node.multiSelect.desc',
+  icon: ListChecks,
+  accent: '#8b5cf6',
+  CanvasComponent: MultiSelectNode,
+  InspectorForm: MultiSelectForm,
+  createDefault: () => ({
+    label: tt('node.default.multiSelect'),
+    options: [],
+    minSelect: 0,
+    maxSelect: 0,
+  }),
+});
+
+registerNode({
+  type: 'media',
+  labelKey: 'node.media.label',
+  descKey: 'node.media.desc',
+  icon: ImageIcon,
+  accent: '#f59e0b',
+  CanvasComponent: MediaNode,
+  InspectorForm: MediaForm,
+  createDefault: () => ({
+    label: tt('node.default.media'),
+    mediaType: 'image',
+    url: '',
+    autoAdvance: false,
+    durationMs: 0,
   }),
 });

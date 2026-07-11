@@ -170,8 +170,8 @@ export const ScenarioIntentSchema = z.object({
   anchors: z.array(ResultAnchorSchema).optional(),
   /** Declarative interaction steps. */
   steps: z.array(ScenarioStepSchema).min(1),
-  /** Settlement configuration. */
-  settlement: ScenarioSettlementSchema,
+  /** Settlement configuration. Optional — scenarios without settlement (e.g. pure narrative, media gallery) end at the last step or a link node. */
+  settlement: ScenarioSettlementSchema.optional(),
   /** Output / persistence configuration. */
   output: z
     .object({
@@ -252,7 +252,8 @@ export const PublishResponseSchema = z.object({
 export const SaveSessionRequestSchema = z.object({
   projectId: z.string().uuid(),
   userIdentifier: z.string().min(1).max(200),
-  settlementResult: z.record(z.unknown()),
+  /** Optional — scenarios without settlement don't have a result. */
+  settlementResult: z.record(z.unknown()).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -260,7 +261,8 @@ export const SessionDetailSchema = z.object({
   id: z.string().uuid(),
   projectId: z.string().uuid(),
   userIdentifier: z.string(),
-  settlementResult: z.record(z.unknown()),
+  /** Nullable — scenarios without settlement don't have a result. */
+  settlementResult: z.record(z.unknown()).nullable(),
   metadata: z.record(z.unknown()).nullable(),
   createdAt: z.string().datetime(),
 });

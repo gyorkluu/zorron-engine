@@ -139,7 +139,8 @@ export const testSessions = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
     userIdentifier: varchar('user_identifier', { length: 200 }).notNull(),
-    settlementResult: jsonb('settlement_result').notNull(),
+    /** Settlement result (nullable for scenarios without settlement). */
+    settlementResult: jsonb('settlement_result'),
     metadata: jsonb('metadata'),
     /** SCALE-001: Tenant this session belongs to (denormalized for fast filtering). */
     tenantId: uuid('tenant_id'),

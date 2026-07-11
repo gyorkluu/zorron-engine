@@ -49,6 +49,16 @@ const envSchema = z.object({
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
   RATE_LIMIT_MAX: z.coerce.number().default(100),
   RATE_LIMIT_AUTH_MAX: z.coerce.number().default(10),
+
+  /**
+   * Dev-only auth bypass: when true, requests without a valid token are
+   * assigned a default dev user identity instead of being rejected. This is
+   * intended for local development / demos only and must NEVER be enabled in
+   * production. A valid Bearer token still takes precedence when present.
+   */
+  AUTH_DEV_BYPASS: z.coerce.boolean().default(false),
+  AUTH_DEV_USER_ID: z.string().uuid().default('00000000-0000-4000-8000-000000000001'),
+  AUTH_DEV_USER_EMAIL: z.string().email().default('dev@zorron.local'),
 });
 
 /**

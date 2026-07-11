@@ -32,6 +32,10 @@ import {
   type SettlementNodeData,
   type VideoNodeData,
   type LinkNodeData,
+  type MinigameNodeData,
+  type RatingNodeData,
+  type MultiSelectNodeData,
+  type MediaNodeData,
   type StartNodeData,
   type SceneChoice,
   type PersonalityVector,
@@ -116,6 +120,24 @@ export interface GameState {
     isSpiritGuideRemote?: boolean;
     isFocusObjectRemote?: boolean;
   } | null;
+  /** Present when the engine reached a minigame node (waits for score submission). */
+  minigame: { gameUrl: string; passingScore?: number; scoreVariable?: string } | null;
+  /** Present when the engine reached a rating node (waits for rating submission). */
+  rating: { min: number; max: number; step?: number; prompt?: string; variable?: string } | null;
+  /** Present when the engine reached a multi-select node (waits for selection submission). */
+  multiSelect: {
+    options: Array<{ id: string; label: string; description?: string }>;
+    minSelect?: number;
+    maxSelect?: number;
+    variable?: string;
+  } | null;
+  /** Present when the engine reached a media node (display image/audio/video). */
+  media: {
+    mediaType: 'image' | 'audio' | 'video';
+    url: string;
+    autoAdvance?: boolean;
+    durationMs?: number;
+  } | null;
 }
 
 /** Listener callback for state changes. */
@@ -137,6 +159,10 @@ function createInitialState(): GameState {
     link: null,
     start: null,
     scene: null,
+    minigame: null,
+    rating: null,
+    multiSelect: null,
+    media: null,
   };
 }
 
@@ -359,6 +385,18 @@ export class GameEngine {
         return;
       case 'link':
         this.processLink(node);
+        return;
+      case 'minigame':
+        this.processMinigame(node);
+        return;
+      case 'rating':
+        this.processRating(node);
+        return;
+      case 'multi-select':
+        this.processMultiSelect(node);
+        return;
+      case 'media':
+        this.processMedia(node);
         return;
       default:
         this.state = { ...this.state, isFinished: true };
@@ -613,6 +651,164 @@ export class GameEngine {
       isFinished: true,
     };
     this.notify();
+  }
+
+  /** Enter a minigame node — waits for the player to submit a score. */
+  private processMinigame(node: FlowNode): void {
+    const data = node.data as MinigameNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'minigame',
+      minigame: {
+        gameUrl: data.gameUrl,
+        passingScore: data.passingScore,
+        scoreVariable: data.scoreVariable,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit a minigame score; advances the flow if it meets the passing score. */
+  submitMinigame(score: number): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'minigame') return this.state;
+    const data = node.data as MinigameNodeData;
+    const passing = data.passingScore ?? 0;
+    if (score < passing) {
+      // Score below threshold — stay on the minigame node (let UI retry).
+      return this.state;
+    }
+    if (data.scoreVariable) {
+      this.variables[data.scoreVariable] = score;
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, minigame: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Enter a rating node — waits for the player to submit a rating value. */
+  private processRating(node: FlowNode): void {
+    const data = node.data as RatingNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'rating',
+      rating: {
+        min: data.min,
+        max: data.max,
+        step: data.step,
+        prompt: data.prompt,
+        variable: data.variable,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit a rating value; writes the variable and advances the flow. */
+  submitRating(value: number): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'rating') return this.state;
+    const data = node.data as RatingNodeData;
+    const clamped = Math.max(data.min, Math.min(data.max, value));
+    if (data.variable) {
+      this.variables[data.variable] = clamped;
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, rating: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Enter a multi-select node — waits for the player to submit selections. */
+  private processMultiSelect(node: FlowNode): void {
+    const data = node.data as MultiSelectNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'multi-select',
+      multiSelect: {
+        options: data.options,
+        minSelect: data.minSelect,
+        maxSelect: data.maxSelect,
+        variable: data.variable,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit multi-select choices; writes the variable and advances the flow. */
+  submitMultiSelect(optionIds: string[]): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'multi-select') return this.state;
+    const data = node.data as MultiSelectNodeData;
+    const min = data.minSelect ?? 0;
+    const max = data.maxSelect ?? 0;
+    if (optionIds.length < min) return this.state;
+    if (max > 0 && optionIds.length > max) return this.state;
+    if (data.variable) {
+      this.variables[data.variable] = optionIds.join(',');
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, multiSelect: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Enter a media node — displays image/audio/video. */
+  private processMedia(node: FlowNode): void {
+    const data = node.data as MediaNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'media',
+      media: {
+        mediaType: data.mediaType,
+        url: data.url,
+        autoAdvance: data.autoAdvance,
+        durationMs: data.durationMs,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Advance from the current media node to its successor. */
+  advanceFromMedia(): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'media') return this.state;
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, media: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
   }
 
   // ---- Helpers ------------------------------------------------------------

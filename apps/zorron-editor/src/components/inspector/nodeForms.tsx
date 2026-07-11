@@ -36,6 +36,10 @@ import type {
   SettlementNodeData,
   VideoNodeData,
   LinkNodeData,
+  MinigameNodeData,
+  RatingNodeData,
+  MultiSelectNodeData,
+  MediaNodeData,
 } from '@/types/flow';
 
 /** Form for a start node. */
@@ -152,7 +156,7 @@ export function SetterForm({ node, update }: { node: FlowNode; update: (data: Pa
 export function CalculatorForm({ node, update }: { node: FlowNode; update: (data: Partial<CalculatorNodeData>) => void }) {
   const { t } = useT();
   const d = node.data as CalculatorNodeData;
-  const dimensions = useProjectStore((s) => s.settings.vectorSpace.dimensions);
+  const dimensions = useProjectStore((s) => s.settings.vectorSpace?.dimensions ?? {});
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
@@ -262,6 +266,113 @@ export function LinkForm({ node, update }: { node: FlowNode; update: (data: Part
       <Field label={t('field.title')}><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
       <Field label={t('field.url')}><UrlField value={d.url ?? ''} onChange={(url) => update({ url })} /></Field>
       <Field label={t('field.description')}><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
+    </div>
+  );
+}
+
+/** Form for a minigame node. */
+export function MinigameForm({ node, update }: { node: FlowNode; update: (data: Partial<MinigameNodeData>) => void }) {
+  const { t } = useT();
+  const d = node.data as MinigameNodeData;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.gameUrl')}><UrlField value={d.gameUrl ?? ''} onChange={(gameUrl) => update({ gameUrl })} /></Field>
+      <Field label={t('field.scoreVariable')}><TextField value={d.scoreVariable ?? ''} onChange={(scoreVariable) => update({ scoreVariable })} /></Field>
+      <Field label={t('field.passingScore')}><NumberField value={d.passingScore ?? 0} onChange={(passingScore) => update({ passingScore })} /></Field>
+    </div>
+  );
+}
+
+/** Form for a rating node. */
+export function RatingForm({ node, update }: { node: FlowNode; update: (data: Partial<RatingNodeData>) => void }) {
+  const { t } = useT();
+  const d = node.data as RatingNodeData;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.prompt')}><TextField value={d.prompt ?? ''} onChange={(prompt) => update({ prompt })} /></Field>
+      <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
+      <Field label={t('field.min')}><NumberField value={d.min} onChange={(min) => update({ min })} /></Field>
+      <Field label={t('field.max')}><NumberField value={d.max} onChange={(max) => update({ max })} /></Field>
+      <Field label={t('field.step')}><NumberField value={d.step ?? 1} onChange={(step) => update({ step })} /></Field>
+    </div>
+  );
+}
+
+/** Form for a multi-select node. */
+export function MultiSelectForm({ node, update }: { node: FlowNode; update: (data: Partial<MultiSelectNodeData>) => void }) {
+  const { t } = useT();
+  const d = node.data as MultiSelectNodeData;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
+      <Field label={t('field.minSelect')}><NumberField value={d.minSelect ?? 0} onChange={(minSelect) => update({ minSelect })} /></Field>
+      <Field label={t('field.maxSelect')}><NumberField value={d.maxSelect ?? 0} onChange={(maxSelect) => update({ maxSelect })} /></Field>
+      <Field label={t('field.options')}>
+        <div className="space-y-2">
+          {(d.options ?? []).map((opt, i) => (
+            <div key={opt.id} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={opt.label}
+                onChange={(e) => {
+                  const options = [...(d.options ?? [])];
+                  options[i] = { ...opt, label: e.target.value };
+                  update({ options });
+                }}
+                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-sm text-slate-100"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const options = (d.options ?? []).filter((_, idx) => idx !== i);
+                  update({ options });
+                }}
+                className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              const options = [...(d.options ?? []), { id: `opt_${Date.now()}`, label: '' }];
+              update({ options });
+            }}
+            className="rounded border border-slate-600 px-3 py-1 text-xs text-slate-400 hover:bg-slate-800"
+          >
+            {t('field.addOption')}
+          </button>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+/** Form for a media node. */
+export function MediaForm({ node, update }: { node: FlowNode; update: (data: Partial<MediaNodeData>) => void }) {
+  const { t } = useT();
+  const d = node.data as MediaNodeData;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.mediaType')}>
+        <SelectField
+          value={d.mediaType}
+          onChange={(mediaType) => update({ mediaType: mediaType as MediaNodeData['mediaType'] })}
+          options={[
+            { value: 'image', label: t('field.image') },
+            { value: 'audio', label: t('field.audio') },
+            { value: 'video', label: t('field.video') },
+          ]}
+        />
+      </Field>
+      <Field label={t('field.url')}><UrlField value={d.url ?? ''} onChange={(url) => update({ url })} /></Field>
+      <SwitchField checked={d.autoAdvance ?? false} onChange={(autoAdvance) => update({ autoAdvance })} label={t('field.autoAdvance')} />
+      <Field label={t('field.durationMs')}><NumberField value={d.durationMs ?? 0} onChange={(durationMs) => update({ durationMs })} /></Field>
     </div>
   );
 }

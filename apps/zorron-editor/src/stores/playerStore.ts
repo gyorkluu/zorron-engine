@@ -28,6 +28,14 @@ interface PlayerStoreState {
   advanceFromStart: () => void;
   /** Skip the current video node. */
   skipVideo: () => void;
+  /** Submit a minigame score. */
+  submitMinigame: (score: number) => void;
+  /** Submit a rating value. */
+  submitRating: (value: number) => void;
+  /** Submit multi-select choices. */
+  submitMultiSelect: (optionIds: string[]) => void;
+  /** Advance from a media node. */
+  advanceFromMedia: () => void;
   /** Reset the engine to the beginning. */
   restart: () => void;
   /** Stop the player and release the engine. */
@@ -77,6 +85,30 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     const engine = get().engine;
     if (!engine) return;
     engine.skipVideo();
+  },
+
+  submitMinigame: (score) => {
+    const engine = get().engine;
+    if (!engine) return;
+    engine.submitMinigame(score);
+  },
+
+  submitRating: (value) => {
+    const engine = get().engine;
+    if (!engine) return;
+    engine.submitRating(value);
+  },
+
+  submitMultiSelect: (optionIds) => {
+    const engine = get().engine;
+    if (!engine) return;
+    engine.submitMultiSelect(optionIds);
+  },
+
+  advanceFromMedia: () => {
+    const engine = get().engine;
+    if (!engine) return;
+    engine.advanceFromMedia();
   },
 
   restart: () => {

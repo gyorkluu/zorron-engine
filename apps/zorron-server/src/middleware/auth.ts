@@ -14,9 +14,23 @@ export interface AuthUser {
 }
 
 /**
+ * Default dev user injected when AUTH_DEV_BYPASS is enabled and no valid
+ * token is present. Allows local development / demos without logging in.
+ */
+const DEV_USER: AuthUser = Object.freeze({
+  id: env.AUTH_DEV_USER_ID,
+  email: env.AUTH_DEV_USER_EMAIL,
+  tenantId: null,
+});
+
+/**
  * [Elysia derive]: validates the optional Bearer access token and injects a
  * `user` object into the request context. Protected routes should check that
  * `user` is not null and throw `AUTH_001` when it is missing.
+ *
+ * Dev bypass: when `AUTH_DEV_BYPASS=true`, requests without a valid token are
+ * assigned the default dev user identity. A valid Bearer token always takes
+ * precedence. This must NEVER be enabled in production.
  */
 export const authPlugin = new Elysia({ name: 'auth' }).derive(
   { as: 'global' },
@@ -28,6 +42,10 @@ export const authPlugin = new Elysia({ name: 'auth' }).derive(
         : undefined;
 
     if (!token) {
+      // Dev bypass: no token → default dev user.
+      if (env.AUTH_DEV_BYPASS) {
+        return { user: DEV_USER };
+      }
       return { user: null };
     }
 
@@ -51,6 +69,10 @@ export const authPlugin = new Elysia({ name: 'auth' }).derive(
 
       return { user: { id: userId, email, tenantId } };
     } catch {
+      // Dev bypass: invalid token → fall back to dev user instead of 401.
+      if (env.AUTH_DEV_BYPASS) {
+        return { user: DEV_USER };
+      }
       throw new AppError('AUTH_002', 'Invalid access token', 401);
     }
   },

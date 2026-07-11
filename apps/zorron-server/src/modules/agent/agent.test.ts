@@ -342,7 +342,7 @@ describe('FlowBuilder.buildFlow', () => {
 
   it('maps anchors to settlement resultMapping when resultMapping omitted', () => {
     const intent = makeFullIntent();
-    intent.settlement.resultMapping = undefined; // force anchor-based mapping
+    intent.settlement!.resultMapping = undefined; // force anchor-based mapping
     const flow = buildFlow(intent) as unknown as {
       nodes: Array<{ type: string; data: { resultMapping?: Array<{ resultId: string; title: string }> } }>;
     };
@@ -940,7 +940,7 @@ describe('resolveVisualBlocks (ECO-002)', () => {
 describe('FlowBuilder visualBlocks population (ECO-002)', () => {
   it('populates settlement node with resolved visual blocks', () => {
     const intent = makeMinimalIntent();
-    intent.settlement.visualBlocks = ['badge', 'radar'];
+    intent.settlement!.visualBlocks = ['badge', 'radar'];
     const flow = buildFlow(intent) as unknown as {
       nodes: Array<{ type: string; data: { visualBlocks?: Array<{ type: string }> } }>;
     };
@@ -953,7 +953,7 @@ describe('FlowBuilder visualBlocks population (ECO-002)', () => {
 
   it('populates blocks from typed config objects', () => {
     const intent = makeMinimalIntent();
-    intent.settlement.visualBlocks = [
+    intent.settlement!.visualBlocks = [
       { type: 'badge', props: { title: '自定义徽章' } },
       { type: 'sprite', props: { imageUrl: 'https://example.com/a.png' } },
     ];
@@ -986,14 +986,14 @@ describe('FlowBuilder visualBlocks population (ECO-002)', () => {
 describe('Schema: visualBlocks accepts strings or typed configs (ECO-002)', () => {
   it('accepts visualBlocks as string array', () => {
     const intent = makeMinimalIntent();
-    intent.settlement.visualBlocks = ['badge', 'radar'];
+    intent.settlement!.visualBlocks = ['badge', 'radar'];
     const result = ScenarioIntentSchema.safeParse(intent);
     expect(result.success).toBe(true);
   });
 
   it('accepts visualBlocks as typed config array', () => {
     const intent = makeMinimalIntent();
-    intent.settlement.visualBlocks = [
+    intent.settlement!.visualBlocks = [
       { type: 'badge', props: { title: 'X' } },
     ];
     const result = ScenarioIntentSchema.safeParse(intent);
@@ -1002,7 +1002,7 @@ describe('Schema: visualBlocks accepts strings or typed configs (ECO-002)', () =
 
   it('accepts a mixed array of strings and objects', () => {
     const intent = makeMinimalIntent();
-    intent.settlement.visualBlocks = ['badge', { type: 'radar', props: { maxValue: 2 } }];
+    intent.settlement!.visualBlocks = ['badge', { type: 'radar', props: { maxValue: 2 } }];
     const result = ScenarioIntentSchema.safeParse(intent);
     expect(result.success).toBe(true);
   });
@@ -1079,7 +1079,7 @@ describe('Zod schema validation', () => {
     const result = ScenarioIntentSchema.safeParse(intent);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.settlement.visualBlocks).toEqual(['badge', 'title', 'layered-texts']);
+      expect(result.data.settlement!.visualBlocks).toEqual(['badge', 'title', 'layered-texts']);
     }
   });
 

@@ -217,7 +217,7 @@ export async function saveSession(
     .values({
       projectId: req.projectId,
       userIdentifier: req.userIdentifier,
-      settlementResult: req.settlementResult,
+      settlementResult: req.settlementResult ?? null,
       metadata: req.metadata ?? null,
     })
     .returning();
@@ -251,7 +251,7 @@ async function dispatchSessionCompleted(
       sessionId: session.id,
       projectId: session.projectId,
       userIdentifier: session.userIdentifier,
-      settlementResult: session.settlementResult as Record<string, unknown>,
+      settlementResult: session.settlementResult as Record<string, unknown> | null,
       timestamp: session.createdAt.toISOString(),
     },
   });
@@ -301,7 +301,7 @@ function toSessionDetail(row: typeof testSessions.$inferSelect): SessionDetail {
     id: row.id,
     projectId: row.projectId,
     userIdentifier: row.userIdentifier,
-    settlementResult: row.settlementResult as Record<string, unknown>,
+    settlementResult: row.settlementResult as Record<string, unknown> | null,
     metadata: (row.metadata as Record<string, unknown> | null) ?? null,
     createdAt: row.createdAt.toISOString(),
   };

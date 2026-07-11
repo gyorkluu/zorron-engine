@@ -38,7 +38,7 @@ function VectorSpaceSettingsImpl({ className }: VectorSpaceSettingsProps) {
   const settings = useProjectStore((s) => s.settings);
   const setSettings = useProjectStore((s) => s.setSettings);
 
-  const vectorSpace = settings.vectorSpace;
+  const vectorSpace = settings.vectorSpace ?? { enabled: false, dimensions: {}, sects: [] };
 
   /** Patch the vector space config and push to the project store. */
   const updateVectorSpace = useCallback(

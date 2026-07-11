@@ -120,12 +120,8 @@ export function defaultFlowData(): FlowData {
     nodes: [],
     edges: [],
     variables: {},
-    settings: {
-      vectorSpace: {
-        enabled: false,
-        dimensions: { x: '处世', y: '立场', z: '性情' },
-      },
-    },
+    // No vectorSpace by default — scenarios that need it declare it explicitly.
+    settings: {},
     version: '1.0.0',
   };
 }

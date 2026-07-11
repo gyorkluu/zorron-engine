@@ -15,6 +15,7 @@ import { SceneStage } from './SceneStage';
 import { VideoStage } from './VideoStage';
 import { LinkStage } from './LinkStage';
 import { SettlementStage } from './SettlementStage';
+import { MinigameStage, RatingStage, MultiSelectStage, MediaStage } from './InteractionStages';
 import type { FlowData } from '@/types/flow';
 
 /** Props for PlayerShell. */
@@ -101,6 +102,10 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
           onSettlementButton={selectSettlementButton}
         />
       )}
+      {state.currentNodeType === 'minigame' && <MinigameStage state={state} />}
+      {state.currentNodeType === 'rating' && <RatingStage state={state} />}
+      {state.currentNodeType === 'multi-select' && <MultiSelectStage state={state} />}
+      {state.currentNodeType === 'media' && <MediaStage state={state} />}
 
       {onExit && (
         <button

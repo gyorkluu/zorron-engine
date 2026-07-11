@@ -44,8 +44,8 @@ function VectorSpacePanelImpl({
   // Read the live player vector (if the player is running).
   const playerState = usePlayerStore((s) => s.state);
 
-  const vectorSpace = settings.vectorSpace;
-  const axisLabels = vectorSpace.dimensions ?? { x: 'X', y: 'Y', z: 'Z' };
+  const vectorSpace = settings.vectorSpace ?? { enabled: false, dimensions: {}, sects: [] };
+  const axisLabels = vectorSpace.dimensions ?? {};
   const sects: ResultAnchor[] = vectorSpace.sects ?? [];
 
   const effectiveVector: PersonalityVector = useMemo(() => {

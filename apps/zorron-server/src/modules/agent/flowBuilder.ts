@@ -73,46 +73,55 @@ export function buildFlow(intent: ScenarioIntent): FlowData {
     nodes.push(node);
   }
 
-  // ── 3. Settlement node ──
-  // Resolve visual block ids/configs into concrete blocks (ECO-002).
-  const resolvedBlocks = resolveVisualBlocks(intent.settlement.visualBlocks);
-  const strategy = intent.settlement.strategy ?? resolveDefaultStrategy(intent.type);
-  const settlementData: Record<string, unknown> = {
-    label: '结算',
-    strategy,
-    strategyConfig: intent.settlement.strategyConfig ?? {},
-    resultMapping:
-      intent.settlement.resultMapping ??
-      intent.anchors?.map((a) => ({
-        resultId: a.id,
-        title: a.title ?? a.name,
-        description: a.description,
-        coverUrl: a.coverUrl,
-      })) ??
-      [{ resultId: 'default', title: '完成' }],
-    buttons: [],
-    variableModifiers: [],
-    visualBlocks: resolvedBlocks,
-  };
-  nodes.push({
-    id: SETTLEMENT_NODE_ID,
-    type: 'settlement',
-    position: { x: 0, y: (intent.steps.length + 1) * 150 },
-    data: settlementData,
-  });
+  // ── 3. Settlement node (optional) ──
+  // When intent.settlement is absent, the flow ends at the last step (no
+  // settlement node is created). This supports pure narrative, media gallery,
+  // and other scenarios that don't need a computed settlement.
+  const hasSettlement = intent.settlement !== undefined;
+  if (hasSettlement) {
+    const resolvedBlocks = resolveVisualBlocks(intent.settlement!.visualBlocks);
+    const strategy = intent.settlement!.strategy ?? resolveDefaultStrategy(intent.type);
+    const settlementData: Record<string, unknown> = {
+      label: '结算',
+      strategy,
+      strategyConfig: intent.settlement!.strategyConfig ?? {},
+      resultMapping:
+        intent.settlement!.resultMapping ??
+        intent.anchors?.map((a) => ({
+          resultId: a.id,
+          title: a.title ?? a.name,
+          description: a.description,
+          coverUrl: a.coverUrl,
+        })) ??
+        [{ resultId: 'default', title: '完成' }],
+      buttons: [],
+      variableModifiers: [],
+      visualBlocks: resolvedBlocks,
+    };
+    nodes.push({
+      id: SETTLEMENT_NODE_ID,
+      type: 'settlement',
+      position: { x: 0, y: (intent.steps.length + 1) * 150 },
+      data: settlementData,
+    });
+  }
 
   // ── 4. Wire edges ──
-  // start → first step
-  edges.push(makeEdge('e_start', START_NODE_ID, stepIds[0] ?? SETTLEMENT_NODE_ID, null));
+  // The "end target" is the settlement node if present, or the last step itself
+  // (the flow simply ends there with no settlement computation).
+  const endTarget = hasSettlement ? SETTLEMENT_NODE_ID : (stepIds[stepIds.length - 1] ?? stepIds[0]);
+
+  // start → first step (or settlement/end if no steps)
+  edges.push(makeEdge('e_start', START_NODE_ID, stepIds[0] ?? endTarget, null));
 
   // step → next
   for (let i = 0; i < intent.steps.length; i++) {
     const step = intent.steps[i];
     const sourceId = stepIds[i];
     const defaultTarget =
-      i + 1 < intent.steps.length ? stepIds[i + 1] : SETTLEMENT_NODE_ID;
+      i + 1 < intent.steps.length ? stepIds[i + 1] : endTarget;
 
-    wireStepEdges(step, sourceId, defaultTarget, stepIds, SETTLEMENT_NODE_ID, edges);
+    wireStepEdges(step, sourceId, defaultTarget, stepIds, endTarget, edges);
   }
 
   // ── 5. Settings ──
