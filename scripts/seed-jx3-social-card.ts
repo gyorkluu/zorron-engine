@@ -137,7 +137,24 @@ function addEdge(source: string, target: string, sourceHandle?: string | null): 
 
 // ── JX3 Data ──
 
-const SERVERS = ['双线一区', '双线二区', '念破', '华山论剑', '梦江南', '如梦令'];
+const SERVERS = [
+  '飞龙在天',
+  '天鹅坪',
+  '破阵子',
+  '共結來緣',
+  '眉间雪',
+  '山海相逢',
+  '蝶恋花',
+  '剑胆琴心',
+  '斗转星移',
+  '乾坤一掷',
+  '长安城',
+  '龙争虎斗',
+  '唯我独尊',
+  '梦江南',
+  '绝代天骄',
+  '幽月轮',
+];
 const MINDSETS = ['紫霞功', '太虚剑意', '易经少林', '离经易道', '补天决', '毒经', '花间游', '傲血战意'];
 const BODY_TYPES = ['成男', '成女', '正太', '萝莉'];
 const GENDERS = ['男', '女'];
