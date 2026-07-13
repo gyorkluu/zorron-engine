@@ -4,7 +4,8 @@
  * Layout adapts to choice count:
  * - ≤4 choices: vertical column (full-width buttons)
  * - 5-8 choices: 2-column grid
- * - 9+ choices: 3-column compact grid
+ * - 9-11 choices: 3-column compact grid
+ * - 12+ choices: 4-column compact grid (e.g. 16 → 4×4)
  *
  * Uses `.player-choice` semantic class so colors follow the active theme
  * (modern teal-dark or ancient gold-ink).
@@ -27,7 +28,8 @@ export interface ChoiceLayerProps {
 function getGridCols(count: number): string {
   if (count <= 4) return 'grid-cols-1';
   if (count <= 8) return 'grid-cols-2';
-  return 'grid-cols-3';
+  if (count <= 11) return 'grid-cols-3';
+  return 'grid-cols-4';
 }
 
 /** A single choice button with its interaction type. */
