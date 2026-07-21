@@ -15,6 +15,7 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useT } from '@/i18n/useT';
 import { useProjectStore } from '@/stores/projectStore';
+import { usePlayerStore } from '@/stores/playerStore';
 import type { GameState } from '@/engine/GameEngine';
 import { VectorScene } from '@/components/vector3d/VectorScene';
 import { SocialCardSummary } from './SocialCardSummary';
@@ -33,10 +34,21 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
   const { t } = useT();
   const result = state.settlementResult;
   const settings = useProjectStore((s) => s.settings);
+  // 监听 playerStore 的最终判词状态：
+  //   - judgmentFinalized=false 时 SocialCardSummary 尚未完成判词生成（预取中 / 同步调用中）—— 等待
+  //   - judgmentFinalized=true 时可以提交，使用 finalJudgment 字段（可能为 null）
+  // confirmModify 时由 playerStore 直接写入 finalJudgment + judgmentFinalized=true，
+  // 这里会立即触发提交，无需等待 SocialCardSummary。
+  const finalJudgment = usePlayerStore((s) => s.finalJudgment);
+  const judgmentFinalized = usePlayerStore((s) => s.judgmentFinalized);
 
   // Persist the JX3 submission when this settlement includes a social-card
   // summary block and a tuilan_id variable. The backend downloads + caches
   // the role-card image as part of the save. Runs once per settlement mount.
+  //
+  // 提交时机：等待 SocialCardSummary 完成判词生成（judgmentFinalized=true）后再触发，
+  // 这样可以把 AI 判词一并持久化到后端，避免重复调用 AI。
+  // 若判词生成失败（finalJudgment=null），也允许提交（后端存 NULL）。
   const submissionFiredRef = useRef(false);
   useEffect(() => {
     if (!result || submissionFiredRef.current) return;
@@ -46,14 +58,17 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
     if (!hasSocialCard || !result.variables) return;
     const tuilanId = String(result.variables.tuilan_id ?? '').trim();
     if (!tuilanId) return;
+    // 等待判词就绪 —— SocialCardSummary 会写入 finalJudgment 并置 judgmentFinalized=true
+    if (!judgmentFinalized) return;
     submissionFiredRef.current = true;
     void submitJx3Submission(
       tuilanId,
       null,
       result.variables,
       result,
+      finalJudgment,
     );
-  }, [result]);
+  }, [result, finalJudgment, judgmentFinalized]);
 
   if (!result) return null;
 

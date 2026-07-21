@@ -90,6 +90,12 @@ interface PlayerStoreState {
    * confirmModify 时直接复用，不再调用 Xoyo API。
    */
   pendingSubmissionProfile: Jx3Profile | null;
+  /**
+   * 上次提交时持久化的 AI 判词文本。
+   * confirmModify 时直接写入 finalJudgment + prefetchedJudgment（伪造缓存命中），
+   * 让 SocialCardSummary 跳过 AI 调用、SettlementStage 直接提交此文本。
+   */
+  pendingSubmissionJudgment: string | null;
   /** True while an appeal is being submitted. */
   isAppealing: boolean;
   /** Last appeal error message. */
@@ -109,6 +115,28 @@ interface PlayerStoreState {
    * 而不是立即触发自己的调用（避免重复请求）。
    */
   isPrefetchingJudgment: boolean;
+  /**
+   * 最终判词文本（用于提交到后端持久化）。
+   * 由 SocialCardSummary 在以下场景写入：
+   *   - 预取缓存命中时写入缓存文本
+   *   - 同步 AI 调用成功时写入返回文本
+   *   - 同步 AI 调用失败 / 无 choices 时写入 null（后端存 NULL）
+   * confirmModify 时由后端 /check 接口回填的 cached judgment 直接写入此字段。
+   * SettlementStage 通过 judgmentFinalized 监听此字段就绪后提交。
+   */
+  finalJudgment: string | null;
+  /**
+   * 判词是否已最终化（SocialCardSummary 已决定最终文本）。
+   * SettlementStage 据此判断是否可以触发 submitJx3Submission：
+   *   - false: SocialCardSummary 尚未完成（预取中 / 同步调用中）—— 等待
+   *   - true: 可以提交，使用 finalJudgment 字段值（可能为 null）
+   */
+  judgmentFinalized: boolean;
+  /**
+   * 写入最终判词文本。同时将 judgmentFinalized 置为 true。
+   * 传入 null 表示判词生成失败 / 无数据，后端会存 NULL。
+   */
+  setFinalJudgment: (text: string | null) => void;
 
   /** Load a project and start the engine. */
   start: (flowData: FlowData) => GameState;
@@ -238,11 +266,16 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
   pendingTuilanId: null,
   pendingSubmissionVariables: null,
   pendingSubmissionProfile: null,
+  pendingSubmissionJudgment: null,
   isAppealing: false,
   appealError: null,
   appealSuccess: false,
   prefetchedJudgment: null,
   isPrefetchingJudgment: false,
+  finalJudgment: null,
+  judgmentFinalized: false,
+
+  setFinalJudgment: (text) => set({ finalJudgment: text, judgmentFinalized: true }),
 
   start: (flowData) => {
     // Tear down any previous engine.
@@ -313,6 +346,9 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       // 重置预取状态（新流程开始时清空旧缓存）
       prefetchedJudgment: null,
       isPrefetchingJudgment: false,
+      // 重置最终判词状态（新流程开始时清空旧判词，等 SocialCardSummary 重新写入）
+      finalJudgment: null,
+      judgmentFinalized: false,
     });
     return initial;
   },
@@ -400,6 +436,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       pendingTuilanId: null,
       pendingSubmissionVariables: null,
       pendingSubmissionProfile: null,
+      pendingSubmissionJudgment: null,
       appealError: null,
       appealSuccess: false,
     });
@@ -414,15 +451,17 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       // 1. Check if a submission already exists for this 推栏号.
       const checkResult = await checkJx3Submission(trimmed);
       if (checkResult.exists) {
-        // 缓存上次提交的 variables 和 profile，confirmModify 时直接注入。
+        // 缓存上次提交的 variables、profile 和 judgment，confirmModify 时直接注入。
         // variables 是玩家之前填写的所有数据 (MBTI/游戏观/常用心法/签名/期望等)，
-        // profile 是上次从 Xoyo 查到的角色信息。
+        // profile 是上次从 Xoyo 查到的角色信息，
+        // judgment 是上次持久化的 AI 判词 —— 直接复用避免重复调用 AI。
         set({
           isLookingUp: false,
           submissionExists: true,
           pendingTuilanId: trimmed,
           pendingSubmissionVariables: checkResult.data?.variables ?? null,
           pendingSubmissionProfile: checkResult.data?.profile ?? null,
+          pendingSubmissionJudgment: checkResult.data?.judgment ?? null,
         });
         return;
       }
@@ -451,6 +490,11 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
    * 3. 缓存缺失时回退到 lookupJx3Profile 重新查询
    * 4. 注入 variables 到引擎 → 推进流程
    *
+   * 判词复用：若缓存中有 judgment 文本，先在 applyVariables 之前伪造 prefetchedJudgment
+   * 缓存（匹配 cachedVars 的 mbti+choicesHash），这样 engine.subscribe 触发预取检查时
+   * 直接命中缓存跳过 AI 调用；同时把 judgment 写入 finalJudgment + judgmentFinalized=true，
+   * 让 SettlementStage 直接提交此文本，无需等待 SocialCardSummary。
+   *
    * 这样玩家点"修改信息"后，所有之前填好的数据都会自动加载，
    * 可以直接在已有数据基础上修改，无需重新走一遍。
    */
@@ -461,6 +505,29 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     if (!tuilanId) return;
     set({ isLookingUp: true, lookupError: null, submissionExists: false });
     try {
+      // 0. 判词复用：在 applyVariables 之前预填缓存，避免 engine.subscribe 触发预取
+      const cachedVars = get().pendingSubmissionVariables;
+      const cachedJudgment = get().pendingSubmissionJudgment;
+      if (cachedJudgment && cachedVars) {
+        const sig = computeJudgmentSignature(cachedVars);
+        if (sig.choicesHash) {
+          // 伪造缓存命中：mbti+choicesHash 匹配，engine.subscribe 检查时直接 return
+          set({
+            prefetchedJudgment: {
+              mbti: sig.mbti,
+              choicesHash: sig.choicesHash,
+              text: cachedJudgment,
+              model: 'cached',
+              latencyMs: 0,
+            },
+            // 同时设置 finalJudgment，让 SettlementStage 直接提交此文本
+            // （即使 SocialCardSummary 因某种原因未触发，submit 也能拿到 judgment）
+            finalJudgment: cachedJudgment,
+            judgmentFinalized: true,
+          });
+        }
+      }
+
       // 1. 优先用缓存的 profile；缺失时回退到 Xoyo API
       const cachedProfile = get().pendingSubmissionProfile;
       const profile = cachedProfile ?? await lookupJx3Profile(tuilanId);
@@ -471,7 +538,6 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       //    这些是上次提交时引擎的完整快照，直接 applyVariables 即可恢复。
       //    浅合并：profile 派生字段优先（更新过的区服/门派/心法），
       //    然后玩家变量补齐（避免 profile 中的旧值覆盖玩家新填的）。
-      const cachedVars = get().pendingSubmissionVariables;
       if (cachedVars && Object.keys(cachedVars).length > 0) {
         engine.applyVariables(cachedVars);
       }
@@ -482,6 +548,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
         pendingTuilanId: null,
         pendingSubmissionVariables: null,
         pendingSubmissionProfile: null,
+        pendingSubmissionJudgment: null,
       });
       engine.submitTextInput(tuilanId);
     } catch (err) {
@@ -501,6 +568,7 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       pendingTuilanId: null,
       pendingSubmissionVariables: null,
       pendingSubmissionProfile: null,
+      pendingSubmissionJudgment: null,
       appealError: null,
       appealSuccess: false,
       isAppealing: false,
@@ -536,8 +604,13 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
     if (!engine) return;
     engine.reset();
     engine.start();
-    // 重置预取缓存（重新开始流程时清空旧判词）
-    set({ prefetchedJudgment: null, isPrefetchingJudgment: false });
+    // 重置预取缓存和最终判词（重新开始流程时清空旧判词）
+    set({
+      prefetchedJudgment: null,
+      isPrefetchingJudgment: false,
+      finalJudgment: null,
+      judgmentFinalized: false,
+    });
   },
 
   stop: () => {
@@ -549,9 +622,11 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       engine: null,
       state: null,
       isRunning: false,
-      // 停止播放器时清空预取缓存
+      // 停止播放器时清空预取缓存和最终判词
       prefetchedJudgment: null,
       isPrefetchingJudgment: false,
+      finalJudgment: null,
+      judgmentFinalized: false,
     });
   },
 }));

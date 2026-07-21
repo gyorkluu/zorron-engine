@@ -565,6 +565,8 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
   // settlement 阶段这里直接读取，无需用户等待。
   const prefetchedJudgment = usePlayerStore((s) => s.prefetchedJudgment);
   const isPrefetchingJudgment = usePlayerStore((s) => s.isPrefetchingJudgment);
+  // 写入最终判词到 playerStore —— SettlementStage 监听 judgmentFinalized 后提交。
+  const setFinalJudgment = usePlayerStore((s) => s.setFinalJudgment);
 
   useEffect(() => {
     // 5 题选项字母数组 (gv_choice_1~5)，从 variables 中读取
@@ -579,8 +581,10 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
     const mbti = String(v.mbti ?? '').trim();
 
     // 若没有任何选项数据，直接使用兜底文案，不调用 AI
+    // 同时把 finalJudgment 标记为 null（后端存 NULL），并通知 SettlementStage 可以提交
     if (choices.length === 0) {
       setGameViewText(fallbackGameViewText);
+      setFinalJudgment(null);
       return;
     }
 
@@ -593,12 +597,17 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       prefetchedJudgment.choicesHash === choicesHash
     ) {
       setJudgmentLoading(false);
-      setGameViewText(prefetchedJudgment.text || fallbackGameViewText);
+      const text = prefetchedJudgment.text || fallbackGameViewText;
+      setGameViewText(text);
+      // 写入最终判词，让 SettlementStage 提交到后端持久化
+      // （confirmModify 场景下 finalJudgment 已是同值，setFinalJudgment 是幂等的）
+      setFinalJudgment(text);
       return;
     }
 
     // ── 预取进行中：显示占位文案，等待预取完成（由 zustand 触发重渲染）──
     // 避免在此重复触发 AI 调用
+    // 不调用 setFinalJudgment —— 保持 judgmentFinalized=false，让 SettlementStage 等待
     if (isPrefetchingJudgment) {
       setJudgmentLoading(true);
       setGameViewText('正在生成专属判语...');
@@ -613,12 +622,17 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
     generateJudgment(mbti, choices)
       .then((res) => {
         if (cancelled) return;
-        setGameViewText(res.judgment || fallbackGameViewText);
+        const text = res.judgment || fallbackGameViewText;
+        setGameViewText(text);
+        // 同步调用成功 —— 写入最终判词触发 SettlementStage 提交
+        setFinalJudgment(text);
       })
       .catch(() => {
         if (cancelled) return;
         // AI 失败兜底：使用基于分数的固定文案
         setGameViewText(fallbackGameViewText);
+        // AI 失败 —— 标记为 null（后端存 NULL），允许 SettlementStage 提交
+        setFinalJudgment(null);
       })
       .finally(() => {
         if (cancelled) return;
@@ -629,6 +643,7 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
       cancelled = true;
     };
     // 依赖：5 题选项 + mbti + 分数 + 预取缓存（任一变化时重新生成）
+    // setFinalJudgment 是 zustand 的稳定函数引用，无需加入依赖
   }, [
     v.gv_choice_1,
     v.gv_choice_2,
@@ -639,6 +654,7 @@ function SocialCardSummaryImpl({ variables }: SocialCardSummaryProps) {
     fallbackGameViewText,
     prefetchedJudgment,
     isPrefetchingJudgment,
+    setFinalJudgment,
   ]);
 
   const roleNameFontSize = roleName.length > 8 ? 42 : roleName.length > 6 ? 48 : 54;

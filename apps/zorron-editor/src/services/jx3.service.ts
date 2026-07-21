@@ -121,6 +121,12 @@ export interface Jx3CheckResult {
     variables?: Record<string, string | number | boolean>;
     /** 上次查询到的 Xoyo profile — confirmModify 时复用，避免再调一次 Xoyo。 */
     profile?: Jx3Profile | null;
+    /**
+     * 上次提交的 AI 判词文本 — confirmModify 时前端直接复用，
+     * 避免重复调用 AI 接口消耗 token。
+     * 新提交时为 null；预取失败兜底走固定文案时也可能为 null。
+     */
+    judgment?: string | null;
   };
 }
 
@@ -223,12 +229,18 @@ export async function checkJx3Submission(
  * Save a completed JX3 social-card submission to the backend.
  *
  * The backend downloads and caches the card image, then stores the record.
+ *
+ * @param judgment AI 预生成的判词文本（可选）。
+ *   - 预取成功时由 SocialCardSummary 在缓存命中 / 同步调用成功后写入 playerStore.finalJudgment
+ *   - confirmModify 时由后端 /check 接口回填（避免重复 AI 调用）
+ *   - 预取失败 / 兜底走固定文案时为 null，后端存 NULL
  */
 export async function submitJx3Submission(
   tuilanId: string,
   profile: Jx3Profile | null,
   variables: Record<string, string | number | boolean>,
   settlementResult: unknown,
+  judgment?: string | null,
 ): Promise<void> {
   try {
     await jx3Http.post('/api/jx3/submit', {
@@ -236,6 +248,7 @@ export async function submitJx3Submission(
       profile,
       variables,
       settlementResult,
+      judgment: judgment ?? null,
     });
   } catch (err) {
     // Best-effort: log but don't block the user.
