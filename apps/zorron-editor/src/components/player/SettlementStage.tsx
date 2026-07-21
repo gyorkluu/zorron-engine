@@ -5,9 +5,14 @@
  * automatically under modern / ancient / future themes. Sect badge,
  * character sprite, layered personality texts, an interactive 3D vector
  * radar (when enabled), settlement action buttons, and a restart button.
+ *
+ * When the settlement includes the `social-card-summary` visual block and a
+ * `tuilan_id` variable, the stage also fires `submitJx3Submission` so the
+ * backend can decrypt + cache the 推栏 role-card image and persist the
+ * submission (used for duplicate detection on subsequent runs).
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useT } from '@/i18n/useT';
 import { useProjectStore } from '@/stores/projectStore';
 import type { GameState } from '@/engine/GameEngine';
@@ -15,6 +20,7 @@ import { VectorScene } from '@/components/vector3d/VectorScene';
 import { SocialCardSummary } from './SocialCardSummary';
 import cdnMapping from '@/assets/cdn-mapping.json';
 import { featureFlags } from '@/lib/featureFlags';
+import { submitJx3Submission } from '@/services/jx3.service';
 
 /** Props for SettlementStage. */
 export interface SettlementStageProps {
@@ -28,10 +34,32 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
   const result = state.settlementResult;
   const settings = useProjectStore((s) => s.settings);
 
+  // Persist the JX3 submission when this settlement includes a social-card
+  // summary block and a tuilan_id variable. The backend downloads + caches
+  // the role-card image as part of the save. Runs once per settlement mount.
+  const submissionFiredRef = useRef(false);
+  useEffect(() => {
+    if (!result || submissionFiredRef.current) return;
+    const hasSocialCard = result.visualBlocks?.some(
+      (b) => b.type === 'social-card-summary',
+    );
+    if (!hasSocialCard || !result.variables) return;
+    const tuilanId = String(result.variables.tuilan_id ?? '').trim();
+    if (!tuilanId) return;
+    submissionFiredRef.current = true;
+    void submitJx3Submission(
+      tuilanId,
+      null,
+      result.variables,
+      result,
+    );
+  }, [result]);
+
   if (!result) return null;
 
   const layerA = result.resultTexts?.layerA;
   const layerB = result.resultTexts?.layerB;
+  const hasSocialCard = result.visualBlocks?.some((b) => b.type === 'social-card-summary');
 
   const spriteUrl = useMemo(() => {
     const sectId = result.anchor?.id;
@@ -55,6 +83,35 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
     const formatted = val.toFixed(2);
     return val >= 0 ? `+${formatted}` : formatted;
   };
+
+  // Social-card summary mode: full-page dark background with the card centered,
+  // matching the reference 魔盒自介卡 design.
+  if (hasSocialCard && result.variables) {
+    return (
+      <div className="relative h-full w-full overflow-hidden" style={{ background: 'radial-gradient(ellipse at 50% 30%, #2a0a0e 0%, #150507 50%, #0a0304 100%)' }}>
+        <div className="relative flex h-full flex-col items-center justify-center overflow-y-auto py-8">
+          <SocialCardSummary variables={result.variables} />
+          {onRestart && (
+            <button
+              type="button"
+              onClick={onRestart}
+              className="mt-5 rounded px-10 py-2.5 text-sm transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, rgba(217,175,82,0.25), rgba(217,175,82,0.1))',
+                border: '1px solid rgba(217,175,82,0.5)',
+                color: '#d9af52',
+                letterSpacing: '4px',
+                fontFamily: '"STKaiti","KaiTi","楷体",serif',
+                fontSize: '14px',
+              }}
+            >
+              重新测试
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="player-bg player-font relative h-full w-full overflow-hidden">

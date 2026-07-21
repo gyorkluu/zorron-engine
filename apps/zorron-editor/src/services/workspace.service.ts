@@ -162,8 +162,11 @@ export async function listProjectsInDirectory(
   const entries: LocalProjectEntry[] = [];
   for await (const [name, handle] of root.entries()) {
     if (handle.kind !== 'directory') continue;
+    // `handle` is narrowed to a directory by the kind check above; cast to
+    // satisfy TypeScript (which can't narrow on `kind` discriminators).
+    const dirHandle = handle as FileSystemDirectoryHandle;
     try {
-      const fileHandle = await handle.getFileHandle(PROJECT_FILENAME);
+      const fileHandle = await dirHandle.getFileHandle(PROJECT_FILENAME);
       const file = await fileHandle.getFile();
       const text = await file.text();
       const detail = JSON.parse(text) as ProjectDetail;

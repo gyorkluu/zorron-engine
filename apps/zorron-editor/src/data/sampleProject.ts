@@ -29,6 +29,7 @@ const nodes: FlowNode[] = [
       label: '山道偶遇',
       dialogue: '你在山道上遇到一位老者，他拦住你的去路，说道："年轻人，前方危险，不如随我绕行。"',
       speaker: '神秘老者',
+      backgroundUrl: '/stage-bg/mode-bg.png',
       choices: [
         {
           id: 'c_accept',
@@ -69,6 +70,7 @@ const nodes: FlowNode[] = [
       label: '山贼拦路',
       dialogue: '前方山道上，三名山贼挡住了去路。为首者冷笑道："留下银两，放你过去！"',
       speaker: '山贼头目',
+      backgroundUrl: '/stage-bg/rank-bg.png',
       choices: [
         {
           id: 'c_fight',
@@ -177,7 +179,6 @@ export const sampleFlowData: FlowData = {
   nodes,
   edges,
   variables: {
-    wisdom: 0,
     courage: 5,
     bravery: 0,
   },

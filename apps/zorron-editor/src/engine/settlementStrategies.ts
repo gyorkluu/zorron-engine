@@ -239,15 +239,17 @@ class SettlementStrategyRegistry {
   /**
    * Resolve a strategy by id.
    *
-   * Falls back to 'count-tally' (not 'vector-nearest') when the id is missing
-   * or unregistered. This ensures non-vector scenarios don't accidentally
-   * invoke vector logic. Callers that explicitly need vector-nearest should
-   * pass the id explicitly.
+   * Falls back to 'vector-nearest' when the id is missing or unregistered.
+   * This preserves the legacy default behavior: when a settlement node does
+   * not specify a strategy, the engine matches the player to the nearest
+   * sect anchor by Euclidean distance. When `vectorSpace` is disabled, the
+   * engine passes an empty anchor list, so `vector-nearest` safely returns
+   * `anchor: null` without any vector logic side effects.
    */
   resolve(id: string | undefined): SettlementStrategy {
     return (
-      this.strategies.get(id ?? 'count-tally') ??
-      this.strategies.get('count-tally') ??
+      this.strategies.get(id ?? 'vector-nearest') ??
+      this.strategies.get('vector-nearest') ??
       vectorNearestStrategy
     );
   }

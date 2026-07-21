@@ -7,7 +7,7 @@
 
 import { memo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Eye, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Check, Loader2, AlertCircle, type LucideIcon } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
@@ -23,7 +23,7 @@ import type { ProjectDetail } from '@/types/project';
 import type { FlowData } from '@/types/flow';
 import { cn } from '@/lib/utils';
 
-const STATUS_STYLES: Record<string, { bg: string; text: string; icon: typeof Check }> = {
+const STATUS_STYLES: Record<string, { bg: string; text: string; icon: LucideIcon }> = {
   saved: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', icon: Check },
   saving: { bg: 'bg-amber-500/15', text: 'text-amber-300', icon: Loader2 },
   unsaved: { bg: 'bg-slate-500/15', text: 'text-slate-300', icon: AlertCircle },
@@ -42,7 +42,7 @@ function ToolbarButton({
   title,
 }: {
   onClick?: () => void;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   label?: string;
   variant?: 'default' | 'primary' | 'accent';
   title?: string;

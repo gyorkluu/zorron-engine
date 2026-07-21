@@ -20,6 +20,17 @@ import { AppError, type AppErrorShape } from '@/lib/errors';
 export const API_BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
+/**
+ * Base URL for the JX3 backend service (service-lover).
+ *
+ * The JX3 推栏号 lookup / submit / appeal endpoints have been carved out of
+ * zorron-server and now run as an independent Hono service. The frontend
+ * points at this URL for any /api/jx3/* call, while the rest of the API
+ * (auth, project, agent, asset) continues to use {@link API_BASE_URL}.
+ */
+export const JX3_API_BASE_URL: string =
+  import.meta.env.VITE_JX3_API_BASE_URL ?? 'http://localhost:4002';
+
 /** localStorage keys for auth persistence. */
 export const AUTH_TOKEN_KEY = 'zorron.auth.token';
 export const AUTH_USER_KEY = 'zorron.auth.user';

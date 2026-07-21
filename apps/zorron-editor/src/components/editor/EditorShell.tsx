@@ -19,7 +19,7 @@
  */
 
 import { memo, useCallback, useState } from 'react';
-import { Eye, Variable, Puzzle, LayoutTemplate, History } from 'lucide-react';
+import { Eye, Variable, Puzzle, LayoutTemplate, History, type LucideIcon } from 'lucide-react';
 import { AssetPanel } from '@/components/asset/AssetPanel';
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodePalette } from '@/components/flow/NodePalette';
@@ -84,7 +84,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   }, []);
 
   /** Side panel toolbar button definitions. */
-  const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }> = [
+  const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: LucideIcon }> = [
     { id: 'variables', label: t('vars.title'), icon: Variable },
     { id: 'fragments', label: t('frag.title'), icon: Puzzle },
     { id: 'templates', label: t('tpl.title'), icon: LayoutTemplate },

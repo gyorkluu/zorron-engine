@@ -25,6 +25,7 @@ import {
   type FlowNode,
   type FlowEdge,
   type GameNodeData,
+  type BaseNodeData,
   type SceneNodeData,
   type LogicNodeData,
   type SetterNodeData,
@@ -36,10 +37,14 @@ import {
   type RatingNodeData,
   type MultiSelectNodeData,
   type MediaNodeData,
+  type TextInputNodeData,
+  type RankOrderNodeData,
+  type NumberPickerNodeData,
   type StartNodeData,
   type SceneChoice,
   type PersonalityVector,
   type ResultAnchor,
+  type SectAnchor,
   type SectResultTexts,
   type SettlementButton,
   type SettlementButtonAction,
@@ -63,6 +68,8 @@ export interface PlayerChoice {
   interaction: SceneChoice['interaction'];
   holdDuration?: number;
   slashDirection?: SceneChoice['slashDirection'];
+  /** Optional icon image URL displayed alongside the choice text. */
+  icon?: string;
 }
 
 /** Result of a settlement node evaluation. */
@@ -127,11 +134,20 @@ export interface GameState {
   /** Present when the engine reached a minigame node (waits for score submission). */
   minigame: { gameUrl: string; passingScore?: number; scoreVariable?: string } | null;
   /** Present when the engine reached a rating node (waits for rating submission). */
-  rating: { min: number; max: number; step?: number; prompt?: string; variable?: string } | null;
+  rating: {
+    min: number;
+    max: number;
+    step?: number;
+    prompt?: string;
+    variable?: string;
+    /** Optional labels for the slider endpoints. */
+    minLabel?: string;
+    maxLabel?: string;
+  } | null;
   /** Present when the engine reached a multi-select node (waits for selection submission). */
   multiSelect: {
     question?: string;
-    options: Array<{ id: string; label: string; description?: string }>;
+    options: Array<{ id: string; label: string; description?: string; icon?: string }>;
     minSelect?: number;
     maxSelect?: number;
     variable?: string;
@@ -143,6 +159,35 @@ export interface GameState {
     autoAdvance?: boolean;
     durationMs?: number;
   } | null;
+  /** Present when the engine reached a text-input node (waits for text submission). */
+  textInput: {
+    question?: string;
+    placeholder?: string;
+    hint?: string;
+    variable?: string;
+    required?: boolean;
+    maxLength?: number;
+  } | null;
+  /** Present when the engine reached a rank-order node (waits for ordering submission). */
+  rankOrder: {
+    question?: string;
+    hint?: string;
+    variable?: string;
+    items: Array<{ id: string; label: string; description?: string }>;
+  } | null;
+  /** Present when the engine reached a number-picker node (waits for value submission). */
+  numberPicker: {
+    question?: string;
+    hint?: string;
+    variable?: string;
+    min: number;
+    max: number;
+    step: number;
+    unit?: string;
+    defaultValue: number;
+  } | null;
+  /** Background image URL for the current interactive stage (read from node data). */
+  stageBackgroundUrl?: string | null;
 }
 
 /** Listener callback for state changes. */
@@ -168,6 +213,10 @@ function createInitialState(): GameState {
     rating: null,
     multiSelect: null,
     media: null,
+    textInput: null,
+    rankOrder: null,
+    numberPicker: null,
+    stageBackgroundUrl: null,
   };
 }
 
@@ -179,13 +228,14 @@ export class GameEngine {
   private nodes: FlowNode[];
   private edges: FlowEdge[];
   private variables: Variables;
+  /** Snapshot of the initial variables from FlowData — used to reset on restart. */
+  private initialVariables: Variables;
   private settings: FlowData['settings'];
   private fragments: Set<string> = new Set();
   private currentVector: PersonalityVector = { ...ZERO_VECTOR };
   private pendingVector: PersonalityVector = { ...ZERO_VECTOR };
   private currentNodeId: string | null = null;
   private history: string[] = [];
-  private lastSettlementResult: SettlementResult | null = null;
   private listeners: Set<StateListener> = new Set();
   private state: GameState = createInitialState();
 
@@ -197,7 +247,8 @@ export class GameEngine {
   constructor(flowData: FlowData) {
     this.nodes = flowData.nodes ?? [];
     this.edges = flowData.edges ?? [];
-    this.variables = { ...(flowData.variables ?? {}) };
+    this.initialVariables = { ...(flowData.variables ?? {}) };
+    this.variables = { ...this.initialVariables };
     this.settings = flowData.settings ?? {};
   }
 
@@ -207,8 +258,10 @@ export class GameEngine {
     this.pendingVector = { ...ZERO_VECTOR };
     this.fragments.clear();
     this.history = [];
-    this.lastSettlementResult = null;
-    this.variables = { ...this.variables };
+    // Reset variables to the initial FlowData snapshot so that re-runs
+    // don't carry over previously filled values (which would trigger
+    // auto-skip on scene nodes whose setter target is already populated).
+    this.variables = { ...this.initialVariables };
 
     const startNode = this.nodes.find((n) => n.type === 'start');
     const firstScene = this.nodes.find((n) => n.type === 'scene');
@@ -347,7 +400,6 @@ export class GameEngine {
     this.fragments.clear();
     this.currentVector = { ...ZERO_VECTOR };
     this.pendingVector = { ...ZERO_VECTOR };
-    this.lastSettlementResult = null;
     this.notify();
     return this.state;
   }
@@ -363,8 +415,27 @@ export class GameEngine {
       return;
     }
 
+    // Auto-skip: when the engine already has prior knowledge of a variable
+    // (e.g. via JX3 推栏号 lookup), scene nodes that would write that variable
+    // are skipped — together with their downstream setter node — to avoid
+    // overwriting the known value and to streamline the user flow.
+    if (node.type === 'scene') {
+      const skipTarget = this.findSceneSkipTarget(node);
+      if (skipTarget) {
+        this.enterNode(skipTarget);
+        return;
+      }
+    }
+
     this.currentNodeId = nodeId;
     this.history = [...this.history, nodeId];
+
+    // Read stage background from any node's base data — applies to all interactive stages.
+    const nodeData = node.data as BaseNodeData;
+    this.state = {
+      ...this.state,
+      stageBackgroundUrl: nodeData?.backgroundUrl ?? null,
+    };
 
     switch (node.type) {
       case 'logic':
@@ -402,6 +473,15 @@ export class GameEngine {
         return;
       case 'media':
         this.processMedia(node);
+        return;
+      case 'text-input':
+        this.processTextInput(node);
+        return;
+      case 'rank-order':
+        this.processRankOrder(node);
+        return;
+      case 'number-picker':
+        this.processNumberPicker(node);
         return;
       default:
         this.state = { ...this.state, isFinished: true };
@@ -445,6 +525,37 @@ export class GameEngine {
     return this.state;
   }
 
+  /**
+   * Auto-skip helper: when the engine has prior knowledge of a variable
+   * (e.g. via JX3 推栏号 lookup), scene nodes that would write that variable
+   * are skipped entirely — including their downstream setter node.
+   *
+   * Detection rule: inspect the scene's first choice's target setter. If
+   * that setter's first assignment writes a variable that already has a
+   * non-empty value, return the setter's downstream node id so the engine
+   * can advance past the scene + setter in one hop.
+   *
+   * @returns target node id to advance to, or null when no skip applies.
+   */
+  private findSceneSkipTarget(sceneNode: FlowNode): string | null {
+    const data = sceneNode.data as SceneNodeData;
+    const firstChoice = data.choices?.[0];
+    if (!firstChoice?.targetNodeId) return null;
+    const setter = this.getNode(firstChoice.targetNodeId);
+    if (!setter || setter.type !== 'setter') return null;
+    const setterData = setter.data as SetterNodeData;
+    const assignment = setterData.assignments?.[0];
+    if (!assignment) return null;
+    // Only 'set' operations can be auto-skipped. 'add'/'sub' accumulate
+    // onto an existing value (e.g. game_view_score starts at 0), so the
+    // scene must still be visited to collect the player's choice.
+    if (assignment.operator !== 'set') return null;
+    const current = this.variables[assignment.variable];
+    if (current === undefined || current === null || current === '') return null;
+    // Variable already populated — find setter's downstream node.
+    return this.findTargetNodeId(setter.id, null);
+  }
+
   private processScene(node: FlowNode): void {
     const data = node.data as SceneNodeData;
     const choices: PlayerChoice[] = (data.choices ?? []).map((c) => ({
@@ -453,6 +564,7 @@ export class GameEngine {
       interaction: c.interaction,
       holdDuration: c.holdDuration,
       slashDirection: c.slashDirection,
+      icon: c.icon,
     }));
     this.state = {
       ...this.state,
@@ -594,10 +706,13 @@ export class GameEngine {
     const result: SettlementResult = {
       anchor: output.anchor,
       distance: output.distance,
-      // Only populate vector fields when vectorSpace is enabled.
+      // finalVector is always present (empty object when vectorSpace is
+      // disabled) so consumers can safely read `result.finalVector` without
+      // null-checks. magnitude/quadrant remain vector-only fields.
+      finalVector,
+      // Only populate magnitude/quadrant when vectorSpace is enabled.
       ...(this.isVectorEnabled && {
         magnitude: mag,
-        finalVector,
         quadrant: playerQuadrant,
       }),
       title: output.mapping?.title ?? output.anchor?.name ?? 'Settlement',
@@ -609,7 +724,6 @@ export class GameEngine {
       visualBlocks: (data as unknown as { visualBlocks?: Array<{ type: string; props?: Record<string, unknown> }> }).visualBlocks,
       variables: { ...this.variables },
     };
-    this.lastSettlementResult = result;
 
     this.state = {
       ...this.state,
@@ -715,6 +829,8 @@ export class GameEngine {
         step: data.step,
         prompt: data.question ?? data.prompt,
         variable: data.variable,
+        minLabel: data.minLabel,
+        maxLabel: data.maxLabel,
       },
       choices: [],
       isFinished: false,
@@ -819,7 +935,155 @@ export class GameEngine {
     return this.state;
   }
 
+  /** Enter a text-input node — waits for the player to submit text. */
+  private processTextInput(node: FlowNode): void {
+    const data = node.data as TextInputNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'text-input',
+      textInput: {
+        question: data.question,
+        placeholder: data.placeholder,
+        hint: data.hint,
+        variable: data.variable,
+        required: data.required,
+        maxLength: data.maxLength,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit text input; writes the variable and advances the flow. */
+  submitTextInput(value: string): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'text-input') return this.state;
+    const data = node.data as TextInputNodeData;
+    const trimmed = value.trim();
+    if (data.required && !trimmed) return this.state;
+    if (data.variable) {
+      this.variables[data.variable] = trimmed;
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, textInput: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Enter a rank-order node — waits for the player to submit an ordering. */
+  private processRankOrder(node: FlowNode): void {
+    const data = node.data as RankOrderNodeData;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'rank-order',
+      rankOrder: {
+        question: data.question,
+        hint: data.hint,
+        variable: data.variable,
+        items: data.items,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit a rank ordering; writes the variable and advances the flow. */
+  submitRankOrder(orderedIds: string[]): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'rank-order') return this.state;
+    const data = node.data as RankOrderNodeData;
+    if (data.variable) {
+      this.variables[data.variable] = orderedIds.join(',');
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, rankOrder: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Enter a number-picker node — waits for the player to submit a number. */
+  private processNumberPicker(node: FlowNode): void {
+    const data = node.data as NumberPickerNodeData;
+    const step = data.step && data.step > 0 ? data.step : 1;
+    const defaultValue =
+      typeof data.defaultValue === 'number' && data.defaultValue >= data.min && data.defaultValue <= data.max
+        ? data.defaultValue
+        : data.min;
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'number-picker',
+      numberPicker: {
+        question: data.question,
+        hint: data.hint,
+        variable: data.variable,
+        min: data.min,
+        max: data.max,
+        step,
+        unit: data.unit,
+        defaultValue,
+      },
+      choices: [],
+      isFinished: false,
+    };
+    this.notify();
+  }
+
+  /** Submit a number-picker value; writes the variable and advances the flow. */
+  submitNumberPicker(value: number): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'number-picker') return this.state;
+    const data = node.data as NumberPickerNodeData;
+    const step = data.step && data.step > 0 ? data.step : 1;
+    // Clamp value to [min, max] and align to step grid.
+    let clamped = Math.max(data.min, Math.min(data.max, value));
+    const offset = (clamped - data.min) % step;
+    if (offset !== 0) {
+      // Round to nearest step.
+      clamped = clamped - offset;
+    }
+    if (data.variable) {
+      this.variables[data.variable] = clamped;
+    }
+    const nextId = this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, numberPicker: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
   // ---- Helpers ------------------------------------------------------------
+
+  /**
+   * Bulk-merge variables from an external source (e.g. the JX3 推栏号
+   * lookup response). Values present in `values` overwrite the existing
+   * ones; keys not present are left untouched.
+   *
+   * Used by `submitTextInputWithLookup` before advancing to the next node,
+   * so that the auto-skip logic in `enterNode` sees the populated variables
+   * and skips already-known scene nodes.
+   */
+  applyVariables(values: Record<string, string | number | boolean>): void {
+    this.variables = { ...this.variables, ...values };
+  }
 
   /** Find a node by id. */
   private getNode(id: string): FlowNode | undefined {

@@ -73,3 +73,14 @@ apps/zorron-server/.drizzle/
 tmp-*.png
 tmp-*.ts
 tmp-*.json
+
+# Vite build temp files
+vite.config.ts.timestamp-*
+
+# Backup directories (manual backups, not for version control)
+**/stage-bg-bak-*/
+
+# Misc local-only files
+opencode.jsonc
+titimap.html
+docs/http/

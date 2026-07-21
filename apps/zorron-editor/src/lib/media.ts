@@ -14,6 +14,14 @@ import cdnMapping from '@/assets/cdn-mapping.json';
 const cdnMap: Record<string, string> = cdnMapping;
 
 /**
+ * Cache-busting version for local static assets that change without
+ * file-name changes (e.g. when we recolor SVG icons in place).
+ * Bump this number whenever an in-place asset update must reach
+ * already-loaded browsers without a hard refresh.
+ */
+const ASSET_VERSION = 2;
+
+/**
  * Resolve a legacy or migrated media path to a playable URL.
  *
  * @param path - The raw media path from node data.
@@ -30,7 +38,14 @@ export function resolveMediaUrl(
     return path;
   }
 
-  if (path.startsWith('/')) return path;
+  if (path.startsWith('/')) {
+    // Append a cache-busting query for in-place-editable vector assets
+    // (SVG) so browsers always fetch the latest version from dev server.
+    if (path.endsWith('.svg') && !path.includes('?')) {
+      return `${path}?v=${ASSET_VERSION}`;
+    }
+    return path;
+  }
 
   // Legacy CDN mapping for known file names.
   const fileName = path.split('/').pop() || path;

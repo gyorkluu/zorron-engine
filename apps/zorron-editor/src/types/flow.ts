@@ -20,7 +20,10 @@ export type NodeType =
   | 'minigame'
   | 'rating'
   | 'multi-select'
-  | 'media';
+  | 'media'
+  | 'text-input'
+  | 'rank-order'
+  | 'number-picker';
 
 /** Interaction modes for scene choices. */
 export type InteractionType = 'tap' | 'hold' | 'slash';
@@ -57,7 +60,14 @@ export type PersonalityVector = Vector;
 
 /** Base data shared by all node types. */
 export interface BaseNodeData {
+  // Index signature is required so the discriminated union `GameNodeData`
+  // satisfies React Flow's `Node<NodeData extends Record<string, unknown>>`
+  // constraint. Without this, `interface`-based payloads cannot be assigned
+  // to `Record<string, unknown>` (only `type` aliases can).
+  [key: string]: unknown;
   label?: string;
+  /** Background image URL for the entire stage (applies to all interactive nodes). */
+  backgroundUrl?: string;
 }
 
 /** Start node data. */
@@ -81,6 +91,8 @@ export interface SceneChoice {
   vector?: PersonalityVector;
   /** Fragment id dropped into the player's fragment collection. */
   dropFragmentId?: string;
+  /** Optional icon image URL displayed alongside the choice text (e.g. 心法图标). */
+  icon?: string;
 }
 
 /** Scene node data. */
@@ -237,7 +249,7 @@ export interface MultiSelectNodeData extends BaseNodeData {
   /** Question prompt displayed to the user. */
   question?: string;
   /** Available options. */
-  options: Array<{ id: string; label: string; description?: string }>;
+  options: Array<{ id: string; label: string; description?: string; icon?: string }>;
   /** Minimum selections required (canonical backend field). */
   minSelected?: number;
   /** Maximum selections allowed (canonical backend field). */
@@ -260,6 +272,68 @@ export interface MediaNodeData extends BaseNodeData {
   durationMs?: number;
 }
 
+/** Text input node data — player enters free-form text (e.g. 推栏号). */
+export interface TextInputNodeData extends BaseNodeData {
+  /** Question prompt displayed to the user. */
+  question?: string;
+  /** Hint / placeholder text shown inside the input. */
+  placeholder?: string;
+  /** Helper text shown below the input (e.g. binding advice). */
+  hint?: string;
+  /** Variable name to store the entered text. */
+  variable?: string;
+  /** Whether the input is required (blocks submit when empty). Defaults to false. */
+  required?: boolean;
+  /** Max character length. 0 = unlimited. */
+  maxLength?: number;
+}
+
+/**
+ * Rank-order node data — player drags to reorder items by preference.
+ *
+ * Stores the final ordered list of item ids (comma-separated) in the
+ * target variable. Used for collecting the player's priority weights
+ * over previously-collected dimensions (e.g. 段位、MBTI、游戏观 ...).
+ */
+export interface RankOrderNodeData extends BaseNodeData {
+  /** Question prompt displayed above the drag list. */
+  question?: string;
+  /** Helper text shown below the list. */
+  hint?: string;
+  /** Variable name to store the ordered item ids (comma-separated). */
+  variable?: string;
+  /** Items the player can drag-reorder. */
+  items: Array<{ id: string; label: string; description?: string }>;
+}
+
+/**
+ * Number-picker node data — player scrolls to pick an integer value.
+ *
+ * Renders a vertical wheel/dial similar to native mobile date pickers.
+ * Used for selecting a year (e.g. 入坑年份 2008-2024) or any other numeric
+ * dimension where a slider's precision is insufficient.
+ *
+ * The selected number is stored in `variable` as a number.
+ */
+export interface NumberPickerNodeData extends BaseNodeData {
+  /** Question prompt displayed above the wheel. */
+  question?: string;
+  /** Helper text shown below the wheel. */
+  hint?: string;
+  /** Variable name to store the selected number. */
+  variable?: string;
+  /** Minimum selectable value (inclusive). */
+  min: number;
+  /** Maximum selectable value (inclusive). */
+  max: number;
+  /** Step between adjacent values. Defaults to 1. */
+  step?: number;
+  /** Unit suffix displayed next to the selected value (e.g. "年"). */
+  unit?: string;
+  /** Default value shown when the node is entered. Falls back to `min`. */
+  defaultValue?: number;
+}
+
 /** Discriminated union of all node data payloads. */
 export type GameNodeData =
   | StartNodeData
@@ -273,7 +347,10 @@ export type GameNodeData =
   | MinigameNodeData
   | RatingNodeData
   | MultiSelectNodeData
-  | MediaNodeData;
+  | MediaNodeData
+  | TextInputNodeData
+  | RankOrderNodeData
+  | NumberPickerNodeData;
 
 /** Variable value type stored in the flow. */
 export type VariableValue = string | number | boolean;

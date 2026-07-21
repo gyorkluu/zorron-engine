@@ -11,6 +11,7 @@ import {
   FileBox,
   HardDrive,
   PackageOpen,
+  type LucideIcon,
 } from 'lucide-react';
 import type { Asset, AssetType } from '@/types/asset';
 import { formatFileSize, isLocalAsset } from '@/types/asset';
@@ -26,7 +27,7 @@ const TYPE_ACCENTS: Record<AssetType, { bg: string; text: string; border: string
   other: { bg: 'bg-slate-500/15', text: 'text-slate-300', border: 'border-slate-500/25' },
 };
 
-const TYPE_ICONS: Record<AssetType, React.ComponentType<{ size?: number; className?: string }>> = {
+const TYPE_ICONS: Record<AssetType, LucideIcon> = {
   image: ImageIcon,
   audio: Music,
   video: Film,

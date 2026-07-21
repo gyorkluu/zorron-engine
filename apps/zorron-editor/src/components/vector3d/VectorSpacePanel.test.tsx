@@ -198,7 +198,7 @@ describe('VectorSpaceSettings', () => {
     });
     render(<VectorSpaceSettings />);
     fireEvent.click(screen.getByText('+ 添加锚点'));
-    expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(1);
+    expect(useProjectStore.getState().settings.vectorSpace?.sects).toHaveLength(1);
   });
 
   it('removes a sect anchor when the delete button is clicked', () => {
@@ -215,12 +215,12 @@ describe('VectorSpaceSettings', () => {
     });
     render(<VectorSpaceSettings />);
     fireEvent.click(screen.getByText('删除'));
-    expect(useProjectStore.getState().settings.vectorSpace.sects).toHaveLength(0);
+    expect(useProjectStore.getState().settings.vectorSpace?.sects).toHaveLength(0);
   });
 
   it('toggles the vector space enabled state', () => {
     render(<VectorSpaceSettings />);
     fireEvent.click(screen.getByText('启用三维向量空间'));
-    expect(useProjectStore.getState().settings.vectorSpace.enabled).toBe(true);
+    expect(useProjectStore.getState().settings.vectorSpace?.enabled).toBe(true);
   });
 });

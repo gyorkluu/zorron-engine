@@ -12,9 +12,26 @@ import type { NodeType } from '@/types/flow';
 /** Terminal node types that cannot have outgoing edges. */
 const TERMINAL_TYPES: ReadonlySet<NodeType> = new Set(['settlement', 'link']);
 
+/**
+ * Build a complete Connection object from a partial override.
+ *
+ * `Connection` requires `sourceHandle` / `targetHandle` to be present (they
+ * may be `null`), but tests are clearer when they omit those fields. This
+ * helper fills in sane defaults.
+ */
+function makeConnection(
+  partial: Partial<Connection> & { source: string; target: string },
+): Connection {
+  return {
+    sourceHandle: null,
+    targetHandle: null,
+    ...partial,
+  };
+}
+
 /** Replicate the isValidConnection logic from FlowCanvas for unit testing. */
 function isValidConnection(
-  connection: Connection & { source: string; target: string },
+  connection: Connection | Edge,
   nodes: Node[],
   edges: Edge[],
 ): boolean {
@@ -39,26 +56,34 @@ function makeNode(id: string, type: string): Node {
 describe('connection rules', () => {
   it('allows a normal scene -> settlement connection', () => {
     const nodes = [makeNode('s1', 'scene'), makeNode('end', 'settlement')];
-    expect(isValidConnection({ source: 's1', target: 'end' }, nodes, [])).toBe(true);
+    expect(isValidConnection(makeConnection({ source: 's1', target: 'end' }), nodes, [])).toBe(true);
   });
 
   it('rejects a settlement node as a source', () => {
     const nodes = [makeNode('end', 'settlement'), makeNode('s2', 'scene')];
-    expect(isValidConnection({ source: 'end', target: 's2' }, nodes, [])).toBe(false);
+    expect(isValidConnection(makeConnection({ source: 'end', target: 's2' }), nodes, [])).toBe(false);
   });
 
   it('rejects a link node as a source', () => {
     const nodes = [makeNode('l1', 'link'), makeNode('s2', 'scene')];
-    expect(isValidConnection({ source: 'l1', target: 's2' }, nodes, [])).toBe(false);
+    expect(isValidConnection(makeConnection({ source: 'l1', target: 's2' }), nodes, [])).toBe(false);
   });
 
   it('allows a logic node true/false outputs', () => {
     const nodes = [makeNode('lg', 'logic'), makeNode('a', 'scene'), makeNode('b', 'scene')];
     expect(
-      isValidConnection({ source: 'lg', target: 'a', sourceHandle: 'true' }, nodes, []),
+      isValidConnection(
+        makeConnection({ source: 'lg', target: 'a', sourceHandle: 'true' }),
+        nodes,
+        [],
+      ),
     ).toBe(true);
     expect(
-      isValidConnection({ source: 'lg', target: 'b', sourceHandle: 'false' }, nodes, []),
+      isValidConnection(
+        makeConnection({ source: 'lg', target: 'b', sourceHandle: 'false' }),
+        nodes,
+        [],
+      ),
     ).toBe(true);
   });
 
@@ -67,7 +92,7 @@ describe('connection rules', () => {
     const edges: Edge[] = [
       { id: 'e1', source: 's1', target: 's2', sourceHandle: null, targetHandle: null },
     ];
-    expect(isValidConnection({ source: 's1', target: 's2' }, nodes, edges)).toBe(false);
+    expect(isValidConnection(makeConnection({ source: 's1', target: 's2' }), nodes, edges)).toBe(false);
   });
 
   it('allows distinct edges from the same source via different handles', () => {
@@ -76,7 +101,11 @@ describe('connection rules', () => {
       { id: 'e1', source: 'lg', target: 'a', sourceHandle: 'true', targetHandle: null },
     ];
     expect(
-      isValidConnection({ source: 'lg', target: 'b', sourceHandle: 'false' }, nodes, edges),
+      isValidConnection(
+        makeConnection({ source: 'lg', target: 'b', sourceHandle: 'false' }),
+        nodes,
+        edges,
+      ),
     ).toBe(true);
   });
 });

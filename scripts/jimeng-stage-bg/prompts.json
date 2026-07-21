@@ -1,0 +1,41 @@
+{
+  "common_style": "Traditional Chinese ink wash painting (水墨画) style, 16:9 landscape composition, subtle muted color palette with gold accent dots, light cream paper texture background (#f7f6f6 base) suitable for UI overlay at 0.2 opacity, generous negative space for text legibility, no text, no watermark, no people faces, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail",
+  "items": [
+    {
+      "name": "mode-bg",
+      "prompt": "Three ancient Chinese weapons crossed arrangement: a slender straight sword (剑) on the left, a heavy broad-blade saber (刀) in the center, and a long spear (枪) on the right. Traditional Chinese ink wash painting style, 16:9 landscape composition, subtle muted ink tones with faint gold sparkles, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, no people, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail."
+    },
+    {
+      "name": "mindset-bg",
+      "prompt": "A Daoist inner-cultivation scene: a floating golden talisman seal (符咒) surrounded by flowing Qi energy streams, a half-visible Bagua (八卦) trigram in the upper-left, faint inner alchemy symbols (内功心法), distant mountain silhouette. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones with gold accents, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, no people faces, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail."
+    },
+    {
+      "name": "body-bg",
+      "prompt": "Four elegant silhouettes of Chinese wuxia figures in different body types: a tall adult male swordsman (成男), a graceful adult female (成女), a small boy (正太), and a small girl (萝莉), each in a distinct martial pose, arranged in a horizontal row. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, high detail."
+    },
+    {
+      "name": "gender-bg",
+      "prompt": "An abstract Taiji (太极 yin-yang) symbol rendered in flowing ink wash, with a masculine Yang side on the left showing a faint sword silhouette, and a feminine Yin side on the right showing a faint lotus silhouette, surrounded by floating mist. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones with subtle gold accents, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, high detail."
+    },
+    {
+      "name": "rank-bg",
+      "prompt": "A lone sword immortal (剑客) standing on a mountain peak at dawn, holding a long sword pointing to the sky, surrounded by swirling clouds and faint falling petals, distant pagoda silhouette. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones with gold sparkles, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, faceless figure, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail."
+    },
+    {
+      "name": "interests-bg",
+      "prompt": "A scattered still-life arrangement of Jianghu treasures: a Go board (围棋) in the upper-left, a blooming peony (牡丹) in the upper-right, a tea set (茶具) in the center, a small pet (宠物) silhouette in the lower-left, and an ancient scroll (画卷) in the lower-right. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones with gold accents, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, high detail."
+    },
+    {
+      "name": "mbti-bg",
+      "prompt": "A mystical night sky with a rotating star chart (星盘), eight trigrams (八卦) arranged in a circle, faint constellation lines connecting golden stars, a compass needle pointing north, ethereal cosmic energy. Traditional Chinese ink wash painting style combined with star-chart illustration, 16:9 landscape composition, muted ink tones with gold starlight, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail."
+    },
+    {
+      "name": "zodiac-bg",
+      "prompt": "Twelve Western zodiac constellation symbols (黄道十二宫) arranged in a circular pattern around a central sun-moon emblem: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces. Each constellation rendered as faint ink wash star patterns connected by thin gold lines, with subtle constellation-figure silhouettes. Traditional Chinese ink wash painting style fused with Western astrology motifs, 16:9 landscape composition, muted ink tones with gold star accents, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, misty atmosphere, high detail."
+    },
+    {
+      "name": "priority-bg",
+      "prompt": "A stack of ancient Chinese bamboo slips (竹简) tied with silk cord, partially unrolled to reveal blank writing space, a writing brush (毛笔) resting on top, an ink stone (砚台) with grinding ink in the lower-right corner, scattered plum blossom petals. Traditional Chinese ink wash painting style, 16:9 landscape composition, muted ink tones with gold accents, light cream paper texture background (#f7f6f6) suitable as UI background at 0.2 opacity, generous negative space, no text, no watermark, ancient Chinese aesthetic, soft brush strokes, high detail."
+    }
+  ]
+}

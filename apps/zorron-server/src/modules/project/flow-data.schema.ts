@@ -24,9 +24,14 @@ export const NodeTypeSchema = z.enum([
   'rating',
   'multi-select',
   'media',
+  'text-input',
+  'rank-order',
 ]);
 
-export const BaseNodeDataSchema = z.object({ label: z.string().optional() });
+export const BaseNodeDataSchema = z.object({
+  label: z.string().optional(),
+  backgroundUrl: z.string().optional(),
+});
 
 export const StartNodeDataSchema = BaseNodeDataSchema.extend({
   coverUrl: z.string().optional(),
@@ -56,6 +61,7 @@ export const SceneChoiceSchema = z.object({
     })
     .optional(),
   dropFragmentId: z.string().nullable().optional(),
+  icon: z.string().optional(),
 });
 
 export const SceneNodeDataSchema = BaseNodeDataSchema.extend({
@@ -231,17 +237,19 @@ export const MultiSelectNodeDataSchema = BaseNodeDataSchema.extend({
         id: z.string(),
         label: z.string(),
         description: z.string().optional(),
+        /** Optional icon image URL displayed alongside the option label (e.g. 心法图标). */
+        icon: z.string().optional(),
       }),
     )
     .default([]),
   /** Minimum selections required. Backend canonical field. */
   minSelected: z.number().int().min(0).default(0),
-  /** Maximum selections allowed. Backend canonical field. */
-  maxSelected: z.number().int().min(1).optional(),
+  /** Maximum selections allowed. 0 = no limit. Backend canonical field. */
+  maxSelected: z.number().int().min(0).optional(),
   /** Legacy alias for minSelected (frontend naming). */
   minSelect: z.number().int().min(0).optional(),
-  /** Legacy alias for maxSelected (frontend naming). */
-  maxSelect: z.number().int().min(1).optional(),
+  /** Legacy alias for maxSelected (frontend naming). 0 = no limit. */
+  maxSelect: z.number().int().min(0).optional(),
   /** Variable name to store the selected option ids. */
   variable: z.string().optional(),
   /** Whether selected options map to tags (for survey settlement). */
@@ -258,6 +266,42 @@ export const MediaNodeDataSchema = BaseNodeDataSchema.extend({
   loop: z.boolean().default(false),
   /** Optional duration in seconds (for audio). */
   duration: z.number().positive().optional(),
+});
+
+/** Text input node: player enters free-form text (e.g. 推栏号). */
+export const TextInputNodeDataSchema = BaseNodeDataSchema.extend({
+  /** Question prompt displayed to the user. */
+  question: z.string().optional(),
+  /** Hint / placeholder text shown inside the input. */
+  placeholder: z.string().optional(),
+  /** Helper text shown below the input (e.g. binding advice). */
+  hint: z.string().optional(),
+  /** Variable name to store the entered text. */
+  variable: z.string().optional(),
+  /** Whether the input is required (blocks submit when empty). */
+  required: z.boolean().default(false),
+  /** Max character length. 0 = unlimited. */
+  maxLength: z.number().int().min(0).default(0),
+});
+
+/** Rank-order node: player drag-reorders items by personal importance. */
+export const RankOrderNodeDataSchema = BaseNodeDataSchema.extend({
+  /** Question prompt displayed to the user. */
+  question: z.string().optional(),
+  /** Helper text shown below the prompt. */
+  hint: z.string().optional(),
+  /** Variable name to store the comma-joined ordered item ids. */
+  variable: z.string().optional(),
+  /** Items to be reordered by the player. */
+  items: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .default([]),
 });
 
 /**
@@ -363,6 +407,22 @@ export const GameNodeSchema = z.discriminatedUnion('type', [
     type: z.literal('media'),
     position: PositionSchema,
     data: MediaNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('text-input'),
+    position: PositionSchema,
+    data: TextInputNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
+  z.object({
+    id: z.string(),
+    type: z.literal('rank-order'),
+    position: PositionSchema,
+    data: RankOrderNodeDataSchema,
     width: z.number().optional(),
     height: z.number().optional(),
   }),

@@ -9,6 +9,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SettlementStage } from './SettlementStage';
+import { useProjectStore } from '@/stores/projectStore';
 import type { GameState, SettlementResult } from '@/engine/GameEngine';
 
 // Mock useT so we get predictable, deterministic strings in the DOM.
@@ -76,6 +77,14 @@ function makeState(result: SettlementResult | null): GameState {
     link: null,
     start: null,
     scene: null,
+    minigame: null,
+    rating: null,
+    multiSelect: null,
+    media: null,
+    textInput: null,
+    rankOrder: null,
+    numberPicker: null,
+    stageBackgroundUrl: null,
   } as GameState;
 }
 
@@ -85,6 +94,16 @@ describe('SettlementStage', () => {
     // Default: vector3d flag OFF so the X/Y/Z readout is rendered (simpler
     // to assert against than the mocked VectorSpacePanel).
     mockFeatureFlags.vector3d = false;
+    // Enable vectorSpace in the project store so the component's
+    // `isVectorEnabled` guard passes and vector readouts are rendered.
+    useProjectStore.setState({
+      settings: {
+        vectorSpace: {
+          enabled: true,
+          dimensions: { x: '处世', y: '立场', z: '性情' },
+        },
+      },
+    });
   });
 
   it('renders nothing when settlementResult is null', () => {

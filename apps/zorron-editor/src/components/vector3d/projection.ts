@@ -133,7 +133,7 @@ export function buildAxes(
 ): AxisLine[] {
   return Object.entries(labels)
     .slice(0, 3)
-    .map(([axisId, label], i) => {
+    .map(([, label], i) => {
       const [ex, ey, ez] = AXIS_ENDS[i];
       return {
         start: projectXYZ(0, 0, 0, camera, origin, scale),

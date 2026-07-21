@@ -1,7 +1,17 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
+import type { InlineConfig } from 'vitest/node';
+
+/**
+ * Vite's `UserConfig` does not include the `test` field; Vitest augments it
+ * via `declare module 'vite'`. Under pnpm, Vitest's transitive Vite (v5) and
+ * the project's Vite (v6) resolve to different copies, so the module
+ * augmentation doesn't reach our config file. We declare the merged shape
+ * locally and cast the config object so the `test` field is accepted.
+ */
+type ViteConfigWithTest = UserConfig & { test?: InlineConfig };
 
 // [Vite]: React frontend build tool & dev server
 export default defineConfig({
@@ -27,4 +37,4 @@ export default defineConfig({
       '**/*.spec.ts',
     ],
   },
-});
+} as ViteConfigWithTest);

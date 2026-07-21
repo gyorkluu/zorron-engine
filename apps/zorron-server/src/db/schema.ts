@@ -307,6 +307,65 @@ export const webhookDeliveries = pgTable(
 );
 
 /**
+ * JX3 submissions table.
+ *
+ * Stores completed JX3 social-card test sessions keyed by 推栏号.
+ * Used for duplicate detection: when a user enters a 推栏号 that already
+ * has a submission, the frontend offers "修改信息" (re-take) or "申诉"
+ * (appeal with screenshot) actions.
+ */
+export const jx3Submissions = pgTable(
+  'jx3_submissions',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    /** 推栏号 — unique per submission. */
+    tuilanId: varchar('tuilan_id', { length: 64 }).notNull().unique(),
+    /** Xoyo personId (internal). */
+    personId: varchar('person_id', { length: 128 }),
+    /** Aggregated profile from Xoyo API (JSONB). */
+    profile: jsonb('profile'),
+    /** Final engine variables at settlement time (JSONB). */
+    variables: jsonb('variables'),
+    /** Settlement result (JSONB). */
+    settlementResult: jsonb('settlement_result'),
+    /** Card-preset image local path (decrypted + downloaded). */
+    cardImagePath: text('card_image_path'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    tuilanIdIdx: uniqueIndex('jx3_submissions_tuilan_id_idx').on(table.tuilanId),
+  }),
+);
+
+/**
+ * JX3 appeals table.
+ *
+ * Stores appeals submitted when a 推栏号 already has a submission and the
+ * user claims the data is incorrect or the account belongs to them.
+ * Each appeal includes a screenshot upload path and a free-text reason.
+ */
+export const jx3Appeals = pgTable(
+  'jx3_appeals',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    tuilanId: varchar('tuilan_id', { length: 64 }).notNull(),
+    /** Local path of the uploaded screenshot. */
+    screenshotPath: text('screenshot_path').notNull(),
+    /** User-provided appeal reason. */
+    reason: text('reason'),
+    /** pending | approved | rejected */
+    status: varchar('status', { length: 20 }).notNull().default('pending'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    tuilanIdIdx: index('jx3_appeals_tuilan_id_idx').on(table.tuilanId),
+    statusIdx: index('jx3_appeals_status_idx').on(table.status),
+  }),
+);
+
+/**
  * Drizzle ORM relations.
  */
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -387,3 +446,7 @@ export type WebhookSubscription = typeof webhookSubscriptions.$inferSelect;
 export type NewWebhookSubscription = typeof webhookSubscriptions.$inferInsert;
 export type WebhookDelivery = typeof webhookDeliveries.$inferSelect;
 export type NewWebhookDelivery = typeof webhookDeliveries.$inferInsert;
+export type Jx3Submission = typeof jx3Submissions.$inferSelect;
+export type NewJx3Submission = typeof jx3Submissions.$inferInsert;
+export type Jx3Appeal = typeof jx3Appeals.$inferSelect;
+export type NewJx3Appeal = typeof jx3Appeals.$inferInsert;

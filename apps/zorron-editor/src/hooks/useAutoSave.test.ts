@@ -75,6 +75,16 @@ describe('useAutoSave', () => {
     vi.useFakeTimers();
     useEditorStore.getState().clear();
     useProjectStore.getState().reset();
+    // Sync the project store's metadata fields with sampleFlow so that
+    // `buildCurrentFlowData()` produces a flow identical to the snapshot.
+    // Without this, the store's default settings ({} after reset) differ
+    // from sampleFlow.settings, causing isDirty to return true on the
+    // first tick even though the canvas hasn't been edited.
+    useProjectStore.setState({
+      variables: sampleFlow.variables,
+      settings: sampleFlow.settings,
+      version: sampleFlow.version,
+    });
     // Seed a saved snapshot so isDirty starts false.
     useProjectStore.getState().setSavedSnapshot(sampleFlow);
   });

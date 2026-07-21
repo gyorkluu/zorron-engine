@@ -43,6 +43,13 @@
       "when": 1783688178490,
       "tag": "0005_marvelous_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784009666466,
+      "tag": "0006_striped_sabretooth",
+      "breakpoints": true
     }
   ]
 }

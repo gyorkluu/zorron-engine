@@ -13,12 +13,12 @@ import {
   BackgroundVariant,
   Controls,
   MiniMap,
-  type Connection,
+  type Edge,
   type IsValidConnection,
   type Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ZoomIn, ZoomOut, Maximize, MousePointer2, Sparkles } from 'lucide-react';
+import { MousePointer2, Sparkles } from 'lucide-react';
 import { useEditorStore } from '@/stores/editorStore';
 import { nodeTypes } from './nodes';
 import { ZorronEdge } from './edges/ZorronEdge';
@@ -43,9 +43,6 @@ function CustomControls() {
         className="!static !m-0 !flex !flex-col !gap-1 !border-0 !bg-transparent !p-0 !shadow-none"
         position="bottom-left"
         showInteractive={false}
-        zoomInIcon={<ZoomIn size={12} className="text-slate-300" />}
-        zoomOutIcon={<ZoomOut size={12} className="text-slate-300" />}
-        fitViewIcon={<Maximize size={12} className="text-slate-300" />}
       />
     </div>
   );
@@ -66,7 +63,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [showSearch, setShowSearch] = useState(false);
 
-  const isValidConnection: IsValidConnection<Connection & { source: string; target: string }> =
+  const isValidConnection: IsValidConnection<Edge> =
     useCallback(
       (connection) => {
         const sourceNode = nodes.find((n) => n.id === connection.source) as Node | undefined;
@@ -145,13 +142,13 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     return () => window.removeEventListener('keydown', handler);
   }, [undo, redo, removeNode]);
 
-  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => { selectNode(node.id); }, [selectNode]);
+  const onNodeClick = useCallback((_event: MouseEvent | React.MouseEvent, node: Node) => { selectNode(node.id); }, [selectNode]);
   const onPaneClick = useCallback(() => { selectNode(null); }, [selectNode]);
-  const onNodeContextMenu = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeContextMenu = useCallback((event: MouseEvent | React.MouseEvent, node: Node) => {
     event.preventDefault();
     setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
   }, []);
-  const onPaneContextMenu = useCallback((event: React.MouseEvent) => {
+  const onPaneContextMenu = useCallback((event: MouseEvent | React.MouseEvent) => {
     event.preventDefault();
     setContextMenu({ x: event.clientX, y: event.clientY, nodeId: null });
   }, []);

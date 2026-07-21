@@ -60,6 +60,14 @@ function makeState(overrides: {
       intro: overrides.intro,
       coverUrl: overrides.coverUrl,
     },
+    minigame: null,
+    rating: null,
+    multiSelect: null,
+    media: null,
+    textInput: null,
+    rankOrder: null,
+    numberPicker: null,
+    stageBackgroundUrl: null,
   } as GameState;
 }
 

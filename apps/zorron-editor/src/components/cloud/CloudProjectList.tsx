@@ -31,8 +31,6 @@ import {
   CheckCircle2,
   LayoutGrid,
   ArrowRight,
-  LogIn,
-  Users,
   HardDrive,
 } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
@@ -44,7 +42,7 @@ import { BrandLogo } from '@/components/brand/BrandLogo';
 import { EmptyStateIllustration } from '@/components/brand/EmptyStateIllustration';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
-import type { ListProjectsQuery, ProjectDetail } from '@/types/project';
+import type { ListProjectsQuery, ProjectListItem } from '@/types/project';
 
 /** Props for the CloudProjectList. */
 export interface CloudProjectListProps {
@@ -71,7 +69,7 @@ function getProjectGradient(seed: string): { from: string; via: string; to: stri
 }
 
 /** Format relative time. */
-function formatRelativeTime(dateStr: string, t: ReturnType<typeof useT>['t']): string {
+function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -93,7 +91,7 @@ const ProjectCard = memo(function ProjectCard({
   onDelete,
   t,
 }: {
-  project: ProjectDetail;
+  project: ProjectListItem;
   onOpen: (id: string) => void;
   onDelete: (id: string) => void;
   t: ReturnType<typeof useT>['t'];
@@ -101,8 +99,10 @@ const ProjectCard = memo(function ProjectCard({
   const gradient = useMemo(() => getProjectGradient(project.id + project.title), [project.id, project.title]);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const nodeCount = project.data?.nodes?.length ?? 0;
-  const edgeCount = project.data?.edges?.length ?? 0;
+  // ProjectListItem does not carry full flow data; card only shows counts when present.
+  const data = (project as ProjectListItem & { data?: { nodes?: unknown[]; edges?: unknown[] } }).data;
+  const nodeCount = data?.nodes?.length ?? 0;
+  const edgeCount = data?.edges?.length ?? 0;
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-900/40 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-slate-700/80 hover:shadow-2xl hover:shadow-cyan-500/5">
@@ -153,7 +153,7 @@ const ProjectCard = memo(function ProjectCard({
         <div className="mb-4 flex items-center gap-3 text-xs text-slate-500">
           <span className="flex items-center gap-1">
             <Clock size={12} />
-            {formatRelativeTime(project.updatedAt, t)}
+            {formatRelativeTime(project.updatedAt)}
           </span>
           <span className="text-slate-700">·</span>
           <span>{nodeCount} 节点</span>

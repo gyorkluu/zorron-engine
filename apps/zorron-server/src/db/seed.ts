@@ -4,6 +4,7 @@ import { logger } from '../shared/logger';
 import { hash } from 'bcrypt';
 import sampleProject from './sample-project.json';
 import { FlowDataSchema } from '../modules/project/flow-data.schema';
+import { env } from '../config/env';
 
 /**
  * Converts the legacy project.json (exported from the Chinese Vue 3 editor)
@@ -158,7 +159,9 @@ async function seed() {
   const [user] = await db
     .insert(users)
     .values({
-      email: 'dev@zorron.io',
+      // Use the fixed dev user ID so AUTH_DEV_BYPASS requests map to a real user.
+      id: env.AUTH_DEV_USER_ID,
+      email: env.AUTH_DEV_USER_EMAIL,
       passwordHash,
       nickname: 'Zorron Dev',
     })

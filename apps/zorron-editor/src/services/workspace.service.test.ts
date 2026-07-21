@@ -73,7 +73,10 @@ class MockWritable {
       next.set(c, acc.length);
       return next;
     }, new Uint8Array());
-    return new Blob([merged]);
+    // Cast to BlobPart: lib.dom's BlobPart expects ArrayBufferView<ArrayBuffer>,
+    // but the reduce inference widens to ArrayBufferLike. Slicing returns a
+    // fresh Uint8Array backed by a real ArrayBuffer, which satisfies BlobPart.
+    return new Blob([merged.slice()]);
   }
 }
 

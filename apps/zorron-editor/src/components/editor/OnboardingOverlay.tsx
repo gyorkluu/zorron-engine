@@ -3,7 +3,7 @@
  */
 
 import { memo, useCallback, useState } from 'react';
-import { Sparkles, ChevronRight, ChevronLeft, X, Zap, Blocks, Settings } from 'lucide-react';
+import { Sparkles, ChevronRight, ChevronLeft, X, Zap, Blocks, Settings, type LucideIcon } from 'lucide-react';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import { BrandLogo } from '@/components/brand/BrandLogo';
@@ -21,7 +21,7 @@ interface OnboardingStep {
   titleKey: TranslationKey;
   bodyKey: TranslationKey;
   highlight: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
 }
 
 const STEP_ICONS = [Blocks, Settings, Zap];

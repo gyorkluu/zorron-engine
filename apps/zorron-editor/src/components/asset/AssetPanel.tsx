@@ -7,7 +7,7 @@
  */
 
 import { memo, useEffect, useMemo } from 'react';
-import { FolderOpen, Image as ImageIcon, Music, Film, Type, FileBox, Search, Plus } from 'lucide-react';
+import { FolderOpen, Image as ImageIcon, Music, Film, Type, FileBox, Search, type LucideIcon } from 'lucide-react';
 import { useAssetStore, useAllAssets } from '@/stores/assetStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 const TYPE_TABS: ReadonlyArray<{
   value: AssetType | undefined;
   labelKey: TranslationKey;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: LucideIcon;
   color: string;
 }> = [
   { value: undefined, labelKey: 'asset.all', icon: FolderOpen, color: 'text-slate-300' },

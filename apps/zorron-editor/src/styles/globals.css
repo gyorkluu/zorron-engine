@@ -162,6 +162,52 @@
   border-color: hsl(var(--color-border));
 }
 
+/* ── "开始匹配" 按钮：炫酷 hover 动画 ──
+ * globals.css 的 `* { border-color }` 通配符会覆盖 Tailwind
+ * 的 hover:border-[...] utility，因此这里用更高特异性的规则显式
+ * 定义按钮的 hover 状态，确保 borderColor / transform 都能生效。
+ */
+.match-trigger {
+  /* baseline transform variables so hover can compose cleanly */
+  --tw-translate-x: 0;
+  --tw-translate-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+  transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y))
+    scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.match-trigger:hover {
+  border-color: #bda9ad;
+  background-color: #ffffff;
+  color: #3c3839;
+  --tw-translate-y: -0.125rem;
+  --tw-scale-x: 1.03;
+  --tw-scale-y: 1.03;
+  box-shadow: 0 10px 28px rgba(54, 38, 42, 0.22);
+}
+.match-trigger:active {
+  --tw-translate-y: 0;
+  --tw-scale-x: 1;
+  --tw-scale-y: 1;
+}
+.match-trigger .match-arrow {
+  --tw-translate-x: -0.5rem;
+  transform: translateX(var(--tw-translate-x));
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+.match-trigger:hover .match-arrow {
+  --tw-translate-x: 0;
+  opacity: 1;
+}
+.match-trigger .match-shine {
+  transform: translateX(-100%);
+  transition: transform 0.9s ease-out;
+}
+.match-trigger:hover .match-shine {
+  transform: translateX(100%);
+}
+
 body {
   background-color: hsl(var(--color-background));
   color: hsl(var(--color-foreground));

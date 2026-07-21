@@ -73,6 +73,14 @@ function makeState(overrides: {
       characterUrl: overrides.characterUrl,
       speaker: overrides.speaker,
     },
+    minigame: null,
+    rating: null,
+    multiSelect: null,
+    media: null,
+    textInput: null,
+    rankOrder: null,
+    numberPicker: null,
+    stageBackgroundUrl: null,
   } as GameState;
 }
 

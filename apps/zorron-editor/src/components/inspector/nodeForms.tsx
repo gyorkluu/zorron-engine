@@ -52,6 +52,7 @@ export function StartForm({ node, update }: { node: FlowNode; update: (data: Par
       <Field label={t('field.title')}><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
       <Field label={t('field.intro')}><TextAreaField value={d.intro ?? ''} onChange={(intro) => update({ intro })} /></Field>
       <Field label={t('field.coverUrl')} hint={t('field.dragImage')}><UrlField value={d.coverUrl ?? ''} onChange={(coverUrl) => update({ coverUrl })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
     </div>
   );
 }
@@ -179,6 +180,7 @@ export function SettlementForm({ node, update }: { node: FlowNode; update: (data
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.strategy') ?? 'Strategy'}>
         <SelectField
           value={d.strategy ?? STRATEGY_IDS.VECTOR_NEAREST}
@@ -249,6 +251,7 @@ export function VideoForm({ node, update }: { node: FlowNode; update: (data: Par
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.videoUrl')} hint={t('field.dragVideo')}><UrlField value={d.videoUrl ?? ''} onChange={(videoUrl) => update({ videoUrl })} /></Field>
       <SwitchField checked={d.autoPlay} onChange={(autoPlay) => update({ autoPlay })} label={t('field.autoPlay')} />
       <SwitchField checked={d.skipAllowed} onChange={(skipAllowed) => update({ skipAllowed })} label={t('field.allowSkip')} />
@@ -265,6 +268,7 @@ export function LinkForm({ node, update }: { node: FlowNode; update: (data: Part
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
       <Field label={t('field.title')}><TextField value={d.title ?? ''} onChange={(title) => update({ title })} /></Field>
       <Field label={t('field.url')}><UrlField value={d.url ?? ''} onChange={(url) => update({ url })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.description')}><TextAreaField value={d.description ?? ''} onChange={(description) => update({ description })} rows={2} /></Field>
     </div>
   );
@@ -277,6 +281,7 @@ export function MinigameForm({ node, update }: { node: FlowNode; update: (data: 
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.gameUrl')}><UrlField value={d.gameUrl ?? ''} onChange={(gameUrl) => update({ gameUrl })} /></Field>
       <Field label={t('field.scoreVariable')}><TextField value={d.scoreVariable ?? ''} onChange={(scoreVariable) => update({ scoreVariable })} /></Field>
       <Field label={t('field.passingScore')}><NumberField value={d.passingScore ?? 0} onChange={(passingScore) => update({ passingScore })} /></Field>
@@ -291,6 +296,7 @@ export function RatingForm({ node, update }: { node: FlowNode; update: (data: Pa
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.prompt')}><TextField value={d.prompt ?? ''} onChange={(prompt) => update({ prompt })} /></Field>
       <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
       <Field label={t('field.min')}><NumberField value={d.min} onChange={(min) => update({ min })} /></Field>
@@ -307,6 +313,7 @@ export function MultiSelectForm({ node, update }: { node: FlowNode; update: (dat
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
       <Field label={t('field.minSelect')}><NumberField value={d.minSelect ?? 0} onChange={(minSelect) => update({ minSelect })} /></Field>
       <Field label={t('field.maxSelect')}><NumberField value={d.maxSelect ?? 0} onChange={(maxSelect) => update({ maxSelect })} /></Field>
@@ -359,6 +366,7 @@ export function MediaForm({ node, update }: { node: FlowNode; update: (data: Par
   return (
     <div className="space-y-3">
       <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
       <Field label={t('field.mediaType')}>
         <SelectField
           value={d.mediaType}
