@@ -1,0 +1,41 @@
+name: AI Context & Doc Sync Check
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+    paths:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - ".ai-context/**"
+      - "docs/**"
+
+jobs:
+  context-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Verify AGENTS.md length & parity
+        run: |
+          node -e '
+            const fs = require("fs");
+            const agents = fs.readFileSync("AGENTS.md", "utf8");
+            const lines = agents.split("\n").length;
+            if (lines > 200) {
+              console.error("Error: AGENTS.md exceeds 200 lines threshold: " + lines);
+              process.exit(1);
+            }
+            if (fs.existsSync("CLAUDE.md")) {
+              const claude = fs.readFileSync("CLAUDE.md", "utf8");
+              if (claude !== agents) {
+                console.warn("Warning: CLAUDE.md is out of sync with AGENTS.md");
+              }
+            }
+            console.log("AI Context verification passed (AGENTS.md lines: " + lines + ")");
+          '

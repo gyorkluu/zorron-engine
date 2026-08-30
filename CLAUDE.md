@@ -124,12 +124,3 @@ pnpm -r run lint       # 运行所有 lint
 pnpm -r run typecheck  # 运行所有类型检查
 pnpm -r run test       # 运行所有测试
 ```
-
-## Key Architectural Specifications
-
-在开发互动视频、GalGame、节点系统、播放器或数据契约时，**必须严格遵循以下生效中的架构规格书**：
-
-- 📘 [互动影游与 AI GalGame 引擎架构规格书](docs/architecture/interactive-video-galgame-engine-spec.md) (`docs/architecture/interactive-video-galgame-engine-spec.md`)
-  - 核心原则：`packages/flow-schema` 单一事实来源、粗分类混合判别模型（`stage` 四层正交架构）、移动端双缓冲池预加载降级、Howler 四轨混音与微信音频解锁、纯 CSS/SVG 渐进式滤镜、`GameEngine` 增量加固（Guard/QTE/Snapshot）、`save_slots` 存档表与 Backlog。
-  - **重要约束**：后续开发中如果对节点契约、播放器流转、状态机或编辑器工具链有任何设计变动，**必须同步修订该文档**。
-

@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS-DTOS | CN DOTA 现代科学化战队训练与运营全景体系</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            dota: {
+              bg: '#0a0d14',
+              surface: '#111622',
+              card: '#161d2d',
+              border: '#243048',
+              borderLight: '#334155',
+              primary: '#f59e0b',
+              primaryHover: '#d97706',
+              cyan: '#06b6d4',
+              emerald: '#10b981',
+              rose: '#f43f5e',
+              textMain: '#f8fafc',
+              textSub: '#cbd5e1',
+              textMuted: '#94a3b8'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans SC"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #0a0d14; }
+    ::-webkit-scrollbar-thumb { background: #243048; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4d6e; }
+    
+    .tactical-card {
+      background: #111622;
+      border: 1px solid #243048;
+      box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.6);
+    }
+    
+    .tactical-card-accent {
+      background: #161d2d;
+      border: 1px solid #2a3852;
+    }
+
+    .tab-nav-btn.active {
+      background: #f59e0b;
+      color: #000000;
+      font-weight: 800;
+      border-color: #f59e0b;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+    }
+
+    .timeline-step.active {
+      border-color: #06b6d4;
+      background: rgba(6, 182, 212, 0.15);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body class="bg-dota-bg text-dota-textMain font-sans text-base antialiased min-h-screen selection:bg-amber-500 selection:text-black">
+
+  <!-- Top Fixed Navigation -->
+  <header class="sticky top-0 z-50 bg-dota-bg/95 backdrop-blur-md border-b border-dota-border py-4 px-4 sm:px-8 shadow-xl">
+    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3.5 self-start md:self-auto">
+        <div class="w-11 h-11 rounded-xl bg-amber-500 flex items-center justify-center text-black font-extrabold shadow-lg">
+          <i data-lucide="shield" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-2xl tracking-wider text-white font-mono">CS-DTOS</span>
+            <span class="text-xs px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold">PRO EDITION</span>
+          </div>
+          <p class="text-sm text-dota-textMuted font-medium">CN DOTA 现代科学化战队训练与运营全景体系</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex flex-wrap items-center gap-2.5 font-medium text-sm w-full md:w-auto justify-start md:justify-end">
+        <button onclick="switchTab('overview')" id="tab-nav-overview" class="tab-nav-btn active px-4 py-2.5 rounded-xl border border-dota-border transition-all flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i> 全景总览
+        </button>
+        <button onclick="switchTab('stage1')" id="tab-nav-stage1" class="tab-nav-btn px-4 py-2.5 rounded-xl bg-dota-surface text-dota-textSub border border-dota-border hover:border-amber-500/50 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="user-check" class="w-4 h-4 text-amber-400"></i> 阶段一: 选拔与重塑
+        </button>
+        <button onclick="switchTab('stage2')" id="tab-nav-stage2" class="tab-nav-btn px-4 py-2.5 rounded-xl bg-dota-surface text-dota-textSub border border-dota-border hover:border-cyan-500/50 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="timer" class="w-4 h-4 text-cyan-400"></i> 阶段二: 前10分SOP
+        </button>
+        <button onclick="switchTab('stage3')" id="tab-nav-stage3" class="tab-nav-btn px-4 py-2.5 rounded-xl bg-dota-surface text-dota-textSub border border-dota-border hover:border-emerald-500/50 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="swords" class="w-4 h-4 text-emerald-400"></i> 阶段三: 切片与复盘
+        </button>
+        <button onclick="switchTab('stage4')" id="tab-nav-stage4" class="tab-nav-btn px-4 py-2.5 rounded-xl bg-dota-surface text-dota-textSub border border-dota-border hover:border-purple-500/50 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+          <i data-lucide="cpu" class="w-4 h-4 text-purple-400"></i> 阶段四: 数据与心理
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="max-w-[1440px] mx-auto px-4 sm:px-8 py-10 space-y-16">
+
+    <!-- ==========================================
+         TAB 0: 全景总览 (OVERVIEW)
+         ========================================== -->
+    <section id="tab-overview" class="tab-pane space-y-12">
+      
+      <!-- Hero Headline Banner -->
+      <div class="tactical-card p-8 sm:p-12 rounded-3xl border-2 border-dota-border relative overflow-hidden">
+        <div class="max-w-4xl space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-sm font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+            CHINESE DOTA2 SCIENTIFIC TRAINING & OPERATIONS SYSTEM
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+            彻底终结人情经验主义<br>
+            <span class="text-amber-400">用数据工程与切片特训重塑 CN DOTA</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-dota-textSub leading-relaxed">
+            深入剖析近年世界大赛溃败根源，构建涵盖<strong class="text-white">“科学选拔、老将重塑、战术数据工程、模块化专项训练、运动心理保障”</strong>五大核心维度的职业化标准体系。
+          </p>
+          <div class="pt-4 flex flex-wrap gap-4">
+            <button onclick="switchTab('stage1')" class="px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-base transition-all shadow-lg flex items-center gap-2">
+              查看阶段一：新人考核与老将重塑 <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+            <button onclick="switchTab('stage2')" class="px-7 py-3.5 rounded-xl bg-dota-card hover:bg-dota-surface text-white font-bold text-base border border-dota-border transition-all flex items-center gap-2">
+              查看阶段二：前 10 分钟资源 SOP <i data-lucide="timer" class="w-5 h-5 text-cyan-400"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Five Dimensions Core Grid -->
+      <div class="space-y-6">
+        <div class="border-b border-dota-border pb-4">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+            <i data-lucide="layers" class="w-7 h-7 text-amber-400"></i> 五大核心维度集成全景
+          </h2>
+          <p class="text-base text-dota-textMuted mt-1">每个维度均对应明确的量化标准、操作规范与考核机制</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Dimension 1 -->
+          <div class="tactical-card p-7 rounded-2xl space-y-4 hover:border-amber-500/60 transition-all border border-dota-border flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                <i data-lucide="target" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">1. 科学选拔与新人量化考核</h3>
+              <p class="text-base text-dota-textSub leading-relaxed">
+                告别纯天梯分迷信，建立 6 维量化能力雷达、1v1 极限对线抗压与 3500 经济落后沙盒找节奏考核。
+              </p>
+            </div>
+            <div class="pt-4 border-t border-dota-border text-sm font-mono text-amber-400 font-semibold flex justify-between items-center">
+              <span>通过门槛: 综合 ≥ 80 分</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+          <!-- Dimension 2 -->
+          <div class="tactical-card p-7 rounded-2xl space-y-4 hover:border-cyan-500/60 transition-all border border-dota-border flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <i data-lucide="refresh-cw" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">2. 老将认知破壁与习惯重塑</h3>
+              <p class="text-base text-dota-textSub leading-relaxed">
+                制定潜意识不良习惯剥离清单（Unlearning）、每日客观数据对账、昼夜节律调整与心肺耐力强化。
+              </p>
+            </div>
+            <div class="pt-4 border-t border-dota-border text-sm font-mono text-cyan-400 font-semibold flex justify-between items-center">
+              <span>强制纠偏: 4 大红线</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+          <!-- Dimension 3 -->
+          <div class="tactical-card p-7 rounded-2xl space-y-4 hover:border-emerald-500/60 transition-all border border-dota-border flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <i data-lucide="binary" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">3. 现代战术与数据工程架构</h3>
+              <p class="text-base text-dota-textSub leading-relaxed">
+                前 10 分钟秒级资源控制 SOP、动态 BP 决策树、录像解析器提取对手插眼习惯与开雾路线热力图。
+              </p>
+            </div>
+            <div class="pt-4 border-t border-dota-border text-sm font-mono text-emerald-400 font-semibold flex justify-between items-center">
+              <span>时间精度: 秒级执行</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+          <!-- Dimension 4 -->
+          <div class="tactical-card p-7 rounded-2xl space-y-4 hover:border-rose-500/60 transition-all border border-dota-border flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                <i data-lucide="scissors" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">4. 科学化日常训练与复盘机制</h3>
+              <p class="text-base text-dota-textSub leading-relaxed">
+                废除低效全场训练赛，推行 10 分钟对线极限循环赛、20 分钟肉山团切片与去情绪化 Blameless 5 Whys 复盘。
+              </p>
+            </div>
+            <div class="pt-4 border-t border-dota-border text-sm font-mono text-rose-400 font-semibold flex justify-between items-center">
+              <span>训练密度: 10 轮高频切片/日</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+          <!-- Dimension 5 -->
+          <div class="tactical-card p-7 rounded-2xl space-y-4 hover:border-purple-500/60 transition-all border border-dota-border flex flex-col justify-between md:col-span-2 lg:col-span-2">
+            <div class="space-y-3">
+              <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">5. 团队动力学与运动心理保障</h3>
+              <p class="text-base text-dota-textSub leading-relaxed">
+                主教练/队长/分析师/经理权责绝对分离。赛场倾斜（Tilt）红温阻断机制（赛间 10 分钟严禁复盘上一局失误 + 4-7-8 生理降温），每周 1v1 心理咨询与良性争议通道。
+              </p>
+            </div>
+            <div class="pt-4 border-t border-dota-border text-sm font-mono text-purple-400 font-semibold flex justify-between items-center">
+              <span>赛间阻断: 10 分钟紧急介入 SOP</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Four Execution Stages Grid -->
+      <div class="space-y-6">
+        <div class="border-b border-dota-border pb-4">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+            <i data-lucide="git-branch" class="w-7 h-7 text-cyan-400"></i> 四大阶段规程文档导航
+          </h2>
+          <p class="text-base text-dota-textMuted mt-1">点击对应卡片即可快速进入各阶段的详细规程与量化表格</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div onclick="switchTab('stage1')" class="tactical-card p-8 rounded-2xl border border-dota-border hover:border-amber-500 cursor-pointer transition-all space-y-4 group">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-mono px-3.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">STAGE 01</span>
+              <i data-lucide="arrow-up-right" class="w-6 h-6 text-dota-textMuted group-hover:text-amber-400 transition-colors"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white group-hover:text-amber-400 transition-colors">选手量化考核与老将重塑规程 (SOP)</h3>
+            <p class="text-base text-dota-textSub leading-relaxed">
+              涵盖 6 维量化能力雷达、1v1 极端劣势对线压测、3500 经济落后找节奏模拟以及老将 4 项潜意识纠偏清单。
+            </p>
+          </div>
+
+          <div onclick="switchTab('stage2')" class="tactical-card p-8 rounded-2xl border border-dota-border hover:border-cyan-500 cursor-pointer transition-all space-y-4 group">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-mono px-3.5 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">STAGE 02</span>
+              <i data-lucide="arrow-up-right" class="w-6 h-6 text-dota-textMuted group-hover:text-cyan-400 transition-colors"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white group-hover:text-cyan-400 transition-colors">现代战术体系与前 10 分钟资源控制 SOP</h3>
+            <p class="text-base text-dota-textSub leading-relaxed">
+              0:00~10:00 秒级执行时间轴、莲花/水符/经验神龛控制、辅助过载游走与动态 BP 三大绝对红线。
+            </p>
+          </div>
+
+          <div onclick="switchTab('stage3')" class="tactical-card p-8 rounded-2xl border border-dota-border hover:border-emerald-500 cursor-pointer transition-all space-y-4 group">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-mono px-3.5 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">STAGE 03</span>
+              <i data-lucide="arrow-up-right" class="w-6 h-6 text-dota-textMuted group-hover:text-emerald-400 transition-colors"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white group-hover:text-emerald-400 transition-colors">科学化日常切片训练与去情绪化复盘指南</h3>
+            <p class="text-base text-dota-textSub leading-relaxed">
+              每日 10 轮 10 分钟对线极限循环赛、周期化周课表、去情绪化 Blameless 5 Whys 归因复盘四步法。
+            </p>
+          </div>
+
+          <div onclick="switchTab('stage4')" class="tactical-card p-8 rounded-2xl border border-dota-border hover:border-purple-500 cursor-pointer transition-all space-y-4 group">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-mono px-3.5 py-1.5 rounded-lg bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">STAGE 04</span>
+              <i data-lucide="arrow-up-right" class="w-6 h-6 text-dota-textMuted group-hover:text-purple-400 transition-colors"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white group-hover:text-purple-400 transition-colors">战队数据中台规范与团队动力学心理保障</h3>
+            <p class="text-base text-dota-textSub leading-relaxed">
+              数据中台核心指标库（开雾期望/热力图）、权责绝对分离架构、赛间 10 分钟 Tilt 红温阻断 SOP。
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         TAB 1: 阶段一 (STAGE 1)
+         ========================================== -->
+    <section id="tab-stage1" class="tab-pane hidden space-y-12">
+      
+      <!-- Stage 1 Title -->
+      <div class="border-b border-dota-border pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono px-3 py-1 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">STAGE 01 · 规程手册</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">选手量化考核、新人选拔与老将重塑规程 (SOP)</h2>
+          <p class="text-base text-dota-textSub mt-1">文档编号: CS-DTOS-STAGE-01 · 彻底解决天梯分迷信与经验主义傲慢</p>
+        </div>
+      </div>
+
+      <!-- Top Row: Radar Chart + Summary Sandbox Cards (Side by Side) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        
+        <!-- Radar Chart Container -->
+        <div class="lg:col-span-5 tactical-card p-8 rounded-3xl border border-dota-border flex flex-col items-center justify-between space-y-6">
+          <div class="w-full">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <i data-lucide="radar" class="w-5 h-5 text-amber-400"></i> 选手 6 维量化能力雷达模拟器
+            </h3>
+            <p class="text-sm text-dota-textMuted mt-1">基于 Stratz/OpenDota 录像解析与沙盒实测数据计算</p>
+          </div>
+
+          <div class="w-full h-80 relative flex items-center justify-center">
+            <canvas id="radarChart"></canvas>
+          </div>
+
+          <div class="w-full grid grid-cols-3 gap-3 text-center font-mono">
+            <div class="p-3 bg-dota-surface rounded-xl border border-dota-border">
+              <span class="text-xs text-dota-textMuted block">综合评估得分</span>
+              <span class="text-amber-400 font-extrabold text-2xl">84.5</span>
+            </div>
+            <div class="p-3 bg-dota-surface rounded-xl border border-dota-border">
+              <span class="text-xs text-dota-textMuted block">签约及格线</span>
+              <span class="text-emerald-400 font-extrabold text-2xl">≥ 80.0</span>
+            </div>
+            <div class="p-3 bg-dota-surface rounded-xl border border-dota-border">
+              <span class="text-xs text-dota-textMuted block">评定结论</span>
+              <span class="text-emerald-400 font-extrabold text-base">建议录用</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sandbox Trials Summary Block (Takes the other 7 columns cleanly) -->
+        <div class="lg:col-span-7 tactical-card p-8 rounded-3xl border border-dota-border flex flex-col justify-between space-y-6">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <i data-lucide="box" class="w-5 h-5 text-amber-400"></i> 实战沙盒三大试训压测核心场景 (5天封闭考核)
+            </h3>
+            <p class="text-sm text-dota-textMuted mt-1">杜绝通过几场普通训练赛草率定人，必须通过三大极端压力测试</p>
+          </div>
+
+          <div class="space-y-4 text-base">
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-rose-300 text-lg">场景 A: 1v1 极限劣势对线压测 (8分钟)</span>
+                <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">抗压基准</span>
+              </div>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                使用被克制英雄在零支援下对线。经济差严禁落后超 800，零失误单杀。考核仇恨拉扯、野区反哺与残血抗压基本功。
+              </p>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-amber-300 text-lg">场景 B: 3500 经济劣势翻盘模拟 (15分钟)</span>
+                <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">逆风找节奏</span>
+              </div>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                预设前 10 分钟 2-9 劣势残局。考察辅助在视野受限下的敌后开雾预判，以及核心在危险线与安全野区的高效经济转化。
+              </p>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-cyan-300 text-lg">场景 C: 双人路战术执行力压测 (秒级协同)</span>
+                <span class="text-xs font-mono px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold">节点协同</span>
+              </div>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                严格执行 3:00 控莲花、4:30 断线进塔、6:00 传送门支援中路。要求指令执行时间误差 ≤ 5 秒，两人换血与站位互补。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Full-Width High-Readability Metric Table -->
+      <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+        <div class="border-b border-dota-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+              <i data-lucide="table" class="w-5 h-5 text-cyan-400"></i> 6 维能力雷达量化指标与考核基准 (全景单行展示)
+            </h3>
+            <p class="text-sm text-dota-textMuted mt-1">每个维度均设定明确的测量工具与单项否决底线</p>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 px-3 py-1 rounded bg-cyan-500/10 border border-cyan-500/20 font-bold self-start">全指标量化</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-base min-w-[900px]">
+            <thead class="bg-dota-surface text-dota-textMuted font-mono text-xs uppercase border-b border-dota-border">
+              <tr>
+                <th class="p-4 w-28 whitespace-nowrap">维度代码</th>
+                <th class="p-4 w-44 whitespace-nowrap">维度名称</th>
+                <th class="p-4">核心测量指标 (KPI)</th>
+                <th class="p-4 w-80 whitespace-nowrap">达标底线 (Pass)</th>
+                <th class="p-4 w-24 text-center whitespace-nowrap">权重</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-dota-border font-sans text-dota-textSub text-sm">
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-01</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">微操精度与反应</td>
+                <td class="p-4 text-dota-textMain">补刀极值容错率（正反补成功率）、连招技能与物品施放延迟（毫秒级）</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">正反补 ≥ 85%, 连招误差 ≤ 50ms</td>
+                <td class="p-4 font-mono text-center font-bold text-white">20%</td>
+              </tr>
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-02</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">态势感知与切屏</td>
+                <td class="p-4 text-dota-textMain">每分钟有效切屏次数 (E-CPM)、小地图注视占比、敌方关键装备/神符感知延迟</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">E-CPM ≥ 35次/分, 关键物露头感知 ≤ 3s</td>
+                <td class="p-4 font-mono text-center font-bold text-white">15%</td>
+              </tr>
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-03</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">战术决策树吻合</td>
+                <td class="p-4 text-dota-textMain">对线期资源分配（补刀 vs 换血 vs 拉野）、支援切入时机与死亡期望值控制</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">与预设最优决策重合度 ≥ 75%</td>
+                <td class="p-4 font-mono text-center font-bold text-white">20%</td>
+              </tr>
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-04</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">沟通信噪比</td>
+                <td class="p-4 text-dota-textMain">关键信息报点（位置/血量/技能CD/意图） vs 无效情绪化废话占比</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">有效信息 ≥ 80%, 情绪废话 ≤ 5%</td>
+                <td class="p-4 font-mono text-center font-bold text-white">15%</td>
+              </tr>
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-05</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">版本英雄学习力</td>
+                <td class="p-4 text-dota-textMain">接触陌生强势英雄 72 小时内的机制熟练度、出装理解与实战胜率转化速度</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">3 天内掌握并在实训打出胜率 ≥ 55%</td>
+                <td class="p-4 font-mono text-center font-bold text-white">15%</td>
+              </tr>
+              <tr class="hover:bg-dota-surface/50 transition-colors">
+                <td class="p-4 font-mono text-amber-400 font-bold whitespace-nowrap">DIM-06</td>
+                <td class="p-4 font-bold text-white whitespace-nowrap">抗挫折与韧性</td>
+                <td class="p-4 text-dota-textMain">大劣势局操作变形率、连续阵亡后的沟通活跃度衰减、红温生理心率控制</td>
+                <td class="p-4 text-emerald-400 font-mono whitespace-nowrap font-semibold">劣势局变形 ≤ 10%, 心率超标不闭麦</td>
+                <td class="p-4 font-mono text-center font-bold text-white">15%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Veteran Unlearning Checklist Block -->
+      <div class="tactical-card p-8 rounded-3xl border-2 border-emerald-500/40 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dota-border pb-4">
+          <div>
+            <h3 class="text-2xl font-extrabold text-white flex items-center gap-2.5">
+              <i data-lucide="list-checks" class="w-6 h-6 text-emerald-400"></i> 老将潜意识不良习惯剥离清单 (Unlearning Checklist)
+            </h3>
+            <p class="text-base text-dota-textSub mt-1">每日录像抽检与强制纠偏清单（点击勾选自查）</p>
+          </div>
+          <span class="text-sm font-mono text-emerald-400 px-4 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 font-bold self-start">每日必清</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
+          
+          <label class="p-6 tactical-card-accent rounded-2xl border border-dota-border flex items-start gap-4 cursor-pointer hover:border-amber-500/50 transition-all">
+            <input type="checkbox" checked class="mt-1.5 w-5 h-5 rounded text-amber-500 focus:ring-0 bg-dota-bg border-dota-border">
+            <div class="space-y-1.5">
+              <span class="font-bold text-white text-lg block">纠偏 01: 严禁辅助对线期超过 15 秒“无动作挂机”</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                每一秒必须明确目的：勾兵/消耗/拉野/控莲花/看中路神符。严禁以“保大哥”为由站在核心身后吃经验。
+              </p>
+            </div>
+          </label>
+
+          <label class="p-6 tactical-card-accent rounded-2xl border border-dota-border flex items-start gap-4 cursor-pointer hover:border-amber-500/50 transition-all">
+            <input type="checkbox" checked class="mt-1.5 w-5 h-5 rounded text-amber-500 focus:ring-0 bg-dota-bg border-dota-border">
+            <div class="space-y-1.5">
+              <span class="font-bold text-white text-lg block">纠偏 02: 严禁忽视固定资源时间节点</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                2:45 必须向莲花池靠拢；5:30 必须向中路神符靠拢；6:45 必须占领经验神龛视野。严禁迟到。
+              </p>
+            </div>
+          </label>
+
+          <label class="p-6 tactical-card-accent rounded-2xl border border-dota-border flex items-start gap-4 cursor-pointer hover:border-amber-500/50 transition-all">
+            <input type="checkbox" checked class="mt-1.5 w-5 h-5 rounded text-amber-500 focus:ring-0 bg-dota-bg border-dota-border">
+            <div class="space-y-1.5">
+              <span class="font-bold text-white text-lg block">纠偏 03: 严禁凭感觉出装与逆风盲目裸大件</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                必须根据敌方爆发与发力期计算出装收益。严禁在队伍急需微光/推推保命的局势下盲目裸出点金/跳刀。
+              </p>
+            </div>
+          </label>
+
+          <label class="p-6 tactical-card-accent rounded-2xl border border-dota-border flex items-start gap-4 cursor-pointer hover:border-amber-500/50 transition-all">
+            <input type="checkbox" checked class="mt-1.5 w-5 h-5 rounded text-amber-500 focus:ring-0 bg-dota-bg border-dota-border">
+            <div class="space-y-1.5">
+              <span class="font-bold text-white text-lg block">纠偏 04: 严禁复盘主观归因（“运气不好/手感差”）</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                复盘发言必须基于客观数据与时间轴事实：“第 3 波兵线进塔导致漏刀”、“漏看小地图 Missing 信号导致阵亡”。
+              </p>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         TAB 2: 阶段二 (STAGE 2)
+         ========================================== -->
+    <section id="tab-stage2" class="tab-pane hidden space-y-12">
+      
+      <!-- Stage 2 Title -->
+      <div class="border-b border-dota-border pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono px-3 py-1 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">STAGE 02 · 规程手册</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">现代战术体系与前 10 分钟资源控制 SOP</h2>
+          <p class="text-base text-dota-textSub mt-1">文档编号: CS-DTOS-STAGE-02 · 将 0~10 分钟微观操作完全参数化与标准化</p>
+        </div>
+      </div>
+
+      <!-- Second-by-Second Interactive Timeline -->
+      <div class="space-y-6">
+        <div class="border-b border-dota-border pb-4">
+          <h3 class="text-2xl font-extrabold text-white flex items-center gap-2.5">
+            <i data-lucide="clock" class="w-6 h-6 text-cyan-400"></i> 前 10 分钟秒级时间轴执行规程 (Timeline SOP)
+          </h3>
+          <p class="text-base text-dota-textMuted mt-1">点击不同时间段，查看各分路选手的明确行动准则</p>
+        </div>
+
+        <!-- Step Selector -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 font-mono text-sm">
+          <button onclick="setTimeline(0)" class="timeline-step active p-4 rounded-xl border border-dota-border text-center transition-all">
+            <span class="font-extrabold text-base block whitespace-nowrap">00:00 - 01:00</span>
+            <span class="text-xs text-dota-textMuted font-sans">视野与卡兵</span>
+          </button>
+          <button onclick="setTimeline(1)" class="timeline-step p-4 rounded-xl bg-dota-surface border border-dota-border text-center transition-all">
+            <span class="font-extrabold text-base block whitespace-nowrap">01:00 - 02:45</span>
+            <span class="text-xs text-dota-textMuted font-sans">拉野与控线</span>
+          </button>
+          <button onclick="setTimeline(2)" class="timeline-step p-4 rounded-xl bg-dota-surface border border-dota-border text-center transition-all">
+            <span class="font-extrabold text-base block whitespace-nowrap">02:45 - 03:15</span>
+            <span class="text-xs text-dota-textMuted font-sans">【首波莲花】</span>
+          </button>
+          <button onclick="setTimeline(3)" class="timeline-step p-4 rounded-xl bg-dota-surface border border-dota-border text-center transition-all">
+            <span class="font-extrabold text-base block whitespace-nowrap">04:00 - 06:00</span>
+            <span class="text-xs text-dota-textMuted font-sans">水符/传送门</span>
+          </button>
+          <button onclick="setTimeline(4)" class="timeline-step p-4 rounded-xl bg-dota-surface border border-dota-border text-center transition-all col-span-2 sm:col-span-1">
+            <span class="font-extrabold text-base block whitespace-nowrap">06:45 - 07:15</span>
+            <span class="text-xs text-dota-textMuted font-sans">【决战经验神龛】</span>
+          </button>
+        </div>
+
+        <!-- Detail Display Card -->
+        <div class="tactical-card p-8 rounded-3xl border-2 border-cyan-500/40 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-dota-border pb-4">
+            <div class="flex items-center gap-3">
+              <span id="tl-tag" class="px-3.5 py-1 rounded bg-cyan-500/20 text-cyan-300 font-mono text-sm font-bold">PHASE 01: 00:00 - 01:00</span>
+              <h4 id="tl-title" class="font-bold text-white text-xl">开局视野、兵线初始化与封大野博弈</h4>
+            </div>
+            <span class="text-sm font-mono text-cyan-400 font-bold whitespace-nowrap">全员协同标准</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
+            <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+              <span class="font-bold text-amber-400 flex items-center gap-2 text-lg">
+                <i data-lucide="shield" class="w-5 h-5"></i> 1/5 号位 (优势路)
+              </span>
+              <p id="tl-pos15" class="text-dota-textSub leading-relaxed text-sm">
+                5号位提前插线眼防拉野，严卡第一波兵线至塔前；1号位禁止无意义垫刀推线，严控仇恨。
+              </p>
+            </div>
+
+            <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+              <span class="font-bold text-cyan-400 flex items-center gap-2 text-lg">
+                <i data-lucide="crosshair" class="w-5 h-5"></i> 3/4 号位 (劣势路)
+              </span>
+              <p id="tl-pos34" class="text-dota-textSub leading-relaxed text-sm">
+                4号位开局直奔敌方小野插眼封野；3号位利用技能压制补刀，抢占高坡仇恨拉扯兵线。
+              </p>
+            </div>
+
+            <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+              <span class="font-bold text-emerald-400 flex items-center gap-2 text-lg">
+                <i data-lucide="zap" class="w-5 h-5"></i> 2 号位 (中路)
+              </span>
+              <p id="tl-pos2" class="text-dota-textSub leading-relaxed text-sm">
+                严卡第一波兵线至己方高坡，观察敌方出门装（吃树/大药/属性装）并在语音中即时报点。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Duo Lane Rules & BP Redlines -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Rules -->
+        <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="move" class="w-6 h-6 text-cyan-400"></i> 辅助“过载游走与敌后开战场”三大铁律
+          </h3>
+          <div class="space-y-4 text-base">
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <span class="font-bold text-cyan-300 text-lg block">1. 兵线安全即离线 (Safe Line = Leave)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                当兵线处于塔前 300 码安全区且大哥无猝死危险，辅助必须在 5 秒内离线：拉野/断线/控莲花/传送门游走，严禁吃经验挂机。
+              </p>
+            </div>
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <span class="font-bold text-cyan-300 text-lg block">2. 敌后战场骚扰 (Harass Behind Lines)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                4号位辅助必须深入敌方一塔后拦截兵线、截杀信使、偷拉野怪仇恨，彻底打乱敌方兵线平衡与补刀节奏。
+              </p>
+            </div>
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1.5">
+              <span class="font-bold text-cyan-300 text-lg block">3. 传送门秒级响应 (Twin Gate Response)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                小地图只要观测到敌方 3 人越塔另一条边路，守塔方辅助必须在 3 秒内按传送门抵达反打，形成以多打少反包夹。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redlines -->
+        <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="shield-alert" class="w-6 h-6 text-rose-400"></i> 战队 BP 三大不可触碰绝对红线
+          </h3>
+          <div class="space-y-4 text-base">
+            <div class="p-5 bg-rose-500/10 rounded-2xl border border-rose-500/30 space-y-1.5">
+              <span class="font-bold text-rose-300 text-lg block">红线 01: 严禁选出“三路纯劣、零线优”阵容</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                阵容必须保证至少两路对线期望胜率 ≥ 55%，且至少拥有一名具备 6 级强行斩杀能力的进攻型酱油。
+              </p>
+            </div>
+            <div class="p-5 bg-rose-500/10 rounded-2xl border border-rose-500/30 space-y-1.5">
+              <span class="font-bold text-rose-300 text-lg block">红线 02: 严禁逆版本盲目自信选人</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                版本禁用率排名前 5 的 T0 级英雄，若未被敌方 Ban 且己方无直接针对体系，必须优先抢夺或以一抢代 Ban。
+              </p>
+            </div>
+            <div class="p-5 bg-rose-500/10 rounded-2xl border border-rose-500/30 space-y-1.5">
+              <span class="font-bold text-rose-300 text-lg block">红线 03: 严禁无控纯刷阵容与缺乏先手</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                5 名英雄必须包含至少 3 个硬控技能与 2 个主动先手位，严禁“全员刷子看大哥一人被冲脸”。
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         TAB 3: 阶段三 (STAGE 3)
+         ========================================== -->
+    <section id="tab-stage3" class="tab-pane hidden space-y-12">
+      
+      <!-- Stage 3 Title -->
+      <div class="border-b border-dota-border pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono px-3 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">STAGE 03 · 规程手册</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">科学化日常切片训练与去情绪化复盘指南 (SOP)</h2>
+          <p class="text-base text-dota-textSub mt-1">文档编号: CS-DTOS-STAGE-03 · 告别堆场次，推行高密度场景切片特训与 5 Whys 复盘</p>
+        </div>
+      </div>
+
+      <!-- Weekly Periodization Schedule Grid -->
+      <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+        <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+          <i data-lucide="calendar" class="w-6 h-6 text-emerald-400"></i> 战队周周期化负荷管理课表 (Weekly Periodization)
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-base">
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="font-mono text-emerald-400 font-bold text-lg block">周一 ~ 周二 【技术强化期】</span>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              晨间体能反应激活 + 连续 8~10 轮【10分钟对线极限循环赛】+ 微操连招沙盒测试。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="font-mono text-emerald-400 font-bold text-lg block">周三 ~ 周四 【战术融合期】</span>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              肉山/高地专项团战切片 + 战术指定对抗 BO3 + 严禁超时的高质量正赛模拟。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="font-mono text-emerald-400 font-bold text-lg block">周五 ~ 周六 【全真模拟期】</span>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              全真大赛 BO5 实战演练 + 赛间 10 分钟心理 Tilt 阻断实操 + 全量数据中台复盘。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="font-mono text-emerald-400 font-bold text-lg block">周日 【主动恢复期】</span>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              理疗按摩、眼部与神经放松 + 1v1 心理咨询访谈 + 欧服顶尖第一视角录像研讨。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blameless Post-mortem 4 Steps -->
+      <div class="tactical-card p-8 rounded-3xl border-2 border-emerald-500/40 space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dota-border pb-4">
+          <div>
+            <h3 class="text-2xl font-extrabold text-white flex items-center gap-2.5">
+              <i data-lucide="git-commit" class="w-6 h-6 text-emerald-400"></i> 去情绪化结构复盘“四步法” (Blameless Review SOP)
+            </h3>
+            <p class="text-base text-dota-textSub mt-1">严禁人身攻击与推卸责任，专注审查系统性断点</p>
+          </div>
+          <span class="text-sm font-mono text-emerald-400 px-4 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 font-bold self-start">SOP 四步法</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-base">
+          
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-emerald-400 font-mono font-bold text-sm block">STEP 01</span>
+            <h4 class="font-bold text-white text-lg">客观事实还原</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              调出录像切片与时间轴数据。禁用“我觉得”、“当时以为”，仅陈述客观时间与动作事实。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-emerald-400 font-mono font-bold text-sm block">STEP 02</span>
+            <h4 class="font-bold text-white text-lg">SOP 执行断点对比</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              对照前 10 分钟 SOP：为什么 6:45 没向经验神龛靠拢？为什么 3:00 没运补给控莲花？
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-emerald-400 font-mono font-bold text-sm block">STEP 03</span>
+            <h4 class="font-bold text-white text-lg">5 Whys 根本归因</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              连续追问 5 次找到根本原因：是信息没报、出门装带错、还是决策冲突？杜绝归咎于个人。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-emerald-400 font-mono font-bold text-sm block">STEP 04</span>
+            <h4 class="font-bold text-white text-lg">生成纠偏行动项</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              输出明确责任人、验证方式与截止时间的《纠偏行动表》，录入看板并在次日切片中检验。
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         TAB 4: 阶段四 (STAGE 4)
+         ========================================== -->
+    <section id="tab-stage4" class="tab-pane hidden space-y-12">
+      
+      <!-- Stage 4 Title -->
+      <div class="border-b border-dota-border pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono px-3 py-1 rounded bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">STAGE 04 · 规程手册</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">战队数据中台规范与团队动力学心理保障 (SOP)</h2>
+          <p class="text-base text-dota-textSub mt-1">文档编号: CS-DTOS-STAGE-04 · 数据工程赋能战术决策、权责分离与赛场红温阻断</p>
+        </div>
+      </div>
+
+      <!-- Metrics & Governance Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Metrics Library -->
+        <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="database" class="w-6 h-6 text-purple-400"></i> 数据中台核心指标库 (Metric Library)
+          </h3>
+          <div class="space-y-4 font-mono text-sm">
+            
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border flex items-center justify-between gap-4">
+              <div>
+                <span class="text-purple-400 font-bold text-base block">MTR-LANE-01: 10分钟经济差期望</span>
+                <span class="text-dota-textSub font-sans text-xs">ΔNet10 = 衡量前期综合压制力与对线基本功</span>
+              </div>
+              <span class="text-emerald-400 font-bold text-lg whitespace-nowrap">≥ +800</span>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border flex items-center justify-between gap-4">
+              <div>
+                <span class="text-purple-400 font-bold text-base block">MTR-LANE-02: 经验神龛争夺率 (WR)</span>
+                <span class="text-dota-textSub font-sans text-xs">7/14/21 分钟辅助集结与抢符成功比例</span>
+              </div>
+              <span class="text-emerald-400 font-bold text-lg whitespace-nowrap">≥ 75%</span>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border flex items-center justify-between gap-4">
+              <div>
+                <span class="text-purple-400 font-bold text-base block">MTR-MACRO-01: 开雾杀戮期望 (SKE)</span>
+                <span class="text-dota-textSub font-sans text-xs">每次开雾 60 秒内造成击杀概率</span>
+              </div>
+              <span class="text-emerald-400 font-bold text-lg whitespace-nowrap">≥ 65%</span>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border flex items-center justify-between gap-4">
+              <div>
+                <span class="text-purple-400 font-bold text-base block">MTR-VIS-01: 真眼排查效率比 (SE)</span>
+                <span class="text-dota-textSub font-sans text-xs">成功排眼数 / 消耗真眼总数</span>
+              </div>
+              <span class="text-emerald-400 font-bold text-lg whitespace-nowrap">≥ 80%</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Governance Hierarchy -->
+        <div class="tactical-card p-8 rounded-3xl border border-dota-border space-y-6">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="users" class="w-6 h-6 text-purple-400"></i> 战队现代治理架构与权责边界
+          </h3>
+          <div class="space-y-4 text-base">
+            
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1">
+              <span class="font-bold text-purple-300 text-lg block">主教练 (Head Coach)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                BP 拥有最终一票否决权与裁决权；战术体系与训练课表制定；选手首发轮换权与训练纪律考勤。
+              </p>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1">
+              <span class="font-bold text-cyan-300 text-lg block">场上队长 (In-game Captain)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                赛场瞬时决断（打/撤/买活/开雾时机）；团队喊火第一优先级；赛场节奏带动者。
+              </p>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1">
+              <span class="font-bold text-emerald-300 text-lg block">战术分析师 (Tactical Analyst)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                数据中台维护与对手战术简报（Dossier）交付；客观录像切片提取与数据对账。
+              </p>
+            </div>
+
+            <div class="p-5 tactical-card-accent rounded-2xl border border-dota-border space-y-1">
+              <span class="font-bold text-amber-300 text-lg block">战队经理与领队 (Team Manager)</span>
+              <p class="text-dota-textSub text-sm leading-relaxed">
+                后勤餐饮、生理作息与媒体公关隔离；严禁任何干预 BP 与赛训决断的行为。
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tilt-Block SOP Protocol -->
+      <div class="tactical-card p-8 rounded-3xl border-2 border-rose-500/40 space-y-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dota-border pb-4">
+          <div>
+            <h3 class="text-2xl font-extrabold text-white flex items-center gap-2.5">
+              <i data-lucide="shield-check" class="w-6 h-6 text-rose-400"></i> 赛场倾斜（Tilt）红温阻断机制 (Tilt-Block SOP)
+            </h3>
+            <p class="text-base text-dota-textSub mt-1">BO3/BO5 赛间 10 分钟紧急心理干预流程</p>
+          </div>
+          <span class="text-sm font-mono text-rose-400 px-4 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 font-bold self-start">赛间 10 分钟</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
+          
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-rose-400 font-mono font-bold text-sm block">0 ~ 3 分钟: 物理隔离</span>
+            <h4 class="font-bold text-white text-lg">严禁复盘上一把失误</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              全员离开赛位，严禁讨论“刚才怎么不放大”、“上一把要是怎样”。所有复盘留到当晚。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-amber-400 font-mono font-bold text-sm block">3 ~ 8 分钟: 4-7-8 呼吸降温</span>
+            <h4 class="font-bold text-white text-lg">生理心率快速重置</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              闭目吸气 4 秒、屏息 7 秒、深呼气 8 秒，连续 3 组。冷敷颈部与手腕，快速抑制交感神经过度兴奋。
+            </p>
+          </div>
+
+          <div class="p-6 tactical-card-accent rounded-2xl border border-dota-border space-y-3">
+            <span class="text-emerald-400 font-mono font-bold text-sm block">8 ~ 10 分钟: 战术锚定</span>
+            <h4 class="font-bold text-white text-lg">宣布下一把 BP 与 SOP</h4>
+            <p class="text-dota-textSub text-sm leading-relaxed">
+              教练用 1 分钟宣布下一局 BP 预案与核心英雄体系，用明确的战术任务重新聚焦选手注意力。
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================
+         INTERACTIVE TOOLS SECTION (CALCULATORS)
+         ========================================== -->
+    <section class="tactical-card p-8 sm:p-10 rounded-3xl border-2 border-amber-500/30 space-y-8">
+      <div class="border-b border-dota-border pb-4">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
+          <i data-lucide="terminal" class="w-7 h-7 text-amber-400"></i> CS-DTOS 实操工具箱与数据速查
+        </h2>
+        <p class="text-base text-dota-textMuted mt-1">战术教练与分析师常用量化计算器与赛前自查清单</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-base">
+        
+        <!-- Tool 1: Lane Evaluator -->
+        <div class="p-7 tactical-card-accent rounded-2xl border border-dota-border space-y-5">
+          <h3 class="font-bold text-white text-xl flex items-center gap-2">
+            <i data-lucide="calculator" class="w-5 h-5 text-cyan-400"></i> 10 分钟对线胜负量化计算器
+          </h3>
+          <div class="grid grid-cols-2 gap-4 font-mono text-sm">
+            <div>
+              <label class="text-dota-textMuted block mb-1.5">我方 10 分钟团队总经济</label>
+              <input id="net-our" type="number" value="21500" class="w-full bg-dota-bg border border-dota-border rounded-xl p-3 text-white focus:outline-none focus:border-amber-400 font-bold text-base">
+            </div>
+            <div>
+              <label class="text-dota-textMuted block mb-1.5">敌方 10 分钟团队总经济</label>
+              <input id="net-opp" type="number" value="20200" class="w-full bg-dota-bg border border-dota-border rounded-xl p-3 text-white focus:outline-none focus:border-amber-400 font-bold text-base">
+            </div>
+          </div>
+          <button onclick="calculateLaneResult()" class="w-full py-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold text-base transition-all font-mono">
+            执行对线期胜负与运营期望判定
+          </button>
+          <div id="lane-calc-result" class="p-4 bg-dota-bg rounded-xl border border-dota-border text-dota-textSub text-sm leading-relaxed">
+            判定结果: <span class="text-emerald-400 font-bold font-mono text-base">+1,300 经济优势 (线优)</span>。SOP判定：辅助可安全离线开辟敌后战场，控下全图经验神龛与外塔。
+          </div>
+        </div>
+
+        <!-- Tool 2: Pre-match Checklist -->
+        <div class="p-7 tactical-card-accent rounded-2xl border border-dota-border space-y-5">
+          <h3 class="font-bold text-white text-xl flex items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5 text-amber-400"></i> 赛前 24H 简报核心 Checklist
+          </h3>
+          <ul class="space-y-3.5 text-base text-dota-textSub">
+            <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i> 已导出对手 4 号位开局 3 分钟插眼热力图坐标</li>
+            <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i> 已确定针对敌方一选英雄的反制 BP 决策树</li>
+            <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i> 确认比赛日作息与晨间 45 分钟微操激活完毕</li>
+            <li class="flex items-center gap-3"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i> 心理老师就位，赛间 10 分钟物理隔离区域划定</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-dota-border py-10 text-center text-sm text-dota-textMuted font-mono">
+    <p class="text-base text-slate-300 font-bold">Chinese DOTA2 Scientific Training & Operations System (CS-DTOS)</p>
+    <p class="mt-2 text-xs">科学驱动 · 数据赋能 · 破除傲慢 · 重塑荣光</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-nav-btn').forEach(el => {
+        el.classList.remove('active');
+        el.classList.add('bg-dota-surface', 'text-dota-textSub');
+      });
+
+      const activePane = document.getElementById('tab-' + tabId);
+      const activeNav = document.getElementById('tab-nav-' + tabId);
+
+      if (activePane) activePane.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.add('active');
+        activeNav.classList.remove('bg-dota-surface', 'text-dota-textSub');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Interactive Timeline Data
+    const timelineData = [
+      {
+        tag: 'PHASE 01: 00:00 - 01:00',
+        title: '开局视野、兵线初始化与封大野博弈',
+        pos15: '5号位提前插线眼防拉野，严卡第一波兵线至塔前；1号位禁止无意义垫刀推线，严控仇恨。',
+        pos34: '4号位开局直奔敌方小野插眼封野；3号位利用技能压制补刀，抢占高坡仇恨拉扯兵线。',
+        pos2: '严卡第一波兵线至己方高坡，观察敌方出门装（吃树/大药/属性装）并在语音中即时报点。'
+      },
+      {
+        tag: 'PHASE 02: 01:00 - 02:45',
+        title: '兵线控制、小野拉野与换血博弈',
+        pos15: '5号位在 01:18 准时拉小野控线，利用射程消耗敌方 3 号位；1号位严格控线在塔前安全区。',
+        pos34: '4号位破坏敌方拉野（勾大野/真眼排查），3号位将兵线往己方高坡拉扯，避免盲目推线进塔。',
+        pos2: '计算敌方瓶子时间，通过推线将兵线送入敌方塔下，消耗敌方补刀状态并寻找耗血机会。'
+      },
+      {
+        tag: 'PHASE 03: 02:45 - 03:15',
+        title: '【关键点】第一波莲花池争夺战 (SOP-01)',
+        pos15: '2:50 两人必须完成一波技能消耗压低敌方血线，3:00 准时占领莲花池。若状态不佳提前运大药。',
+        pos34: '3/4号位提前留技能斩杀线，逼迫敌方放弃莲花；若强抢，立刻打响击杀打残对方酱油。',
+        pos2: '观察上下路莲花池交火情况，做好灌瓶准备或协助控符。'
+      },
+      {
+        tag: 'PHASE 04: 04:00 - 06:00',
+        title: '水符/中路神符掌控与传送门过路支援',
+        pos15: '5号位观察中路水符时间，若己方中单劣势，4:00 准时站传送门随时支援中路反蹲。',
+        pos34: '4号位提前压低敌方 1 号位血线，5:30 准备游走中路控 6:00 关键双倍/极速/加速神符。',
+        pos2: '4:00 抢水符补给；5:45 提前推线压制，准备控 6:00 改变局势的关键神符。'
+      },
+      {
+        tag: 'PHASE 05: 06:45 - 07:15',
+        title: '【决战点】经验神龛（Wisdom Rune）强袭与集结 (SOP-02)',
+        pos15: '6:45 劣势路/优势路酱油通过传送门集结，形成局部人数优势强冲敌方经验符。',
+        pos34: '3号位推线进塔牵制，4号位配合己方酱油完成经验符斩杀或反抢。',
+        pos2: '6:50 往靠近经验符的一侧河道靠拢，提供威慑与反打先手。'
+      }
+    ];
+
+    function setTimeline(idx) {
+      document.querySelectorAll('.timeline-step').forEach((btn, i) => {
+        if (i === idx) {
+          btn.classList.add('active');
+          btn.classList.remove('bg-dota-surface');
+        } else {
+          btn.classList.remove('active');
+          btn.classList.add('bg-dota-surface');
+        }
+      });
+
+      const d = timelineData[idx];
+      document.getElementById('tl-tag').innerText = d.tag;
+      document.getElementById('tl-title').innerText = d.title;
+      document.getElementById('tl-pos15').innerText = d.pos15;
+      document.getElementById('tl-pos34').innerText = d.pos34;
+      document.getElementById('tl-pos2').innerText = d.pos2;
+    }
+
+    // Lane Calculator
+    function calculateLaneResult() {
+      const our = parseFloat(document.getElementById('net-our').value) || 0;
+      const opp = parseFloat(document.getElementById('net-opp').value) || 0;
+      const diff = our - opp;
+      const resEl = document.getElementById('lane-calc-result');
+
+      if (diff >= 1000) {
+        resEl.innerHTML = `判定结果: <span class="text-emerald-400 font-bold font-mono text-base">+${diff.toLocaleString()} 经济大优 (线优)</span>。SOP判定：辅助可安全离线开辟敌后战场，控下全图经验神龛与外塔。`;
+      } else if (diff >= -500 && diff < 1000) {
+        resEl.innerHTML = `判定结果: <span class="text-amber-400 font-bold font-mono text-base">${diff >= 0 ? '+' : ''}${diff.toLocaleString()} 经济均势</span>。SOP判定：依靠 12-14 分钟第一波开雾团战决出胜负，重点争夺魔方与三角区视野。`;
+      } else {
+        resEl.innerHTML = `判定结果: <span class="text-rose-400 font-bold font-mono text-base">${diff.toLocaleString()} 经济大劣 (线崩)</span>。SOP判定：立即启动大劣避战预案，核心转入安全副野区，双酱油开危险线防守雾。`;
+      }
+    }
+
+    // Initialize Radar Chart with readable font sizes
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['微操精度与反应', '态势感知与切屏', '决策树吻合度', '沟通信噪比', '英雄池学习力', '心理韧性'],
+          datasets: [{
+            label: '试训选手实测值',
+            data: [88, 82, 85, 80, 78, 88],
+            backgroundColor: 'rgba(245, 158, 11, 0.35)',
+            borderColor: '#f59e0b',
+            borderWidth: 3,
+            pointBackgroundColor: '#f59e0b',
+            pointBorderColor: '#ffffff',
+            pointRadius: 5
+          }, {
+            label: '及格门槛基准线',
+            data: [80, 80, 80, 80, 80, 80],
+            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+            borderColor: 'rgba(6, 182, 212, 0.8)',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+              grid: { color: 'rgba(255, 255, 255, 0.15)' },
+              pointLabels: {
+                color: '#ffffff',
+                font: { size: 13, weight: 'bold', family: '"Plus Jakarta Sans", "Noto Sans SC", sans-serif' }
+              },
+              ticks: { display: false, min: 0, max: 100 }
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { color: '#f8fafc', font: { size: 12, weight: 'bold' } }
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

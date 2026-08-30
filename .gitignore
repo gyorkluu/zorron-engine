@@ -84,3 +84,11 @@ vite.config.ts.timestamp-*
 opencode.jsonc
 titimap.html
 docs/http/
+
+# AI Agent Context Infrastructure (Explicitly Tracked)
+!.ai-context/
+!.agents/
+
+# Local agent workspace data (session state / memory logs - never commit)
+.workbuddy/
+

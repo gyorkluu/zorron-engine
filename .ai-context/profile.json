@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "zorron-engine",
+    "type": "monorepo",
+    "package_manager": "pnpm",
+    "runtime": "bun",
+    "size": "medium",
+    "description": "Node-centric AI-driven universal interaction engine (personality test, scenario simulation, interactive media, minigames, questionnaires)."
+  },
+  "packages": [
+    {
+      "name": "zorron-editor",
+      "path": "apps/zorron-editor",
+      "framework": "React 18+",
+      "build_tool": "Vite 6+",
+      "styling": "Tailwind CSS v4 + shadcn/ui + Radix UI",
+      "state": "Zustand",
+      "flow_editor": "@xyflow/react",
+      "routing": "React Router v7",
+      "test_framework": "Vitest + React Testing Library",
+      "dev_port": 5173
+    },
+    {
+      "name": "zorron-server",
+      "path": "apps/zorron-server",
+      "framework": "ElysiaJS",
+      "runtime": "Bun",
+      "database": "PostgreSQL 16 (Drizzle ORM)",
+      "cache": "Redis 7 (ioredis)",
+      "validation": "Zod",
+      "logging": "pino",
+      "test_framework": "Vitest",
+      "dev_port": 3000
+    }
+  ],
+  "commands": {
+    "install": "pnpm install",
+    "dev_editor": "pnpm dev:editor",
+    "dev_server": "pnpm dev:server",
+    "typecheck": "pnpm typecheck",
+    "lint": "pnpm lint",
+    "test": "pnpm test",
+    "db_migrate": "pnpm db:migrate",
+    "db_seed": "pnpm db:seed",
+    "db_studio": "pnpm db:studio"
+  },
+  "rules": {
+    "primary_rule_file": "AGENTS.md",
+    "claude_rule_file": "CLAUDE.md",
+    "max_rule_lines": 200,
+    "style": "ESM strict, Zod validation for external inputs, layered backend (routes -> controllers -> services -> repositories -> db), pure rendering frontend with Zustand/Hooks."
+  }
+}
