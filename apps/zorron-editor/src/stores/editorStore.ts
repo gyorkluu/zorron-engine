@@ -86,6 +86,10 @@ interface EditorState {
   pasteNode: (position: { x: number; y: number }) => void;
   /** Focus/select a node and center viewport on it. */
   focusNode: (id: string) => void;
+  /** Create an empty collapsible group container. Returns the new node id. */
+  createGroup: (label?: string) => string;
+  /** Collapse or expand a group, hiding or revealing its children. */
+  toggleGroupCollapse: (groupId: string) => void;
 
   // Undo/redo
   undo: () => void;
@@ -115,6 +119,13 @@ function buildNode(type: NodeType, position: { x: number; y: number }): FlowNode
     selected: false,
   } as FlowNode;
 }
+
+/** Footprint of a newly created group. */
+const GROUP_DEFAULT_WIDTH = 420;
+const GROUP_DEFAULT_HEIGHT = 280;
+/** Footprint of a collapsed group — just enough for the header chip. */
+const GROUP_COLLAPSED_WIDTH = 180;
+const GROUP_COLLAPSED_HEIGHT = 38;
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   nodes: [],
@@ -256,6 +267,74 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   focusNode: (id) => {
     set({ selectedNodeId: id, selectedEdgeId: null });
+  },
+
+  createGroup: (label) => {
+    const id = `group-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const groupNode = {
+      id,
+      type: 'group',
+      position: { x: 120, y: 120 },
+      data: {
+        label: label ?? '\u65b0\u5206\u7ec4',
+        color: '#38bdf8',
+        collapsed: false,
+        width: GROUP_DEFAULT_WIDTH,
+        height: GROUP_DEFAULT_HEIGHT,
+      },
+      style: { width: GROUP_DEFAULT_WIDTH, height: GROUP_DEFAULT_HEIGHT },
+      // Groups render behind whatever they contain.
+      zIndex: 0,
+      selectable: true,
+      draggable: true,
+    };
+    set((s) => ({
+      ...pushHistory(s),
+      nodes: [...s.nodes, groupNode],
+      selectedNodeId: id,
+    }));
+    return id;
+  },
+
+  toggleGroupCollapse: (groupId) => {
+    set((state) => {
+      const group = state.nodes.find((n) => n.id === groupId);
+      if (!group) return state;
+
+      const data = group.data as { collapsed?: boolean; width?: number; height?: number };
+      const collapsed = !data.collapsed;
+      const expandedWidth = (group.style?.width as number) || GROUP_DEFAULT_WIDTH;
+      const expandedHeight = (group.style?.height as number) || GROUP_DEFAULT_HEIGHT;
+
+      const nodes = state.nodes.map((n) => {
+        if (n.id === groupId) {
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              collapsed,
+              // Cache the expanded footprint so expanding restores it.
+              width: collapsed ? expandedWidth : (data.width ?? expandedWidth),
+              height: collapsed ? expandedHeight : (data.height ?? expandedHeight),
+            },
+            style: collapsed
+              ? { ...n.style, width: GROUP_COLLAPSED_WIDTH, height: GROUP_COLLAPSED_HEIGHT }
+              : {
+                  ...n.style,
+                  width: data.width ?? GROUP_DEFAULT_WIDTH,
+                  height: data.height ?? GROUP_DEFAULT_HEIGHT,
+                },
+          };
+        }
+        // Children follow the group's collapsed state.
+        if (n.parentId === groupId) {
+          return { ...n, hidden: collapsed };
+        }
+        return n;
+      });
+
+      return { nodes };
+    });
   },
 
   updateNodeData: (id, data) => {

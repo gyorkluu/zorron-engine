@@ -168,6 +168,77 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     setContextMenu({ x: event.clientX, y: event.clientY, flowPosition, nodeId: null });
   }, [rfInstance]);
 
+  // GroupNode signals collapse through a DOM event so the node component stays
+  // independent of the editor store.
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ nodeId: string }>).detail;
+      if (detail?.nodeId) {
+        useEditorStore.getState().toggleGroupCollapse(detail.nodeId);
+      }
+    };
+    window.addEventListener('zorron:toggle-group', handler);
+    return () => window.removeEventListener('zorron:toggle-group', handler);
+  }, []);
+
+  /**
+   * Adopt a dragged node into whichever group it was dropped on, converting
+   * between absolute and parent-relative coordinates as React Flow expects.
+   */
+  const onNodeDragStop = useCallback((_event: React.MouseEvent, node: Node) => {
+    const { nodes, setNodes } = useEditorStore.getState();
+
+    const target = nodes.find((n) => {
+      if (n.type !== 'group' || n.id === node.id) return false;
+      const w = (n.style?.width as number) ?? 0;
+      const h = (n.style?.height as number) ?? 0;
+      return (
+        node.position.x >= n.position.x &&
+        node.position.x <= n.position.x + w &&
+        node.position.y >= n.position.y &&
+        node.position.y <= n.position.y + h
+      );
+    });
+
+    const previousParent = node.parentId ?? null;
+    const nextParent = target?.id ?? null;
+    if (previousParent === nextParent) return;
+
+    const anchorId = nextParent ?? previousParent;
+    const anchor = anchorId ? nodes.find((g) => g.id === anchorId) : undefined;
+
+    setNodes(
+      nodes.map((n) => {
+        if (n.id !== node.id) return n;
+        if (nextParent && anchor) {
+          // Entering a group: store coordinates relative to the group.
+          return {
+            ...n,
+            parentId: nextParent,
+            extent: 'parent' as const,
+            position: {
+              x: node.position.x - anchor.position.x,
+              y: node.position.y - anchor.position.y,
+            },
+          };
+        }
+        if (!nextParent && anchor) {
+          // Leaving a group: convert back to absolute coordinates.
+          return {
+            ...n,
+            parentId: undefined,
+            extent: undefined,
+            position: {
+              x: node.position.x + anchor.position.x,
+              y: node.position.y + anchor.position.y,
+            },
+          };
+        }
+        return n;
+      }),
+    );
+  }, []);
+
   const minimapNodeColor = useCallback((n: Node) => getNodeAccent(n.type as NodeType), []);
   const flowNodes = useMemo(() => nodes, [nodes]);
   const flowEdges = useMemo(() => edges, [edges]);
@@ -193,6 +264,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         onNodeContextMenu={onNodeContextMenu}

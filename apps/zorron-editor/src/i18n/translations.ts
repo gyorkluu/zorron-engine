@@ -110,6 +110,10 @@ export const translations = {
   'node.rankOrder.desc': { zh: '用户拖拽对选项进行优先级排序', en: 'User drags to reorder items by priority' },
   'node.numberPicker.label': { zh: '数值拾取', en: 'Number Picker' },
   'node.numberPicker.desc': { zh: '轮盘或滚轮选择数字', en: 'Wheel/dial to pick numeric values' },
+  'node.group.label': { zh: '分组', en: 'Group' },
+  'node.group.desc': { zh: '把节点收进可折叠的容器，便于管理大图', en: 'Collapsible container for managing large graphs' },
+  'node.note.label': { zh: '便签', en: 'Note' },
+  'node.note.desc': { zh: '画布备注，不参与流程执行', en: 'Canvas annotation; never executed' },
 
   // ── Node defaults ───────────────────────────────────────────
   'node.default.stage': { zh: '剧情舞台', en: 'Stage' },
@@ -128,6 +132,8 @@ export const translations = {
   'node.default.textInput': { zh: '文本输入', en: 'Text Input' },
   'node.default.rankOrder': { zh: '优先级排序', en: 'Rank Order' },
   'node.default.numberPicker': { zh: '数值拾取', en: 'Number Picker' },
+  'node.default.group': { zh: '新分组', en: 'New Group' },
+  'node.default.note': { zh: '便签', en: 'Note' },
   'node.default.newStory': { zh: '新故事', en: 'New Story' },
 
   // ── Inspector Panel ─────────────────────────────────────────

@@ -24,7 +24,11 @@ export type NodeType =
   | 'media'
   | 'text-input'
   | 'rank-order'
-  | 'number-picker';
+  | 'number-picker'
+  /** Collapsible container that owns other nodes. */
+  | 'group'
+  /** Free-floating canvas annotation; never wired into the flow. */
+  | 'note';
 
 /** Interaction modes for scene choices. */
 export type InteractionType = 'tap' | 'hold' | 'slash';
@@ -349,6 +353,24 @@ export type {
 import type { StageNodeData } from '@zorron/flow-schema';
 
 /** Discriminated union of all node data payloads. */
+/** Data payload for a collapsible group container. */
+export interface GroupNodeData extends BaseNodeData {
+  /** Accent colour for the frame (hex). */
+  color?: string;
+  /** When true the children are hidden and the frame shrinks to a chip. */
+  collapsed?: boolean;
+  /** Cached child count, shown on the collapsed chip. */
+  childCount?: number;
+}
+
+/** Data payload for a canvas sticky note. */
+export interface NoteNodeData extends BaseNodeData {
+  /** Note body text. */
+  text?: string;
+  /** Paper colour (hex). */
+  color?: string;
+}
+
 export type GameNodeData =
   | StageNodeData
   | StartNodeData
@@ -365,7 +387,9 @@ export type GameNodeData =
   | MediaNodeData
   | TextInputNodeData
   | RankOrderNodeData
-  | NumberPickerNodeData;
+  | NumberPickerNodeData
+  | GroupNodeData
+  | NoteNodeData;
 
 /** Variable value type stored in the flow. */
 export type VariableValue = string | number | boolean;

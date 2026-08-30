@@ -28,6 +28,8 @@ import {
   ArrowUpDown,
   Sliders,
   Clapperboard,
+  Boxes,
+  StickyNote,
 } from 'lucide-react';
 import { tt } from '@/i18n/useT';
 import { registerNode } from '@/engine/nodeRegistry';
@@ -49,6 +51,8 @@ import {
   RankOrderNode,
   NumberPickerNode,
 } from './InteractionNodes';
+import { GroupNodeComponent } from './GroupNode';
+import { NoteNodeComponent } from './NoteNode';
 import { StageForm } from '@/components/inspector/StageForm';
 import { StageStage } from '@/components/player/StageStage';
 import { StartStage } from '@/components/player/StartStage';
@@ -81,6 +85,8 @@ import {
   TextInputForm,
   RankOrderForm,
   NumberPickerForm,
+  GroupForm,
+  NoteForm,
 } from '@/components/inspector/nodeForms';
 
 // ── 🎬 叙事与展示 (Narrative & Presentation) ───────────────────
@@ -382,5 +388,39 @@ registerNode({
   createDefault: () => ({
     label: tt('node.default.settlement'),
     resultMapping: [],
+  }),
+});
+
+// ── 📦 组织与注释 (Organization) ────────────────────────────
+
+registerNode({
+  type: 'group',
+  category: 'logic',
+  labelKey: 'node.group.label',
+  descKey: 'node.group.desc',
+  icon: Boxes,
+  accent: '#38bdf8',
+  CanvasComponent: GroupNodeComponent,
+  InspectorForm: GroupForm,
+  createDefault: () => ({
+    label: tt('node.default.group'),
+    color: '#38bdf8',
+    collapsed: false,
+  }),
+});
+
+registerNode({
+  type: 'note',
+  category: 'narrative',
+  labelKey: 'node.note.label',
+  descKey: 'node.note.desc',
+  icon: StickyNote,
+  accent: '#eab308',
+  CanvasComponent: NoteNodeComponent,
+  InspectorForm: NoteForm,
+  createDefault: () => ({
+    label: tt('node.default.note'),
+    text: '',
+    color: '#eab308',
   }),
 });
