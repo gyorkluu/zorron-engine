@@ -8,6 +8,7 @@
 
 import { memo } from 'react';
 import { X, RotateCcw, Settings2 } from 'lucide-react';
+import { useT } from '@/i18n/useT';
 import { useGalgameStore } from '@/stores/galgameStore';
 import { cn } from '@/lib/utils';
 
@@ -100,6 +101,7 @@ function SettingToggle({
 }
 
 function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
+  const { t } = useT();
   const settings = useGalgameStore((s) => s.settings);
   const updateSettings = useGalgameStore((s) => s.updateSettings);
   const resetSettings = useGalgameStore((s) => s.resetSettings);
@@ -119,7 +121,7 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
           <div className="flex items-center gap-2">
             <Settings2 size={16} className="text-cyan-400" />
-            <h3 className="text-sm font-bold text-slate-100">播放设置</h3>
+            <h3 className="text-sm font-bold text-slate-100">{t('settings.title')}</h3>
           </div>
           <button
             type="button"
@@ -134,10 +136,10 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
         <div className="flex-1 space-y-5 overflow-y-auto px-5 py-4">
           <section className="space-y-3">
             <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              文本与节奏
+              {t('settings.section.text')}
             </h4>
             <SettingSlider
-              label="文字显示速度"
+              label={t('settings.textSpeed')}
               value={settings.textSpeedMs}
               min={0}
               max={120}
@@ -146,7 +148,7 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
               onChange={(v) => updateSettings({ textSpeedMs: v })}
             />
             <SettingSlider
-              label="自动播放停顿"
+              label={t('settings.autoDelay')}
               value={settings.autoDelayMs}
               min={0}
               max={4000}
@@ -158,10 +160,10 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
 
           <section className="space-y-3">
             <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              音量
+              {t('settings.section.volume')}
             </h4>
             <SettingSlider
-              label="背景音乐 BGM"
+              label={t('settings.volume.bgm')}
               value={Math.round(settings.bgmVolume * 100)}
               min={0}
               max={100}
@@ -170,7 +172,7 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
               onChange={(v) => updateSettings({ bgmVolume: v / 100 })}
             />
             <SettingSlider
-              label="角色语音 Voice"
+              label={t('settings.volume.voice')}
               value={Math.round(settings.voiceVolume * 100)}
               min={0}
               max={100}
@@ -179,7 +181,7 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
               onChange={(v) => updateSettings({ voiceVolume: v / 100 })}
             />
             <SettingSlider
-              label="音效 SFX"
+              label={t('settings.volume.sfx')}
               value={Math.round(settings.sfxVolume * 100)}
               min={0}
               max={100}
@@ -188,7 +190,7 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
               onChange={(v) => updateSettings({ sfxVolume: v / 100 })}
             />
             <SettingSlider
-              label="环境音 Ambient"
+              label={t('settings.volume.ambient')}
               value={Math.round(settings.ambientVolume * 100)}
               min={0}
               max={100}
@@ -200,17 +202,17 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
 
           <section className="space-y-2">
             <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-              播放行为
+              {t('settings.section.behaviour')}
             </h4>
             <SettingToggle
-              label="跳过已读内容"
-              hint="开启后，SKIP 只快进已读过的剧情，遇到未读会自动停下"
+              label={t('settings.skipRead')}
+              hint={t('settings.skipRead.hint')}
               checked={settings.skipRead}
               onChange={(v) => updateSettings({ skipRead: v })}
             />
             <SettingToggle
-              label="自动模式在选项处停止"
-              hint="关闭后，自动播放会自行选择分支（不建议）"
+              label={t('settings.autoStopOnChoice')}
+              hint={t('settings.autoStopOnChoice.hint')}
               checked={settings.autoStopOnChoice}
               onChange={(v) => updateSettings({ autoStopOnChoice: v })}
             />
@@ -225,14 +227,14 @@ function SettingsModalImpl({ isOpen, onClose }: SettingsModalProps) {
             className="flex items-center gap-1.5 rounded-lg border border-slate-700/60 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
           >
             <RotateCcw size={12} />
-            恢复默认
+            {t('settings.reset')}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="rounded-lg bg-cyan-500/20 px-4 py-1.5 text-xs font-medium text-cyan-200 transition-colors hover:bg-cyan-500/30"
           >
-            完成
+            {t('settings.done')}
           </button>
         </div>
       </div>

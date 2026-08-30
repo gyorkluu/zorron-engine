@@ -8,6 +8,7 @@
  */
 
 import { memo, useCallback } from 'react';
+import { useT } from '@/i18n/useT';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { ChevronDown, ChevronRight, Boxes } from 'lucide-react';
 
@@ -23,6 +24,7 @@ export interface GroupNodeProps extends NodeProps {
 }
 
 export function GroupNode({ id, data, selected }: GroupNodeProps) {
+  const { t } = useT();
   const collapsed = Boolean(data.collapsed);
   const color = data.color ?? '#38bdf8';
 
@@ -61,7 +63,7 @@ export function GroupNode({ id, data, selected }: GroupNodeProps) {
           <button
             type="button"
             onClick={toggleCollapse}
-            title={collapsed ? '展开分组' : '折叠分组'}
+            title={collapsed ? t('group.expand') : t('group.collapse')}
             className="rounded p-0.5 transition-colors hover:bg-white/10"
             style={{ color }}
           >
@@ -72,7 +74,7 @@ export function GroupNode({ id, data, selected }: GroupNodeProps) {
             className="min-w-0 flex-1 truncate text-xs font-semibold"
             style={{ color }}
           >
-            {data.label || '分组'}
+            {data.label || t('node.group.label')}
           </span>
           {collapsed && data.childCount ? (
             <span

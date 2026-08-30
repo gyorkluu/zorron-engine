@@ -483,19 +483,19 @@ export function GroupForm({ node, update }: InspectorFormProps) {
     <div className="space-y-3">
       <label className="block">
         <span className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-slate-500">
-          分组名称
+          {t('group.form.name')}
         </span>
         <input
           type="text"
           value={data.label ?? ''}
           onChange={(e) => update({ label: e.target.value } as never)}
-          placeholder="例如：第二章 · 长安"
+          placeholder={t('group.form.name.placeholder')}
           className="w-full rounded-md border border-slate-700/60 bg-slate-900/60 px-2 py-1.5 text-xs text-slate-200 placeholder:text-slate-600 focus:border-cyan-500/50 focus:outline-none"
         />
       </label>
       <label className="flex items-center justify-between">
         <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-          边框颜色
+          {t('group.form.color')}
         </span>
         <input
           type="color"
@@ -505,7 +505,7 @@ export function GroupForm({ node, update }: InspectorFormProps) {
         />
       </label>
       <p className="rounded-md border border-slate-800 bg-slate-900/40 p-2 text-[11px] leading-relaxed text-slate-500">
-        把节点拖进分组框即可收纳；点击标题栏的箭头可折叠整个分组。
+        {t('group.form.hint')}
       </p>
     </div>
   );
@@ -518,19 +518,19 @@ export function NoteForm({ node, update }: InspectorFormProps) {
     <div className="space-y-3">
       <label className="block">
         <span className="mb-1 block text-[10px] font-medium uppercase tracking-wider text-slate-500">
-          备注内容
+          {t('note.form.text')}
         </span>
         <textarea
           rows={5}
           value={data.text ?? ''}
           onChange={(e) => update({ text: e.target.value } as never)}
-          placeholder="写给作者的说明…"
+          placeholder={t('note.form.text.placeholder')}
           className="w-full resize-none rounded-md border border-slate-700/60 bg-slate-900/60 p-2 text-xs leading-relaxed text-slate-200 placeholder:text-slate-600 focus:border-cyan-500/50 focus:outline-none"
         />
       </label>
       <label className="flex items-center justify-between">
         <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-          便签颜色
+          {t('note.form.color')}
         </span>
         <input
           type="color"

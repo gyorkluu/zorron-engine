@@ -8,6 +8,7 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import type { NodeProps } from '@xyflow/react';
 import { StickyNote } from 'lucide-react';
+import { useT } from '@/i18n/useT';
 import { useEditorStore } from '@/stores/editorStore';
 
 export interface NoteNodeProps extends NodeProps {
@@ -19,6 +20,7 @@ export interface NoteNodeProps extends NodeProps {
 }
 
 export function NoteNode({ id, data, selected }: NoteNodeProps) {
+  const { t } = useT();
   const updateNodeData = useEditorStore((s) => s.updateNodeData);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(data.text ?? '');
@@ -59,7 +61,7 @@ export function NoteNode({ id, data, selected }: NoteNodeProps) {
         style={{ color }}
       >
         <StickyNote size={10} />
-        便签
+        {t('note.label')}
       </div>
       {editing ? (
         <textarea
@@ -81,7 +83,7 @@ export function NoteNode({ id, data, selected }: NoteNodeProps) {
       ) : (
         <p className="whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-200">
           {data.text || (
-            <span className="italic text-slate-500">双击编辑备注…</span>
+            <span className="italic text-slate-500">{t('note.placeholder')}</span>
           )}
         </p>
       )}

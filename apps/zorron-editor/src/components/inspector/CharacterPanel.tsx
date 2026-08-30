@@ -7,6 +7,7 @@
 
 import { memo, useCallback, useState } from 'react';
 import { Users, Plus, Trash2, ChevronDown, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { useT } from '@/i18n/useT';
 import { useProjectStore } from '@/stores/projectStore';
 import type { Character, CharacterExpression } from '@/types/flow';
 import { cn } from '@/lib/utils';
@@ -66,14 +67,14 @@ function ExpressionRow({
         <input
           type="text"
           value={expression.label}
-          placeholder="名称"
+          placeholder={t('character.expression.label')}
           onChange={(e) => onChange({ label: e.target.value })}
           className="min-w-0 flex-1 rounded border border-slate-700/60 bg-slate-950/60 px-1.5 py-1 text-[10px] text-slate-300 focus:border-cyan-500/50 focus:outline-none"
         />
         <button
           type="button"
           onClick={onRemove}
-          title="删除表情"
+          title={t('character.expression.remove')}
           className="rounded p-1 text-slate-500 transition-colors hover:bg-rose-900/40 hover:text-rose-300"
         >
           <Trash2 size={11} />
@@ -82,7 +83,7 @@ function ExpressionRow({
       <input
         type="text"
         value={expression.url}
-        placeholder="立绘 URL"
+        placeholder={t('character.expression.url')}
         onChange={(e) => onChange({ url: e.target.value })}
         className="w-full rounded border border-slate-700/60 bg-slate-950/60 px-1.5 py-1 text-[10px] text-slate-400 focus:border-cyan-500/50 focus:outline-none"
       />
@@ -108,14 +109,14 @@ function CharacterEditor({ character }: { character: Character }) {
   return (
     <div className="space-y-2.5 border-t border-slate-800 px-2.5 py-2.5">
       <Field
-        label="角色名"
+        label={t('character.name')}
         value={character.name}
         onChange={(name) => patch({ name })}
       />
 
       <label className="flex items-center justify-between">
         <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-          主题色
+          {t('character.color')}
         </span>
         <span className="flex items-center gap-1.5">
           <input
@@ -131,7 +132,7 @@ function CharacterEditor({ character }: { character: Character }) {
       </label>
 
       <Field
-        label="默认立绘"
+        label={t('character.portrait')}
         value={character.portraitUrl ?? ''}
         placeholder="https://..."
         onChange={(portraitUrl) => patch({ portraitUrl })}
@@ -140,7 +141,7 @@ function CharacterEditor({ character }: { character: Character }) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-            表情差分 ({expressions.length})
+            {t('character.expressions')} ({expressions.length})
           </span>
           <button
             type="button"
@@ -159,12 +160,12 @@ function CharacterEditor({ character }: { character: Character }) {
             className="flex items-center gap-1 rounded bg-slate-800/70 px-1.5 py-0.5 text-[10px] text-slate-300 transition-colors hover:bg-slate-700 hover:text-white"
           >
             <Plus size={10} />
-            添加
+            {t('character.expression.add')}
           </button>
         </div>
         {expressions.length === 0 ? (
           <p className="rounded-md border border-dashed border-slate-800 px-2 py-1.5 text-center text-[10px] text-slate-600">
-            暂无表情差分，将始终使用默认立绘
+            {t('character.expression.empty')}
           </p>
         ) : (
           expressions.map((expr, i) => (
@@ -181,9 +182,9 @@ function CharacterEditor({ character }: { character: Character }) {
       </div>
 
       <Field
-        label="备注"
+        label={t('character.description')}
         value={character.description ?? ''}
-        placeholder="给作者看的说明"
+        placeholder={t('character.description.placeholder')}
         onChange={(description) => patch({ description })}
       />
     </div>
@@ -191,6 +192,7 @@ function CharacterEditor({ character }: { character: Character }) {
 }
 
 function CharacterPanelImpl({ className }: CharacterPanelProps) {
+  const { t } = useT();
   const characters = useProjectStore((s) => s.characters);
   const addCharacter = useProjectStore((s) => s.addCharacter);
   const removeCharacter = useProjectStore((s) => s.removeCharacter);
@@ -212,9 +214,9 @@ function CharacterPanelImpl({ className }: CharacterPanelProps) {
       <div className="flex items-center justify-between border-b border-slate-800 px-3 py-2">
         <div className="flex flex-col">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-200">
-            角色库
+            {t('character.title')}
           </h3>
-          <span className="text-[10px] text-slate-500">节点按 id 引用，改一次全图生效</span>
+          <span className="text-[10px] text-slate-500">{t('character.tip')}</span>
         </div>
         <button
           type="button"
@@ -222,14 +224,14 @@ function CharacterPanelImpl({ className }: CharacterPanelProps) {
           className="flex items-center gap-1 rounded-md bg-cyan-500/20 px-2 py-1 text-[11px] text-cyan-200 transition-colors hover:bg-cyan-500/30"
         >
           <Plus size={11} />
-          新建
+          {t('character.add')}
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">
         {characters.length === 0 ? (
           <p className="m-1 rounded-lg border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">
-            还没有角色。新建一个，然后在舞台 / 场景节点里选择它。
+            还没有角色。{t('character.add')}一个，然后在舞台 / 场景节点里选择它。
           </p>
         ) : (
           <ul className="space-y-1.5">
@@ -275,7 +277,7 @@ function CharacterPanelImpl({ className }: CharacterPanelProps) {
                         <span className="block truncate font-mono text-[9px] text-slate-500">
                           {character.id}
                           {(character.expressions?.length ?? 0) > 0
-                            ? ` · ${character.expressions?.length} 表情`
+                            ? ` · ${t('character.expressionCount', { n: character.expressions?.length ?? 0 })}`
                             : ''}
                         </span>
                       </span>
@@ -283,7 +285,7 @@ function CharacterPanelImpl({ className }: CharacterPanelProps) {
                     <button
                       type="button"
                       onClick={() => removeCharacter(character.id)}
-                      title="删除角色"
+                      title={t('character.remove')}
                       className="rounded p-1 text-slate-500 transition-colors hover:bg-rose-900/40 hover:text-rose-300"
                     >
                       <Trash2 size={12} />

@@ -23,6 +23,7 @@ import {
   computeAutoDelayMs,
   skipStep,
 } from '@/engine/galgame';
+import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 
 /** Interval between skip steps while fast-forwarding. */
@@ -43,6 +44,7 @@ export function PlayerControlBar({
   onOpenLoad,
 }: PlayerControlBarProps) {
   const engine = usePlayerStore((s) => s.engine);
+  const { t } = useT();
   const state = usePlayerStore((s) => s.state);
 
   const settings = useGalgameStore((s) => s.settings);
@@ -108,8 +110,8 @@ export function PlayerControlBar({
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center p-3 sm:p-4">
       <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-slate-700/50 bg-slate-950/85 p-1.5 shadow-2xl backdrop-blur-md">
         <ControlButton
-          label="上一步"
-          title="回退到上一句 (Backspace)"
+          label={t('control.back')}
+          title={t('control.back.tip')}
           onClick={handleBack}
           disabled={!canGoBack.current}
         >
@@ -117,8 +119,8 @@ export function PlayerControlBar({
         </ControlButton>
 
         <ControlButton
-          label="AUTO"
-          title="自动播放"
+          label={t('control.auto')}
+          title={t('control.auto.tip')}
           active={autoMode}
           onClick={toggleAuto}
         >
@@ -126,8 +128,8 @@ export function PlayerControlBar({
         </ControlButton>
 
         <ControlButton
-          label="SKIP"
-          title="按住快进已读剧情"
+          label={t('control.skip')}
+          title={t('control.skip.tip')}
           active={skipMode}
           onPressStart={() => setSkip(true)}
           onPressEnd={() => setSkip(false)}
@@ -138,21 +140,21 @@ export function PlayerControlBar({
 
         <Divider />
 
-        <ControlButton label="回顾" title="对话历史 (L)" onClick={onOpenBacklog}>
+        <ControlButton label={t('control.backlog')} title={t('control.backlog.tip')} onClick={onOpenBacklog}>
           <BookOpen size={14} />
         </ControlButton>
-        <ControlButton label="保存" title="保存进度 (F5)" onClick={onOpenSave}>
+        <ControlButton label={t('control.save')} title={t('control.save.tip')} onClick={onOpenSave}>
           <Save size={14} />
         </ControlButton>
-        <ControlButton label="读取" title="读取存档 (F8)" onClick={onOpenLoad}>
+        <ControlButton label={t('control.load')} title={t('control.load.tip')} onClick={onOpenLoad}>
           <Download size={14} />
         </ControlButton>
 
         <Divider />
 
         <ControlButton
-          label="设置"
-          title="播放设置"
+          label={t('control.settings')}
+          title={t('settings.title')}
           hideLabel
           onClick={() => setSettingsOpen(true)}
         >
