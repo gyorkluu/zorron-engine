@@ -725,6 +725,19 @@ export const translations = {
   'toolbar.publishConfirm': { zh: '发布后玩家将看到当前内容，未保存的修改不会包含在内。继续？', en: 'Players will see the current content once published. Unsaved changes are not included. Continue?' },
   'toolbar.revertConfirm': { zh: '放弃未发布的修改，回到上一个已发布版本？', en: 'Discard unpublished edits and return to the last published version?' },
 
+  'market.title': { zh: '节点市场', en: 'Node market' },
+  'market.tip': { zh: '复用别人调好的节点', en: 'Reuse nodes others have tuned' },
+  'market.publish': { zh: '发布为模板', en: 'Publish as template' },
+  'market.insert': { zh: '插入画布', en: 'Insert' },
+  'market.search': { zh: '搜索模板…', en: 'Search templates…' },
+  'market.empty': { zh: '还没有模板。选中一个节点，发布为模板试试。', en: 'No templates yet. Select a node and publish it.' },
+  'market.uses': { zh: '{n} 次使用', en: '{n} uses' },
+  'market.selectNodeFirst': { zh: '请先在画布上选中一个节点', en: 'Select a node on the canvas first' },
+  'market.loadFailed': { zh: '无法加载模板', en: 'Could not load templates' },
+  'market.insertFailed': { zh: '插入失败', en: 'Insert failed' },
+  'market.publishFailed': { zh: '发布失败', en: 'Publish failed' },
+  'market.deleteFailed': { zh: '删除失败', en: 'Delete failed' },
+
 } as const;
 
 /** Type of a translation key. */

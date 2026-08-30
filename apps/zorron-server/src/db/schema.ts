@@ -402,6 +402,45 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   assets: many(assets),
 }));
 
+/**
+ * Reusable node templates — the "node as an asset" marketplace.
+ *
+ * An author packages a configured node (a well-tuned QTE stage, a reusable
+ * rating prompt) and others instantiate it into their own projects. Copies are
+ * always by value, so editing an instance never changes the template.
+ */
+export const nodeAssets = pgTable(
+  'node_assets',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    ownerId: uuid('owner_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** SCALE-001: tenant scope for workspace isolation. */
+    tenantId: uuid('tenant_id'),
+    name: varchar('name', { length: 200 }).notNull(),
+    description: text('description'),
+    /** Node type this template instantiates (e.g. 'stage', 'rating'). */
+    nodeType: varchar('node_type', { length: 40 }).notNull(),
+    /** The node's data payload exactly as authored. */
+    data: jsonb('data').notNull().default({}),
+    /** Presentation category used to group the catalogue. */
+    category: varchar('category', { length: 40 }),
+    tags: jsonb('tags').$type<string[]>().default([]),
+    /** Times instantiated, for ranking. */
+    usageCount: integer('usage_count').notNull().default(0),
+    /** Public assets appear in everyone's catalogue. */
+    isPublic: boolean('is_public').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    ownerIdIdx: index('node_assets_owner_id_idx').on(table.ownerId),
+    nodeTypeIdx: index('node_assets_node_type_idx').on(table.nodeType),
+    publicIdx: index('node_assets_public_idx').on(table.isPublic),
+  }),
+);
+
 export const projectsRelations = relations(projects, ({ one, many }) => ({
   owner: one(users, { fields: [projects.ownerId], references: [users.id] }),
   tenant: one(tenants, { fields: [projects.tenantId], references: [tenants.id] }),
@@ -410,6 +449,11 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   variants: many(scenarioVariants),
   events: many(sessionEvents),
   webhookSubscriptions: many(webhookSubscriptions),
+}));
+
+export const nodeAssetsRelations = relations(nodeAssets, ({ one }) => ({
+  owner: one(users, { fields: [nodeAssets.ownerId], references: [users.id] }),
+  tenant: one(tenants, { fields: [nodeAssets.tenantId], references: [tenants.id] }),
 }));
 
 export const assetsRelations = relations(assets, ({ one }) => ({

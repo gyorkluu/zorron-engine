@@ -24,6 +24,7 @@ import {
   Variable,
   Users,
   FileText,
+  Store,
   Puzzle,
   LayoutTemplate,
   History,
@@ -37,6 +38,7 @@ import { AICopilotPanel } from '@/components/ai/AICopilotPanel';
 import { VariablesPanel } from '@/components/inspector/VariablesPanel';
 import { CharacterPanel } from '@/components/inspector/CharacterPanel';
 import { ScriptPanel } from '@/components/inspector/ScriptPanel';
+import { NodeMarketPanel } from '@/components/inspector/NodeMarketPanel';
 import { FragmentPanel } from '@/components/inspector/FragmentPanel';
 import { HistoryPanel } from '@/components/inspector/HistoryPanel';
 import { EditorToolbar } from './EditorToolbar';
@@ -64,6 +66,7 @@ type SidePanelId =
   | 'variables'
   | 'characters'
   | 'script'
+  | 'market'
   | 'fragments'
   | 'templates'
   | 'history'
@@ -93,6 +96,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
     { id: 'variables', label: t('vars.title'), icon: Variable },
     { id: 'characters', label: '角色库', icon: Users },
     { id: 'script', label: '剧本', icon: FileText },
+    { id: 'market', label: '节点市场', icon: Store },
     { id: 'fragments', label: t('frag.title'), icon: Puzzle },
     { id: 'templates', label: t('tpl.title'), icon: LayoutTemplate },
     { id: 'history', label: t('history.title'), icon: History },
@@ -129,6 +133,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
                 {activeSidePanel === 'variables' && <VariablesPanel />}
                 {activeSidePanel === 'characters' && <CharacterPanel />}
                 {activeSidePanel === 'script' && <ScriptPanel />}
+                {activeSidePanel === 'market' && <NodeMarketPanel />}
                 {activeSidePanel === 'fragments' && <FragmentPanel />}
                 {activeSidePanel === 'templates' && <TemplateLibrary />}
                 {activeSidePanel === 'history' && <HistoryPanel />}
