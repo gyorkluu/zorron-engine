@@ -197,7 +197,7 @@ function MultiSelectStageImpl({ state }: MultiSelectStageProps) {
 
   // Build option list with optional "任意" pseudo-option for any-mode nodes.
   const allOptions = isAnyMode
-    ? [{ id: ANY_ID, label: '任意' }, ...ms.options]
+    ? [{ id: ANY_ID, label: t('multiSelect.any') }, ...ms.options]
     : ms.options;
 
   const canSubmit = isAnyMode
@@ -418,9 +418,9 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
   if (appealSuccess && isTuilanId) {
     return (
       <StageShell bgUrl={state.stageBackgroundUrl}>
-        <h2 className="text-lg font-bold sm:text-xl">申诉已提交</h2>
+        <h2 className="text-lg font-bold sm:text-xl">{t('appeal.submitted')}</h2>
         <p className="player-text-muted text-sm">
-          我们会尽快审核你的申诉，请耐心等待。
+          {t('appeal.reviewing')}
         </p>
         <PrimaryButton onClick={handleAppealCancel}>
           返回
@@ -433,9 +433,9 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
   if (showAppealForm && isTuilanId) {
     return (
       <StageShell bgUrl={state.stageBackgroundUrl}>
-        <h2 className="text-lg font-bold sm:text-xl">提交申诉</h2>
+        <h2 className="text-lg font-bold sm:text-xl">{t('appeal.title')}</h2>
         <p className="player-text-muted text-xs">
-          请上传截图证明该推栏号属于你，或说明数据有误的原因。
+          {t('appeal.prompt')}
         </p>
 
         <div className="flex w-full max-w-md flex-col items-center gap-3">
@@ -449,7 +449,7 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="请说明申诉原因（选填）"
+            placeholder={t('appeal.reasonPlaceholder')}
             rows={3}
             className="player-surface player-border player-text player-radius w-full px-4 py-2 text-sm outline-none focus:player-border-hover"
             style={{ color: 'hsl(var(--p-text))' }}
@@ -461,7 +461,7 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
 
           {isAppealing && (
             <p className="player-accent-text text-xs animate-pulse">
-              正在提交申诉...
+              {t('appeal.submitting')}
             </p>
           )}
         </div>
@@ -471,7 +471,7 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
             disabled={!selectedFile || isAppealing}
             onClick={handleAppealSubmit}
           >
-            {isAppealing ? '提交中...' : '提交申诉'}
+            {isAppealing ? t('appeal.submittingShort') : t('appeal.submit')}
           </PrimaryButton>
           <button
             type="button"
@@ -490,16 +490,16 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
   if (submissionExists && isTuilanId) {
     return (
       <StageShell bgUrl={state.stageBackgroundUrl}>
-        <h2 className="text-lg font-bold sm:text-xl">该推栏号已有提交记录</h2>
+        <h2 className="text-lg font-bold sm:text-xl">{t('appeal.existsTitle')}</h2>
         <p className="player-text-muted text-xs leading-relaxed">
-          推栏号 {usePlayerStore.getState().pendingTuilanId} 已存在提交数据。
+          {t('appeal.existsBody', { id: usePlayerStore.getState().pendingTuilanId })}
           <br />
-          你可以选择修改信息重新测试，或提交申诉。
+          {t('appeal.existsPrompt')}
         </p>
 
         <div className="flex gap-3">
           <PrimaryButton onClick={() => void confirmModify()}>
-            修改信息
+            {t('appeal.modify')}
           </PrimaryButton>
           <button
             type="button"
@@ -558,28 +558,32 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
         {isLookingUp && (
           <p className="inline-flex items-center gap-1.5 text-xs text-cyan-400 animate-pulse">
             <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
-            正在查询推栏号信息...
+            {t('tuilan.lookingUp')}
           </p>
         )}
 
         {lookupError && isTuilanId && (
           <div className="flex flex-col items-center gap-2">
             <p className="text-xs leading-relaxed text-rose-400">
-              查询失败：{lookupError}
+              {t('tuilan.lookupFailed', { error: lookupError })}
             </p>
             <button
               type="button"
               onClick={() => skipTuilanLookup(value)}
               className="text-xs text-slate-400 underline transition-colors hover:text-cyan-300"
             >
-              查询服务不可用，手动填写信息 →
+              {t('tuilan.serviceUnavailable')} →
             </button>
           </div>
         )}
       </div>
 
       <PrimaryButton disabled={!canSubmit} onClick={handleSubmit}>
-        {isLookingUp ? '查询中...' : lookupError && isTuilanId ? '重试' : t('player.submit')}
+        {isLookingUp
+                ? t('tuilan.lookingUpShort')
+                : lookupError && isTuilanId
+                  ? t('tuilan.retry')
+                  : t('player.submit')}
       </PrimaryButton>
     </StageShell>
   );
@@ -655,7 +659,7 @@ function RankOrderStageImpl({ state }: RankOrderStageProps) {
   return (
     <StageShell bgUrl={state.stageBackgroundUrl}>
       <h2 className="text-lg font-bold sm:text-xl">
-        {ro.question ?? '请拖动排序'}
+        {ro.question ?? t('rankOrder.placeholder')}
       </h2>
       {ro.hint && (
         <p className="player-text-muted text-sm">{ro.hint}</p>
@@ -699,7 +703,7 @@ function RankOrderStageImpl({ state }: RankOrderStageProps) {
                   onClick={() => move(index, -1)}
                   disabled={index === 0}
                   className="player-text-muted hover:player-accent-text disabled:opacity-30 px-1 text-sm"
-                  aria-label="上移"
+                  aria-label={t('rankOrder.moveUp')}
                 >
                   ↑
                 </button>
@@ -708,7 +712,7 @@ function RankOrderStageImpl({ state }: RankOrderStageProps) {
                   onClick={() => move(index, 1)}
                   disabled={index === ordered.length - 1}
                   className="player-text-muted hover:player-accent-text disabled:opacity-30 px-1 text-sm"
-                  aria-label="下移"
+                  aria-label={t('rankOrder.moveDown')}
                 >
                   ↓
                 </button>
@@ -834,7 +838,7 @@ function NumberPickerStageImpl({ state }: NumberPickerStageProps) {
           onClick={() => move(-1)}
           disabled={safeIndex === 0}
           className="player-text-muted hover:player-accent-text disabled:opacity-20 mb-2 text-3xl transition-colors"
-          aria-label="上一个"
+          aria-label={t('numberPicker.prev')}
         >
           ▲
         </button>
@@ -877,7 +881,7 @@ function NumberPickerStageImpl({ state }: NumberPickerStageProps) {
           onClick={() => move(1)}
           disabled={safeIndex === allValues.length - 1}
           className="player-text-muted hover:player-accent-text disabled:opacity-20 mt-2 text-3xl transition-colors"
-          aria-label="下一个"
+          aria-label={t('numberPicker.next')}
         >
           ▼
         </button>

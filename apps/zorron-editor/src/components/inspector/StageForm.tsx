@@ -15,6 +15,7 @@ import {
 import type { FlowNode, StageNodeData, StageCarrier, StageChoice, StageHitbox } from '@/types/flow';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
+import { useT } from '@/i18n/useT';
 
 export interface StageFormProps {
   node?: FlowNode;
@@ -27,6 +28,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
   const [activeTab, setActiveTab] = useState<'carrier' | 'interaction' | 'fx' | 'flow'>('carrier');
   const nodes = useEditorStore((s) => s.nodes);
   const characters = useProjectStore((s) => s.characters);
+  const { t } = useT();
 
   const nodeData = (node?.data as StageNodeData | undefined) || data || ({} as StageNodeData);
   const handleUpdate = update || onChange || (() => {});
@@ -96,12 +98,12 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
     <div className="space-y-4 text-xs">
       {/* Node Label */}
       <div>
-        <label className="mb-1 block font-medium text-slate-300">节点名称</label>
+        <label className="mb-1 block font-medium text-slate-300">{t('stageForm.nodeName')}</label>
         <input
           type="text"
           value={nodeData.label || ''}
           onChange={(e) => handleUpdate({ label: e.target.value })}
-          placeholder="例如：开场影游视频"
+          placeholder={t('stageForm.nodeNamePlaceholder')}
           className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
         />
       </div>
@@ -118,7 +120,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           }`}
         >
           <Clapperboard size={12} />
-          <span>载体</span>
+          <span>{t('stageForm.tab.carrier')}</span>
         </button>
         <button
           type="button"
@@ -130,7 +132,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           }`}
         >
           <Target size={12} />
-          <span>交互</span>
+          <span>{t('stageForm.tab.interaction')}</span>
         </button>
         <button
           type="button"
@@ -142,7 +144,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           }`}
         >
           <Sparkles size={12} />
-          <span>视听</span>
+          <span>{t('stageForm.tab.fx')}</span>
         </button>
         <button
           type="button"
@@ -154,15 +156,15 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           }`}
         >
           <GitBranch size={12} />
-          <span>流转</span>
+          <span>{t('stageForm.tab.flow')}</span>
         </button>
       </div>
 
-      {/* ── TAB 1: 舞台载体 (Carrier) ───────────────────────── */}
+      {/* ── TAB 1: 舞台{t('stageForm.tab.carrier')} (Carrier) ───────────────────────── */}
       {activeTab === 'carrier' && (
         <div className="space-y-3.5 animate-in fade-in-50 duration-200">
           <div>
-            <label className="mb-1.5 block font-medium text-slate-300">载体类型</label>
+            <label className="mb-1.5 block font-medium text-slate-300">{t('stageForm.tab.carrier')}类型</label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
@@ -174,7 +176,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 }`}
               >
                 <Video size={16} />
-                <span className="text-[11px]">视频流</span>
+                <span className="text-[11px]">{t('stageForm.carrier.video')}</span>
               </button>
               <button
                 type="button"
@@ -186,7 +188,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 }`}
               >
                 <ImageIcon size={16} />
-                <span className="text-[11px]">图片/立绘</span>
+                <span className="text-[11px]">{t('stageForm.carrier.image')}</span>
               </button>
               <button
                 type="button"
@@ -198,19 +200,19 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 }`}
               >
                 <Gamepad2 size={16} />
-                <span className="text-[11px]">H5/小游戏</span>
+                <span className="text-[11px]">{t('stageForm.carrier.h5')}</span>
               </button>
             </div>
           </div>
 
           {/* Carrier Resource URL */}
           <div>
-            <label className="mb-1 block font-medium text-slate-300">素材 URL</label>
+            <label className="mb-1 block font-medium text-slate-300">{t('stageForm.assetUrl')}</label>
             <input
               type="text"
               value={carrier.url || ''}
               onChange={(e) => updateCarrier({ url: e.target.value })}
-              placeholder="https://... 或从左侧资源库选择"
+              placeholder={t('stageForm.assetUrlPlaceholder')}
               className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
             />
           </div>
@@ -219,7 +221,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           {carrier.type === 'video' && (
             <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
               <div className="flex items-center justify-between">
-                <span className="text-slate-300">循环播放 (Loop)</span>
+                <span className="text-slate-300">{t('stageForm.loop')}</span>
                 <input
                   type="checkbox"
                   checked={carrier.loop || false}
@@ -229,7 +231,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
               </div>
 
               <div>
-                <label className="mb-1 block text-slate-400">时间轴切片 (timeRange: 秒)</label>
+                <label className="mb-1 block text-slate-400">{t('stageForm.timeRange')}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -241,7 +243,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                       const end = carrier.timeRange?.[1] ?? 10;
                       updateCarrier({ timeRange: [start, end] });
                     }}
-                    placeholder="起点 (0s)"
+                    placeholder={t('stageForm.timeRangeStart')}
                     className="w-1/2 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-center"
                   />
                   <span className="text-slate-500">~</span>
@@ -255,7 +257,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                       const end = parseFloat(e.target.value) || 0;
                       updateCarrier({ timeRange: [start, end] });
                     }}
-                    placeholder="终点 (秒)"
+                    placeholder={t('stageForm.timeRangeEnd')}
                     className="w-1/2 rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-center"
                   />
                 </div>
@@ -265,12 +267,12 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
         </div>
       )}
 
-      {/* ── TAB 2: 交互与热区 (Interaction) ──────────────────── */}
+      {/* ── TAB 2: {t('stageForm.tab.interaction')}与热区 (Interaction) ──────────────────── */}
       {activeTab === 'interaction' && (
         <div className="space-y-4 animate-in fade-in-50 duration-200">
           {/* Dialogue Section */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
-            <div className="font-semibold text-cyan-300">剧情对话 / 字幕</div>
+            <div className="font-semibold text-cyan-300">{t('stageForm.dialogue')}</div>
 
             {/* Character reference — takes precedence over the free-text speaker. */}
             <div className="grid grid-cols-2 gap-2">
@@ -282,7 +284,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 }}
                 className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100"
               >
-                <option value="">— 选择角色 —</option>
+                <option value="">{t('stageForm.selectCharacter')}</option>
                 {characters.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -297,7 +299,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 }
                 className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <option value="">默认立绘</option>
+                <option value="">{t('stageForm.defaultSprite')}</option>
                 {activeExpressions.map((expr) => (
                   <option key={expr.id} value={expr.id}>
                     {expr.label}
@@ -325,14 +327,14 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 type="text"
                 value={dialogue.speaker || ''}
                 onChange={(e) => updateDialogue({ speaker: e.target.value })}
-                placeholder="说话人（未选角色时生效）"
+                placeholder={t('stageForm.speakerPlaceholder')}
                 className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 placeholder-slate-500"
               />
               <input
                 type="text"
                 value={dialogue.voiceUrl || ''}
                 onChange={(e) => updateDialogue({ voiceUrl: e.target.value })}
-                placeholder="角色配音 Voice URL"
+                placeholder={t('stageForm.voiceUrlPlaceholder')}
                 className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 placeholder-slate-500"
               />
             </div>
@@ -340,7 +342,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
               rows={2}
               value={dialogue.text || ''}
               onChange={(e) => updateDialogue({ text: e.target.value })}
-              placeholder="台词内容，支持打字机动效..."
+              placeholder={t('stageForm.textPlaceholder')}
               className="w-full rounded border border-slate-700 bg-slate-800 p-2 text-slate-100 placeholder-slate-500 focus:border-cyan-500 focus:outline-none"
             />
           </div>
@@ -348,13 +350,13 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           {/* Choices Section */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-cyan-300">分支选项 ({choices.length})</span>
+              <span className="font-semibold text-cyan-300">{t('stageForm.choices')} ({choices.length})</span>
               <button
                 type="button"
                 onClick={() => {
                   const newChoice: StageChoice = {
                     id: `c-${Date.now()}`,
-                    text: `选项 ${choices.length + 1}`,
+                    text: `${t('stageForm.choiceDefault')} ${choices.length + 1}`,
                     targetNodeId: '',
                   };
                   updateChoices([...choices, newChoice]);
@@ -362,7 +364,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 className="flex items-center gap-1 rounded bg-cyan-500/20 px-2 py-0.5 text-[11px] text-cyan-300 hover:bg-cyan-500/30"
               >
                 <Plus size={12} />
-                添加选项
+                {t('stageForm.addChoice')}
               </button>
             </div>
 
@@ -377,7 +379,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                       updated[i].text = e.target.value;
                       updateChoices(updated);
                     }}
-                    placeholder="选项文本"
+                    placeholder={t('stageForm.choiceTextPlaceholder')}
                     className="flex-1 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100"
                   />
                   <button
@@ -398,7 +400,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                     }}
                     className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100 text-[11px]"
                   >
-                    <option value="">跳转至目标节点...</option>
+                    <option value="">{t('stageForm.choiceTargetPlaceholder')}</option>
                     {candidateNodes.map((n) => (
                       <option key={n.id} value={n.id}>
                         {n.data?.label || n.id}
@@ -413,7 +415,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                       updated[i].guard = e.target.value;
                       updateChoices(updated);
                     }}
-                    placeholder="Guard条件 (例如: variables.love>=80)"
+                    placeholder={t('stageForm.guardPlaceholder')}
                     className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-slate-100 text-[11px]"
                   />
                 </div>
@@ -424,7 +426,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           {/* Hitboxes Section */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-amber-300">画面热区 ({hitboxes.length})</span>
+              <span className="font-semibold text-amber-300">{t('stageForm.hitboxes')} ({hitboxes.length})</span>
               <button
                 type="button"
                 onClick={() => {
@@ -438,7 +440,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 className="flex items-center gap-1 rounded bg-amber-500/20 px-2 py-0.5 text-[11px] text-amber-300 hover:bg-amber-500/30"
               >
                 <Plus size={12} />
-                添加热区
+                {t('stageForm.addHitbox')}
               </button>
             </div>
 
@@ -497,12 +499,12 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           {/* QTE Timeout Section */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-rose-300">QTE 倒计时限制</span>
+              <span className="font-semibold text-rose-300">{t('stageForm.qte')}</span>
               <Timer size={14} className="text-rose-400" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="mb-0.5 block text-[10px] text-slate-400">倒计时秒数</label>
+                <label className="mb-0.5 block text-[10px] text-slate-400">{t('stageForm.qteSeconds')}</label>
                 <input
                   type="number"
                   min={0}
@@ -516,12 +518,12 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                       },
                     })
                   }
-                  placeholder="留空即无倒计时"
+                  placeholder={t('stageForm.qteSecondsPlaceholder')}
                   className="w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100"
                 />
               </div>
               <div>
-                <label className="mb-0.5 block text-[10px] text-slate-400">超时兜底目标</label>
+                <label className="mb-0.5 block text-[10px] text-slate-400">{t('stageForm.qteFallback')}</label>
                 <select
                   value={interaction.defaultTimeoutTargetNodeId || ''}
                   onChange={(e) =>
@@ -534,7 +536,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                   }
                   className="w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 text-[11px]"
                 >
-                  <option value="">超时默认分支...</option>
+                  <option value="">{t('stageForm.qteFallbackPlaceholder')}</option>
                   {candidateNodes.map((n) => (
                     <option key={n.id} value={n.id}>
                       {n.data?.label || n.id}
@@ -547,31 +549,31 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
         </div>
       )}
 
-      {/* ── TAB 3: 视听与特效 (FX) ──────────────────────────── */}
+      {/* ── TAB 3: {t('stageForm.tab.fx')}与特效 (FX) ──────────────────────────── */}
       {activeTab === 'fx' && (
         <div className="space-y-3.5 animate-in fade-in-50 duration-200">
           <div>
-            <label className="mb-1 block font-medium text-slate-300">滤镜特效 (Filter)</label>
+            <label className="mb-1 block font-medium text-slate-300">{t('stageForm.filter')}</label>
             <select
               value={fx.filter || 'none'}
               onChange={(e) => updateFX({ filter: e.target.value as any })}
               className="w-full rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-slate-100 focus:border-cyan-500 focus:outline-none"
             >
-              <option value="none">无滤镜 (None)</option>
-              <option value="glitch">故障风 (Glitch RGB 撕裂)</option>
-              <option value="heartbeat">心跳危机 (Heartbeat Bloom 暗角)</option>
-              <option value="bloom">柔光漫射 (Bloom)</option>
-              <option value="vignette">边缘暗角 (Vignette)</option>
-              <option value="black-white">复古回忆 (Black & White Sepia)</option>
+              <option value="none">{t('stageForm.filter.none')}</option>
+              <option value="glitch">{t('stageForm.filter.glitch')}</option>
+              <option value="heartbeat">{t('stageForm.filter.heartbeat')}</option>
+              <option value="bloom">{t('stageForm.filter.bloom')}</option>
+              <option value="vignette">{t('stageForm.filter.vignette')}</option>
+              <option value="black-white">{t('stageForm.filter.blackWhite')}</option>
             </select>
           </div>
 
           {/* Camera Shake */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
-            <div className="font-semibold text-purple-300">镜头震颤 (Camera Shake)</div>
+            <div className="font-semibold text-purple-300">{t('stageForm.shake')}</div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] text-slate-400">震颤强度 (1~10)</label>
+                <label className="text-[10px] text-slate-400">{t('stageForm.shakeIntensity')}</label>
                 <input
                   type="number"
                   min={1}
@@ -590,7 +592,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-400">触发秒数 (秒)</label>
+                <label className="text-[10px] text-slate-400">{t('stageForm.shakeTrigger')}</label>
                 <input
                   type="number"
                   min={0}
@@ -615,24 +617,24 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
             <div className="flex items-center gap-1.5 font-semibold text-emerald-300">
               <Volume2 size={13} />
-              <span>背景音乐 (BGM)</span>
+              <span>{t('stageForm.bgm')}</span>
             </div>
             <input
               type="text"
               value={fx.bgm?.url || ''}
               onChange={(e) => updateFX({ bgm: { url: e.target.value, fadeInMs: 1000, volume: 1.0 } })}
-              placeholder="BGM 音频 URL"
+              placeholder={t('stageForm.bgmPlaceholder')}
               className="w-full rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 placeholder-slate-500"
             />
           </div>
         </div>
       )}
 
-      {/* ── TAB 4: 状态流转 (Flow) ─────────────────────────── */}
+      {/* ── TAB 4: 状态{t('stageForm.tab.flow')} (Flow) ─────────────────────────── */}
       {activeTab === 'flow' && (
         <div className="space-y-3.5 animate-in fade-in-50 duration-200">
           <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3">
-            <label className="mb-1 block font-semibold text-blue-300">分支预加载 (Preload Tree)</label>
+            <label className="mb-1 block font-semibold text-blue-300">{t('stageForm.preload')}</label>
             <p className="mb-2 text-[11px] text-slate-400">
               指定下一个最可能的分支节点，播放器将在后台提前双缓冲预热视频/素材，确保零延迟切换。
             </p>

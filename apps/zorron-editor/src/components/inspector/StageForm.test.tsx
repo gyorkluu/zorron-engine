@@ -1,9 +1,16 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { StageForm } from './StageForm';
+import { useLocaleStore } from '@/i18n/localeStore';
 import type { FlowNode, StageNodeData } from '@/types/flow';
 
 describe('StageForm', () => {
+  // The form renders all of its copy through t(), so pin the locale to keep
+  // the assertions below readable whatever the app default is.
+  beforeEach(() => {
+    useLocaleStore.setState({ locale: 'zh' });
+  });
+
   it('renders correctly with InspectorPanel props format ({ node, update })', () => {
     const mockUpdate = vi.fn();
     const mockNode: FlowNode = {
