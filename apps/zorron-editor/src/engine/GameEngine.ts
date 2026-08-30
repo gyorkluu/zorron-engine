@@ -52,7 +52,9 @@ import {
   type NodeType,
   type Variables,
   type SettlementResultMapping,
+  type StageNodeData,
 } from '@/types/flow';
+import { evaluateGuard } from '@zorron/flow-schema';
 import {
   add,
   magnitude,
@@ -65,11 +67,40 @@ import { settlementStrategyRegistry } from './settlementStrategies';
 export interface PlayerChoice {
   id: string;
   text: string;
-  interaction: SceneChoice['interaction'];
+  interaction?: SceneChoice['interaction'];
   holdDuration?: number;
   slashDirection?: SceneChoice['slashDirection'];
   /** Optional icon image URL displayed alongside the choice text. */
   icon?: string;
+  /** Edge condition expression for locking/unlocking. */
+  guard?: string;
+  isLocked?: boolean;
+}
+
+/** Dialogue Backlog item for GalGame historical log reader. */
+export interface BacklogItem {
+  id: string;
+  nodeId: string;
+  speaker?: string;
+  text: string;
+  voiceUrl?: string;
+  timestamp: number;
+  choiceSelected?: string;
+}
+
+/** Complete serializable snapshot for Save/Load system. */
+export interface GameStateSnapshot {
+  schemaVersion: '2.0.0';
+  timestamp: number;
+  currentNodeId: string | null;
+  variables: Variables;
+  fragments: string[];
+  vector?: PersonalityVector;
+  pendingVector?: PersonalityVector;
+  history: string[];
+  backlog: BacklogItem[];
+  bgmUrl?: string | null;
+  bgmPositionSec?: number;
 }
 
 /** Result of a settlement node evaluation. */
@@ -109,6 +140,8 @@ export interface GameState {
   isFinished: boolean;
   /** Present when the engine reached a settlement node. */
   settlementResult: SettlementResult | null;
+  /** Present when the engine reached a stage 2.0 node. */
+  stage: StageNodeData | null;
   /** Present when the engine reached a video node. */
   video: { url: string; autoPlay: boolean; skipAllowed: boolean } | null;
   /** Present when the engine reached a link node. */
@@ -205,6 +238,7 @@ function createInitialState(): GameState {
     choices: [],
     isFinished: false,
     settlementResult: null,
+    stage: null,
     video: null,
     link: null,
     start: null,
@@ -236,6 +270,7 @@ export class GameEngine {
   private pendingVector: PersonalityVector = { ...ZERO_VECTOR };
   private currentNodeId: string | null = null;
   private history: string[] = [];
+  private backlogBuffer: BacklogItem[] = [];
   private listeners: Set<StateListener> = new Set();
   private state: GameState = createInitialState();
 
@@ -277,15 +312,36 @@ export class GameEngine {
     return this.state;
   }
 
-  /** Select a choice on the current scene node. Returns the new state. */
+  /** Select a choice on the current scene or stage node. Returns the new state. */
   selectChoice(choiceId: string): GameState {
     if (!this.currentNodeId) return this.state;
     const node = this.getNode(this.currentNodeId);
-    if (!node || node.type !== 'scene') return this.state;
+    if (!node) return this.state;
 
-    const data = node.data as SceneNodeData;
-    const choice = data.choices?.find((c) => c.id === choiceId);
+    let choice: { id: string; text: string; targetNodeId?: string; vector?: PersonalityVector; dropFragmentId?: string | null; guard?: string } | undefined;
+
+    if (node.type === 'scene') {
+      const data = node.data as SceneNodeData;
+      choice = data.choices?.find((c) => c.id === choiceId);
+    } else if (node.type === 'stage') {
+      const data = node.data as StageNodeData;
+      choice = data.interaction?.choices?.find((c) => c.id === choiceId);
+    }
+
     if (!choice) return this.state;
+
+    // Check guard condition if present
+    if (choice.guard) {
+      const isAllowed = evaluateGuard(choice.guard, { variables: this.variables, fragments: this.fragments });
+      if (!isAllowed) {
+        return this.state; // Blocked by guard
+      }
+    }
+
+    // Record selected choice in the last backlog entry
+    if (this.backlogBuffer.length > 0) {
+      this.backlogBuffer[this.backlogBuffer.length - 1].choiceSelected = choice.text;
+    }
 
     // Accumulate pending vector delta (applied at the next calculator node).
     // Skipped when the vector space is disabled in project settings.
@@ -364,6 +420,21 @@ export class GameEngine {
     if (!variable) return;
     const operator = modifier.operation ?? modifier.action ?? 'set';
     this.applyAssignment(variable, modifier.value ?? 0, operator);
+  }
+
+  /** Advance from settlement node to next connected node. */
+  advanceFromSettlement(targetNodeId?: string): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'settlement') return this.state;
+    const nextId = targetNodeId ?? (node.data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
   }
 
   /** Skip the current video node (advances to the next node). */
@@ -452,6 +523,9 @@ export class GameEngine {
         return;
       case 'start':
         this.processStart(node);
+        return;
+      case 'stage':
+        this.processStage(node);
         return;
       case 'scene':
         this.processScene(node);
@@ -595,6 +669,124 @@ export class GameEngine {
     this.notify();
   }
 
+  private processStage(node: FlowNode): void {
+    const data = node.data as StageNodeData;
+
+    // 1. Apply variable mutations from Stage flow config
+    if (data.flow?.mutations) {
+      for (const m of data.flow.mutations) {
+        if (m.operator === 'set') {
+          this.variables[m.variable] = m.value;
+        } else {
+          const current = Number(this.variables[m.variable] ?? 0);
+          const delta = Number(m.value);
+          this.variables[m.variable] = m.operator === 'add' ? current + delta : current - delta;
+        }
+      }
+    }
+
+    // 2. Append dialogue to backlog buffer (max 200 items)
+    if (data.interaction?.dialogue?.text) {
+      this.backlogBuffer.push({
+        id: `bl-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        nodeId: node.id,
+        speaker: data.interaction.dialogue.speaker,
+        text: data.interaction.dialogue.text,
+        voiceUrl: data.interaction.dialogue.voiceUrl,
+        timestamp: Date.now(),
+      });
+      if (this.backlogBuffer.length > 200) {
+        this.backlogBuffer.shift();
+      }
+    }
+
+    // 3. Build choices with lock evaluation
+    const choices: PlayerChoice[] = (data.interaction?.choices ?? []).map((c) => {
+      const isLocked = c.guard
+        ? !evaluateGuard(c.guard, { variables: this.variables, fragments: this.fragments })
+        : false;
+      return {
+        id: c.id,
+        text: c.text,
+        guard: c.guard,
+        isLocked,
+      };
+    });
+
+    this.state = {
+      ...this.state,
+      currentNodeId: node.id,
+      currentNodeType: 'stage',
+      stage: data,
+      choices,
+      isFinished: false,
+      scene: null,
+      video: null,
+      link: null,
+      start: null,
+      settlementResult: null,
+    };
+    this.notify();
+  }
+
+  /** Advance directly from current Stage node to target node. */
+  advanceFromStage(targetNodeId?: string): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'stage') return this.state;
+
+    const nextId = targetNodeId || this.findTargetNodeId(node.id, null);
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, stage: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
+  }
+
+  /** Retrieve dialogue backlog entries. */
+  getBacklog(): BacklogItem[] {
+    return [...this.backlogBuffer];
+  }
+
+  /** Capture full serializable game state snapshot for Save slot. */
+  snapshot(extra?: { bgmUrl?: string | null; bgmPositionSec?: number }): GameStateSnapshot {
+    return {
+      schemaVersion: '2.0.0',
+      timestamp: Date.now(),
+      currentNodeId: this.currentNodeId,
+      variables: { ...this.variables },
+      fragments: [...this.fragments],
+      vector: this.isVectorEnabled ? { ...this.currentVector } : undefined,
+      pendingVector: this.isVectorEnabled ? { ...this.pendingVector } : undefined,
+      history: [...this.history],
+      backlog: [...this.backlogBuffer],
+      bgmUrl: extra?.bgmUrl,
+      bgmPositionSec: extra?.bgmPositionSec,
+    };
+  }
+
+  /** Restore engine state from a previously saved snapshot. */
+  restore(snapshot: GameStateSnapshot): GameState {
+    this.currentNodeId = snapshot.currentNodeId;
+    this.variables = { ...snapshot.variables };
+    this.fragments = new Set(snapshot.fragments ?? []);
+    this.currentVector = snapshot.vector ? { ...snapshot.vector } : { ...ZERO_VECTOR };
+    this.pendingVector = snapshot.pendingVector ? { ...snapshot.pendingVector } : { ...ZERO_VECTOR };
+    this.history = [...(snapshot.history ?? [])];
+
+    if (snapshot.currentNodeId) {
+      this.enterNode(snapshot.currentNodeId);
+    } else {
+      this.notify();
+    }
+
+    // Preserve exact backlog buffer from snapshot
+    this.backlogBuffer = [...(snapshot.backlog ?? [])];
+    return this.state;
+  }
+
   private processLogic(node: FlowNode): void {
     const data = node.data as LogicNodeData;
     const result = this.evaluateLogic(data);
@@ -715,8 +907,8 @@ export class GameEngine {
         magnitude: mag,
         quadrant: playerQuadrant,
       }),
-      title: output.mapping?.title ?? output.anchor?.name ?? 'Settlement',
-      description: output.mapping?.description ?? output.anchor?.description,
+      title: output.mapping?.title ?? output.anchor?.name ?? data.title ?? data.label ?? 'Settlement',
+      description: output.mapping?.description ?? output.anchor?.description ?? data.description,
       coverUrl: output.mapping?.coverUrl ?? output.anchor?.coverUrl,
       resultTexts: output.anchor?.resultTexts,
       buttons: data.buttons,
@@ -774,7 +966,7 @@ export class GameEngine {
     this.notify();
   }
 
-  /** Enter a minigame node — waits for the player to submit a score. */
+  /** Enter a minigame node — waits for the player to complete the game. */
   private processMinigame(node: FlowNode): void {
     const data = node.data as MinigameNodeData;
     this.state = {
@@ -783,13 +975,39 @@ export class GameEngine {
       currentNodeType: 'minigame',
       minigame: {
         gameUrl: data.gameUrl,
+        minigameId: data.minigameId ?? data.gameUrl,
         passingScore: data.passingScore,
         scoreVariable: data.scoreVariable,
+        difficulty: data.difficulty,
+        timeLimit: data.timeLimit,
       },
       choices: [],
       isFinished: false,
     };
     this.notify();
+  }
+
+  /** Complete minigame either with pass/fail boolean or score. */
+  completeMinigame(success: boolean): GameState {
+    if (!this.currentNodeId) return this.state;
+    const node = this.getNode(this.currentNodeId);
+    if (!node || node.type !== 'minigame') return this.state;
+    const data = node.data as MinigameNodeData;
+
+    let nextId: string | null = null;
+    if (success) {
+      nextId = data.passTargetNodeId ?? this.findTargetNodeId(node.id, null);
+    } else {
+      nextId = data.failTargetNodeId ?? this.findTargetNodeId(node.id, 'fail') ?? this.findTargetNodeId(node.id, null);
+    }
+
+    if (!nextId) {
+      this.state = { ...this.state, isFinished: true, minigame: null };
+      this.notify();
+      return this.state;
+    }
+    this.enterNode(nextId);
+    return this.state;
   }
 
   /** Submit a minigame score; advances the flow if it meets the passing score. */
@@ -806,7 +1024,7 @@ export class GameEngine {
     if (data.scoreVariable) {
       this.variables[data.scoreVariable] = score;
     }
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = data.passTargetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, minigame: null };
       this.notify();
@@ -819,14 +1037,16 @@ export class GameEngine {
   /** Enter a rating node — waits for the player to submit a rating value. */
   private processRating(node: FlowNode): void {
     const data = node.data as RatingNodeData;
+    const min = data.min ?? (data as any).minRating ?? 1;
+    const max = data.max ?? (data as any).maxRating ?? 5;
     this.state = {
       ...this.state,
       currentNodeId: node.id,
       currentNodeType: 'rating',
       rating: {
-        min: data.min,
-        max: data.max,
-        step: data.step,
+        min,
+        max,
+        step: data.step ?? 1,
         prompt: data.question ?? data.prompt,
         variable: data.variable,
         minLabel: data.minLabel,
@@ -844,11 +1064,13 @@ export class GameEngine {
     const node = this.getNode(this.currentNodeId);
     if (!node || node.type !== 'rating') return this.state;
     const data = node.data as RatingNodeData;
-    const clamped = Math.max(data.min, Math.min(data.max, value));
+    const min = data.min ?? (data as any).minRating ?? 1;
+    const max = data.max ?? (data as any).maxRating ?? 5;
+    const clamped = Math.max(min, Math.min(max, value));
     if (data.variable) {
       this.variables[data.variable] = clamped;
     }
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = (data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, rating: null };
       this.notify();
@@ -866,7 +1088,7 @@ export class GameEngine {
       currentNodeId: node.id,
       currentNodeType: 'multi-select',
       multiSelect: {
-        question: data.question,
+        question: data.question ?? data.prompt,
         options: data.options,
         minSelect: data.minSelected ?? data.minSelect,
         maxSelect: data.maxSelected ?? data.maxSelect,
@@ -891,7 +1113,7 @@ export class GameEngine {
     if (data.variable) {
       this.variables[data.variable] = optionIds.join(',');
     }
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = (data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, multiSelect: null };
       this.notify();
@@ -925,7 +1147,7 @@ export class GameEngine {
     if (!this.currentNodeId) return this.state;
     const node = this.getNode(this.currentNodeId);
     if (!node || node.type !== 'media') return this.state;
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = (node.data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, media: null };
       this.notify();
@@ -943,7 +1165,7 @@ export class GameEngine {
       currentNodeId: node.id,
       currentNodeType: 'text-input',
       textInput: {
-        question: data.question,
+        question: data.question ?? data.prompt,
         placeholder: data.placeholder,
         hint: data.hint,
         variable: data.variable,
@@ -967,7 +1189,7 @@ export class GameEngine {
     if (data.variable) {
       this.variables[data.variable] = trimmed;
     }
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = (data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, textInput: null };
       this.notify();
@@ -985,7 +1207,7 @@ export class GameEngine {
       currentNodeId: node.id,
       currentNodeType: 'rank-order',
       rankOrder: {
-        question: data.question,
+        question: data.question ?? data.prompt,
         hint: data.hint,
         variable: data.variable,
         items: data.items,
@@ -1005,7 +1227,7 @@ export class GameEngine {
     if (data.variable) {
       this.variables[data.variable] = orderedIds.join(',');
     }
-    const nextId = this.findTargetNodeId(node.id, null);
+    const nextId = (data as any).targetNodeId ?? this.findTargetNodeId(node.id, null);
     if (!nextId) {
       this.state = { ...this.state, isFinished: true, rankOrder: null };
       this.notify();

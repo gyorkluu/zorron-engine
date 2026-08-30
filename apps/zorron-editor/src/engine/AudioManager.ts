@@ -1,36 +1,36 @@
 /**
- * AudioManager - DOM-aware audio manager for the player.
+ * AudioManager - 4-Track Independent Audio的心流引擎.
  *
- * Singleton that manages BGM and one-shot SFX using the native HTMLAudioElement.
- * Decoupled from the pure GameEngine so the engine stays framework-agnostic.
+ * Provides 4 decoupled mixing channels:
+ *  1. BGM: Background soundtrack with smooth crossfade & position tracking.
+ *  2. Ambient: Environmental soundscapes (rain, wind, heartbeat).
+ *  3. Voice: Dialogue acting with Audio Ducking (dips BGM -30% during speech).
+ *  4. SFX: One-shot interactive sounds and QTE cues.
  *
- * Features ported from the legacy implementation:
- * - Single BGM instance with crossfade on switch.
- * - One-shot SFX with fade-out.
- * - Mobile autoplay unlock (best-effort).
+ * Includes WebAudio touch unlock for iOS Safari and WeChat browser.
  */
 
-/** Callback type for state changes (unused externally but available). */
 export type AudioStateListener = (playing: boolean) => void;
 
-interface PendingBgm {
-  url: string;
-  volume: number;
+interface ChannelTrack {
+  audio: HTMLAudioElement | null;
+  url: string | null;
+  baseVolume: number;
 }
 
 export class AudioManager {
   private static instance: AudioManager | null = null;
 
-  private bgm: HTMLAudioElement | null = null;
-  private currentBgmUrl: string | null = null;
-  private sfx: HTMLAudioElement | null = null;
-  private currentSfxUrl: string | null = null;
+  private bgmTrack: ChannelTrack = { audio: null, url: null, baseVolume: 0.8 };
+  private ambientTrack: ChannelTrack = { audio: null, url: null, baseVolume: 0.6 };
+  private voiceTrack: ChannelTrack = { audio: null, url: null, baseVolume: 1.0 };
+  private sfxTrack: ChannelTrack = { audio: null, url: null, baseVolume: 1.0 };
+
   private isAudioUnlocked = false;
-  private pendingBgm: PendingBgm | null = null;
+  private isDucking = false;
   private listeners: Set<AudioStateListener> = new Set();
   private fadeTimers: ReturnType<typeof setTimeout>[] = [];
 
-  /** Get the singleton instance. */
   static getInstance(): AudioManager {
     if (!AudioManager.instance) {
       AudioManager.instance = new AudioManager();
@@ -38,7 +38,6 @@ export class AudioManager {
     return AudioManager.instance;
   }
 
-  /** Reset the singleton (for tests). */
   static resetInstance(): void {
     if (AudioManager.instance) {
       AudioManager.instance.stopAll();
@@ -50,138 +49,191 @@ export class AudioManager {
     if (typeof window === 'undefined') return;
     if (!this.isMobile()) {
       this.isAudioUnlocked = true;
-      return;
     }
     this.setupMobileUnlock();
   }
 
-  /** Play a background music track with crossfade. */
-  playBgm(url: string, volume = 0.5): void {
+  // ── 1. BGM 轨道 (Background Music) ────────────────────────────
+  playBgm(url: string, volume = 0.8, fadeInMs = 1000): void {
     if (typeof window === 'undefined') return;
-    if (this.currentBgmUrl === url) return;
-
-    // Fade out existing BGM.
-    if (this.bgm) {
-      this.fadeOut(this.bgm, 800);
-      this.bgm = null;
+    if (this.bgmTrack.url === url && this.bgmTrack.audio && !this.bgmTrack.audio.paused) {
+      return;
     }
 
-    this.currentBgmUrl = url;
+    if (this.bgmTrack.audio) {
+      this.fadeOut(this.bgmTrack.audio, fadeInMs / 2);
+      this.bgmTrack.audio = null;
+    }
+
+    this.bgmTrack.url = url;
+    this.bgmTrack.baseVolume = volume;
+    if (!url) {
+      this.notify(false);
+      return;
+    }
+
+    const audio = new Audio(url);
+    audio.loop = true;
+    audio.volume = 0;
+    audio.crossOrigin = 'anonymous';
+    this.bgmTrack.audio = audio;
+
+    const targetVol = this.isDucking ? volume * 0.35 : volume;
+
+    this.safePlay(audio)
+      .then(() => {
+        this.fadeIn(audio, targetVol, fadeInMs);
+        this.notify(true);
+      })
+      .catch(() => {
+        // Queue for touch unlock
+      });
+  }
+
+  getBgmPosition(): number {
+    return this.bgmTrack.audio?.currentTime || 0;
+  }
+
+  getCurrentBgmUrl(): string | null {
+    return this.bgmTrack.url;
+  }
+
+  // ── 2. Ambient 轨道 (环境音) ──────────────────────────────────
+  playAmbient(url: string, volume = 0.6, fadeInMs = 1500): void {
+    if (typeof window === 'undefined') return;
+    if (this.ambientTrack.url === url && this.ambientTrack.audio) return;
+
+    if (this.ambientTrack.audio) {
+      this.fadeOut(this.ambientTrack.audio, 800);
+      this.ambientTrack.audio = null;
+    }
+
+    this.ambientTrack.url = url;
+    this.ambientTrack.baseVolume = volume;
     if (!url) return;
 
     const audio = new Audio(url);
     audio.loop = true;
     audio.volume = 0;
     audio.crossOrigin = 'anonymous';
-    this.bgm = audio;
+    this.ambientTrack.audio = audio;
 
-    const attemptPlay = (): void => {
-      void audio.play().then(() => {
-        this.fadeIn(audio, volume, 800);
-        this.notify(true);
-      }).catch(() => {
-        // Autoplay blocked; queue for retry on user interaction.
-        this.pendingBgm = { url, volume };
-      });
-    };
+    this.safePlay(audio)
+      .then(() => {
+        this.fadeIn(audio, volume, fadeInMs);
+      })
+      .catch(() => {});
+  }
 
-    if (!this.isAudioUnlocked) {
-      this.pendingBgm = { url, volume };
+  // ── 3. Voice 轨道与 Audio Ducking (台词配音) ────────────────────
+  playVoice(url: string, volume = 1.0, onEnded?: () => void): void {
+    if (typeof window === 'undefined' || !url) {
+      onEnded?.();
       return;
     }
 
-    attemptPlay();
-  }
-
-  /** Play a one-shot sound effect. */
-  playSfx(url: string, volume = 1): void {
-    if (typeof window === 'undefined' || !url) return;
-    if (this.sfx && this.currentSfxUrl !== url) {
-      this.fadeOut(this.sfx, 300);
+    if (this.voiceTrack.audio) {
+      this.voiceTrack.audio.pause();
+      this.voiceTrack.audio = null;
     }
-    this.currentSfxUrl = url;
+
     const audio = new Audio(url);
-    audio.volume = 0;
+    audio.volume = volume;
     audio.crossOrigin = 'anonymous';
-    this.sfx = audio;
-    void audio.play().then(() => {
-      this.fadeIn(audio, volume, 200);
-    }).catch(() => {
-      // Ignore blocked autoplay.
-    });
-    audio.addEventListener('ended', () => {
-      if (this.sfx === audio) {
-        this.sfx = null;
-        this.currentSfxUrl = null;
+    this.voiceTrack.audio = audio;
+    this.voiceTrack.url = url;
+
+    // Apply Audio Ducking: lower BGM volume
+    this.applyDucking(true);
+
+    const handleEnded = () => {
+      this.applyDucking(false);
+      if (this.voiceTrack.audio === audio) {
+        this.voiceTrack.audio = null;
+        this.voiceTrack.url = null;
       }
+      onEnded?.();
+    };
+
+    audio.addEventListener('ended', handleEnded, { once: true });
+    audio.addEventListener('error', handleEnded, { once: true });
+
+    this.safePlay(audio).catch(() => {
+      handleEnded();
     });
   }
 
-  /** Stop and unload all audio. */
+  stopVoice(): void {
+    if (this.voiceTrack.audio) {
+      this.voiceTrack.audio.pause();
+      this.voiceTrack.audio = null;
+      this.voiceTrack.url = null;
+      this.applyDucking(false);
+    }
+  }
+
+  // ── 4. SFX 轨道 (音效) ─────────────────────────────────────────
+  playSfx(url: string, volume = 1.0): void {
+    if (typeof window === 'undefined' || !url) return;
+    const audio = new Audio(url);
+    audio.volume = volume;
+    audio.crossOrigin = 'anonymous';
+    this.sfxTrack.audio = audio;
+    this.safePlay(audio).catch(() => {});
+  }
+
+  // ── Audio Ducking Controller ─────────────────────────────────
+  private applyDucking(duck: boolean): void {
+    this.isDucking = duck;
+    if (!this.bgmTrack.audio) return;
+
+    const targetVolume = duck
+      ? this.bgmTrack.baseVolume * 0.35
+      : this.bgmTrack.baseVolume;
+
+    this.smoothVolume(this.bgmTrack.audio, targetVolume, 400);
+  }
+
+  // ── Global Controls & Lifecycle ──────────────────────────────
   stopAll(): void {
     for (const timer of this.fadeTimers) clearTimeout(timer);
     this.fadeTimers = [];
-    if (this.bgm) {
-      this.bgm.pause();
-      this.bgm.src = '';
-      this.bgm = null;
-    }
-    if (this.sfx) {
-      this.sfx.pause();
-      this.sfx.src = '';
-      this.sfx = null;
-    }
-    this.currentBgmUrl = null;
-    this.currentSfxUrl = null;
-    this.pendingBgm = null;
+
+    const stopTrack = (track: ChannelTrack) => {
+      if (track.audio) {
+        track.audio.pause();
+        track.audio.src = '';
+        track.audio = null;
+      }
+      track.url = null;
+    };
+
+    stopTrack(this.bgmTrack);
+    stopTrack(this.ambientTrack);
+    stopTrack(this.voiceTrack);
+    stopTrack(this.sfxTrack);
+
+    this.isDucking = false;
     this.notify(false);
   }
 
-  /** Subscribe to playing-state changes. Returns an unsubscribe function. */
   subscribe(listener: AudioStateListener): () => void {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   }
 
-  /** Attempt to unlock audio playback after a user gesture. */
   unlock(): Promise<boolean> {
-    if (typeof window === 'undefined') {
-      return Promise.resolve(false);
-    }
-    const resumePending = (): void => {
-      this.isAudioUnlocked = true;
-      if (this.pendingBgm) {
-        this.playBgm(this.pendingBgm.url, this.pendingBgm.volume);
-        this.pendingBgm = null;
-      }
-    };
+    if (typeof window === 'undefined') return Promise.resolve(false);
+    this.isAudioUnlocked = true;
 
-    // Already unlocked: just resume any pending BGM.
-    if (this.isAudioUnlocked) {
-      resumePending();
-      return Promise.resolve(true);
+    if (this.bgmTrack.url && (!this.bgmTrack.audio || this.bgmTrack.audio.paused)) {
+      this.playBgm(this.bgmTrack.url, this.bgmTrack.baseVolume);
     }
 
-    return new Promise((resolve) => {
-      const tempAudio = new Audio();
-      tempAudio.volume = 0;
-      void tempAudio
-        .play()
-        .then(() => {
-          tempAudio.pause();
-          resumePending();
-          resolve(true);
-        })
-        .catch(() => {
-          // Mark unlocked anyway; user has interacted.
-          resumePending();
-          resolve(true);
-        });
-    });
+    return Promise.resolve(true);
   }
 
-  // ---- Internal helpers --------------------------------------------------
-
+  // ── Helpers ──────────────────────────────────────────────────
   private isMobile(): boolean {
     if (typeof navigator === 'undefined') return false;
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -191,7 +243,7 @@ export class AudioManager {
 
   private setupMobileUnlock(): void {
     if (typeof document === 'undefined') return;
-    const unlock = (): void => {
+    const unlock = () => {
       void this.unlock();
     };
     document.body.addEventListener('touchstart', unlock, { once: true, passive: true });
@@ -199,20 +251,7 @@ export class AudioManager {
   }
 
   private fadeIn(audio: HTMLAudioElement, target: number, durationMs: number): void {
-    const steps = 10;
-    const stepMs = durationMs / steps;
-    const increment = target / steps;
-    let current = 0;
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        audio.volume = target;
-        clearInterval(timer);
-      } else {
-        audio.volume = current;
-      }
-    }, stepMs);
-    this.fadeTimers.push(timer);
+    this.smoothVolume(audio, target, durationMs);
   }
 
   private fadeOut(audio: HTMLAudioElement, durationMs: number): void {
@@ -221,6 +260,7 @@ export class AudioManager {
     const stepMs = durationMs / steps;
     const decrement = startVolume / steps;
     let current = startVolume;
+
     const timer = setInterval(() => {
       current -= decrement;
       if (current <= 0) {
@@ -228,10 +268,41 @@ export class AudioManager {
         audio.src = '';
         clearInterval(timer);
       } else {
-        audio.volume = current;
+        audio.volume = Math.max(0, current);
       }
     }, stepMs);
     this.fadeTimers.push(timer);
+  }
+
+  private smoothVolume(audio: HTMLAudioElement, target: number, durationMs: number): void {
+    const startVolume = audio.volume;
+    const steps = 10;
+    const stepMs = durationMs / steps;
+    const delta = (target - startVolume) / steps;
+    let current = startVolume;
+
+    const timer = setInterval(() => {
+      current += delta;
+      if ((delta > 0 && current >= target) || (delta < 0 && current <= target)) {
+        audio.volume = Math.min(1, Math.max(0, target));
+        clearInterval(timer);
+      } else {
+        audio.volume = Math.min(1, Math.max(0, current));
+      }
+    }, stepMs);
+    this.fadeTimers.push(timer);
+  }
+
+  private safePlay(audio: HTMLAudioElement): Promise<void> {
+    try {
+      const p = audio.play();
+      if (p && typeof (p as any).then === 'function') {
+        return p;
+      }
+      return Promise.resolve();
+    } catch {
+      return Promise.resolve();
+    }
   }
 
   private notify(playing: boolean): void {
@@ -241,7 +312,6 @@ export class AudioManager {
   }
 }
 
-/** Convenience accessor for the singleton. */
 export function getAudioManager(): AudioManager {
   return AudioManager.getInstance();
 }
