@@ -688,6 +688,18 @@ export const translations = {
   'preview.tablet': { zh: '平板', en: 'Tablet' },
   'preview.safeArea': { zh: '显示安全区参考线', en: 'Show safe-area guides' },
 
+  'layout.auto': { zh: '自动布局', en: 'Auto layout' },
+  'layout.align': { zh: '对齐', en: 'Align' },
+  'layout.align.needSelection': { zh: '至少选择 {n} 个节点', en: 'Select at least {n} nodes' },
+  'layout.align.left': { zh: '左对齐', en: 'Align left' },
+  'layout.align.centerX': { zh: '水平居中', en: 'Centre horizontally' },
+  'layout.align.right': { zh: '右对齐', en: 'Align right' },
+  'layout.align.top': { zh: '顶对齐', en: 'Align top' },
+  'layout.align.centerY': { zh: '垂直居中', en: 'Centre vertically' },
+  'layout.align.bottom': { zh: '底对齐', en: 'Align bottom' },
+  'layout.distribute.h': { zh: '水平等距', en: 'Distribute horizontally' },
+  'layout.distribute.v': { zh: '垂直等距', en: 'Distribute vertically' },
+
 } as const;
 
 /** Type of a translation key. */

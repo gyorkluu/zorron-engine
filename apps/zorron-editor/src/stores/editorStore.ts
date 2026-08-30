@@ -30,6 +30,12 @@ import {
   type GameNodeData,
 } from '@/types/flow';
 import { createDefaultNodeData } from '@/engine/nodeRegistry';
+import {
+  autoLayout,
+  alignNodes,
+  distributeNodes,
+  type AlignMode,
+} from '@/lib/layoutTools';
 
 /** Maximum history entries kept for undo/redo. */
 const MAX_HISTORY = 50;
@@ -90,6 +96,12 @@ interface EditorState {
   createGroup: (label?: string) => string;
   /** Collapse or expand a group, hiding or revealing its children. */
   toggleGroupCollapse: (groupId: string) => void;
+  /** Re-flow the whole graph into layered columns. */
+  autoLayoutAll: () => void;
+  /** Align the selected nodes against their shared bounding box. No-op under 2. */
+  alignSelected: (mode: AlignMode) => void;
+  /** Evenly space the selected nodes. No-op under 3. */
+  distributeSelected: (axis: 'horizontal' | 'vertical') => void;
 
   // Undo/redo
   undo: () => void;
@@ -334,6 +346,37 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       });
 
       return { nodes };
+    });
+  },
+
+  autoLayoutAll: () => {
+    set((s) => ({
+      ...pushHistory(s),
+      nodes: autoLayout(s.nodes, s.edges),
+    }));
+  },
+
+  alignSelected: (mode) => {
+    set((s) => {
+      const selected = s.nodes.filter((n) => n.selected);
+      if (selected.length < 2) return s;
+      const moved = new Map(alignNodes(selected, mode).map((n) => [n.id, n]));
+      return {
+        ...pushHistory(s),
+        nodes: s.nodes.map((n) => moved.get(n.id) ?? n),
+      };
+    });
+  },
+
+  distributeSelected: (axis) => {
+    set((s) => {
+      const selected = s.nodes.filter((n) => n.selected);
+      if (selected.length < 3) return s;
+      const moved = new Map(distributeNodes(selected, axis).map((n) => [n.id, n]));
+      return {
+        ...pushHistory(s),
+        nodes: s.nodes.map((n) => moved.get(n.id) ?? n),
+      };
     });
   },
 

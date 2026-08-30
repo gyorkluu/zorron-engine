@@ -15,6 +15,7 @@ import { useAIStore } from '@/stores/aiStore';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
 import { exportProjectJson, pickJsonFile } from '@/utils/fileIO';
 import { SyncStatusIndicator } from '@/components/cloud/SyncStatusIndicator';
+import { LayoutTools } from './LayoutTools';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { featureFlags } from '@/lib/featureFlags';
@@ -85,6 +86,10 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   const importProject = useProjectStore((s) => s.importProject);
   const setTitle = useProjectStore((s) => s.setTitle);
   const loadFlow = useEditorStore((s) => s.loadFlow);
+  // Drives the align/distribute affordances in the toolbar.
+  const selectedCount = useEditorStore(
+    (s) => s.nodes.filter((n) => n.selected).length,
+  );
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -205,6 +210,7 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-2">
+        <LayoutTools selectedCount={selectedCount} />
         {featureFlags.cloudSync && <SyncStatusIndicator />}
 
         <span
