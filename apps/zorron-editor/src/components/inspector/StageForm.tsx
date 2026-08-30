@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Clapperboard,
   Video,
@@ -15,6 +15,9 @@ import {
 import type { FlowNode, StageNodeData, StageCarrier, StageChoice, StageHitbox } from '@/types/flow';
 import { useEditorStore } from '@/stores/editorStore';
 import { useProjectStore } from '@/stores/projectStore';
+import { useAssetStore } from '@/stores/assetStore';
+import { StageTimelineEditor } from './StageTimelineEditor';
+import { HitboxCanvas } from './HitboxCanvas';
 import { useT } from '@/i18n/useT';
 
 export interface StageFormProps {
@@ -28,6 +31,7 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
   const [activeTab, setActiveTab] = useState<'carrier' | 'interaction' | 'fx' | 'flow'>('carrier');
   const nodes = useEditorStore((s) => s.nodes);
   const characters = useProjectStore((s) => s.characters);
+  const assets = useAssetStore((s) => s.assets);
   const { t } = useT();
 
   const nodeData = (node?.data as StageNodeData | undefined) || data || ({} as StageNodeData);
@@ -46,6 +50,14 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
   const hitboxes = interaction.hitboxes || [];
   const fx = nodeData.fx || {};
   const flow = nodeData.flow || { preloadNext: [], mutations: [] };
+
+  // True duration comes from the ffprobe pipeline that runs server-side on
+  // upload; without it the timeline falls back to a guess.
+  const mediaDurationSec = useMemo(() => {
+    if (!carrier.url) return undefined;
+    const match = assets.find((a) => a.url === carrier.url);
+    return match?.metadata?.durationSec;
+  }, [assets, carrier.url]);
 
   const updateCarrier = (patch: Partial<StageCarrier>) => {
     handleUpdate({
@@ -231,6 +243,16 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
               </div>
 
               <div>
+                <StageTimelineEditor
+                  durationSec={mediaDurationSec}
+                  timeRange={{
+                    startSec: carrier.timeRange?.[0] ?? 0,
+                    endSec: carrier.timeRange?.[1] ?? mediaDurationSec ?? 10,
+                  }}
+                  onChange={(range) =>
+                    updateCarrier({ timeRange: [range.startSec, range.endSec] })
+                  }
+                />
                 <label className="mb-1 block text-slate-400">{t('stageForm.timeRange')}</label>
                 <div className="flex items-center gap-2">
                   <input
@@ -432,8 +454,11 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 onClick={() => {
                   const newHb: StageHitbox = {
                     id: `hb-${Date.now()}`,
-                    rect: [20, 20, 30, 30],
-                    action: 'jump',
+                    x: 20,
+                    y: 20,
+                    w: 30,
+                    h: 30,
+                    targetNodeId: '',
                   };
                   updateHitboxes([...hitboxes, newHb]);
                 }}
@@ -443,6 +468,15 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 {t('stageForm.addHitbox')}
               </button>
             </div>
+
+            <HitboxCanvas
+              backgroundUrl={carrier.url}
+              hitboxes={hitboxes}
+              onChange={updateHitboxes}
+              defaultTargetNodeId={
+                interaction?.choices?.[0]?.targetNodeId ?? ''
+              }
+            />
 
             {hitboxes.map((hb, i) => (
               <div key={hb.id || i} className="space-y-1.5 rounded border border-amber-500/30 bg-slate-800/80 p-2">
@@ -458,11 +492,19 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                 </div>
                 <div className="grid grid-cols-4 gap-1">
                   {['X%', 'Y%', 'W%', 'H%'].map((label, coordIdx) => {
-                    const rectVals: [number, number, number, number] = hb.rect || [
+                    // Read the contract shape first; `rect`/`width`/`height`
+                    // are legacy fields kept for projects saved before the
+                    // shared schema existed.
+                    const legacy = hb as unknown as {
+                      rect?: [number, number, number, number];
+                      width?: number;
+                      height?: number;
+                    };
+                    const rectVals: [number, number, number, number] = legacy.rect ?? [
                       hb.x ?? 20,
                       hb.y ?? 20,
-                      hb.width ?? 30,
-                      hb.height ?? 30,
+                      hb.w ?? legacy.width ?? 30,
+                      hb.h ?? legacy.height ?? 30,
                     ];
                     return (
                       <div key={label} className="text-center">
@@ -478,11 +520,10 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
                             nextRect[coordIdx] = parseFloat(e.target.value) || 0;
                             updated[i] = {
                               ...updated[i],
-                              rect: nextRect,
                               x: nextRect[0],
                               y: nextRect[1],
-                              width: nextRect[2],
-                              height: nextRect[3],
+                              w: nextRect[2],
+                              h: nextRect[3],
                             };
                             updateHitboxes(updated);
                           }}

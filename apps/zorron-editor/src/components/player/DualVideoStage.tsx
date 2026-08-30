@@ -254,10 +254,17 @@ export function DualVideoStage({
 
       {/* ── Interactive Hotspots (Hitboxes) ───────────────────── */}
       {visibleHitboxes.map((hb) => {
-        const x = hb.rect ? hb.rect[0] : (hb.x ?? 0);
-        const y = hb.rect ? hb.rect[1] : (hb.y ?? 0);
-        const w = hb.rect ? hb.rect[2] : (hb.width ?? 20);
-        const h = hb.rect ? hb.rect[3] : (hb.height ?? 20);
+        // Contract shape is x/y/w/h; `rect` and `width`/`height` are legacy
+        // aliases kept so older projects keep working.
+        const legacy = hb as unknown as {
+          rect?: [number, number, number, number];
+          width?: number;
+          height?: number;
+        };
+        const x = legacy.rect ? legacy.rect[0] : hb.x ?? 0;
+        const y = legacy.rect ? legacy.rect[1] : hb.y ?? 0;
+        const w = legacy.rect ? legacy.rect[2] : hb.w ?? legacy.width ?? 20;
+        const h = legacy.rect ? legacy.rect[3] : hb.h ?? legacy.height ?? 20;
         return (
           <button
             key={hb.id}

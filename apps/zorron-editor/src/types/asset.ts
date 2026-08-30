@@ -9,6 +9,22 @@ export type AssetType = 'image' | 'audio' | 'video' | 'font' | 'other';
 export type AssetSource = 'local' | 'remote';
 
 /** Asset record returned by the backend (or materialized from IndexedDB). */
+/**
+ * Media metadata extracted by the server-side ffprobe pipeline on upload.
+ *
+ * Used for Auto-mode pacing (voiceDurationSec) and to draw the Stage timeline
+ * at true length instead of a guessed duration.
+ */
+export interface AssetMetadata {
+  /** Duration in seconds. */
+  durationSec?: number;
+  width?: number;
+  height?: number;
+  fps?: number;
+  codec?: string;
+  bitrateKbps?: number;
+}
+
 export interface Asset {
   id: string;
   name: string;
@@ -23,6 +39,8 @@ export interface Asset {
   source?: AssetSource;
   /** IndexedDB object id when `source === 'local'`. */
   localHandleId?: string;
+  /** ffprobe output for media assets; absent for images and legacy uploads. */
+  metadata?: AssetMetadata;
 }
 
 /** Type guard: true when the asset is backed by IndexedDB. */
