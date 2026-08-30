@@ -426,6 +426,38 @@ export const sessionEventsRelations = relations(sessionEvents, ({ one }) => ({
   tenant: one(tenants, { fields: [sessionEvents.tenantId], references: [tenants.id] }),
 }));
 
+export const saveSlots = pgTable(
+  'save_slots',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => projects.id, { onDelete: 'cascade' }),
+    slotIndex: integer('slot_index').notNull(),
+    snapshotData: jsonb('snapshot_data').notNull(),
+    chapterTitle: varchar('chapter_title', { length: 200 }),
+    previewImageUrl: text('preview_image_url'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    userProjectSlotIdx: uniqueIndex('save_slots_user_project_slot_idx').on(
+      table.userId,
+      table.projectId,
+      table.slotIndex,
+    ),
+    projectIdx: index('save_slots_project_idx').on(table.projectId),
+  }),
+);
+
+export const saveSlotsRelations = relations(saveSlots, ({ one }) => ({
+  user: one(users, { fields: [saveSlots.userId], references: [users.id] }),
+  project: one(projects, { fields: [saveSlots.projectId], references: [projects.id] }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Tenant = typeof tenants.$inferSelect;
@@ -450,3 +482,6 @@ export type Jx3Submission = typeof jx3Submissions.$inferSelect;
 export type NewJx3Submission = typeof jx3Submissions.$inferInsert;
 export type Jx3Appeal = typeof jx3Appeals.$inferSelect;
 export type NewJx3Appeal = typeof jx3Appeals.$inferInsert;
+export type SaveSlot = typeof saveSlots.$inferSelect;
+export type NewSaveSlot = typeof saveSlots.$inferInsert;
+

@@ -4,6 +4,7 @@ import { env } from '../../config/env';
 import type { StorageProvider } from '../../shared/storage/provider';
 import { findProjectByIdAndOwner } from '../project/project.repository';
 import * as repository from './asset.repository';
+import { probeMediaBuffer } from './ffprobe.service';
 import type {
   AssetResponse,
   AssetType,
@@ -126,6 +127,16 @@ export async function uploadAsset(
 
   const url = await storage.put(storageKey, file);
 
+  let probedMeta = {};
+  if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
+    try {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      probedMeta = await probeMediaBuffer(buffer, file.name);
+    } catch {
+      // Non-fatal
+    }
+  }
+
   const asset = await repository.createAsset({
     ownerId,
     projectId: projectId ?? null,
@@ -136,7 +147,10 @@ export async function uploadAsset(
     storageKey,
     storageProvider: env.STORAGE_PROVIDER,
     url,
-    metadata: metadata ?? {},
+    metadata: {
+      ...(metadata ?? {}),
+      ...probedMeta,
+    },
   });
 
   return toAssetResponse(asset);

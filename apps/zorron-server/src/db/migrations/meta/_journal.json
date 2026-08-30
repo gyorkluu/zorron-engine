@@ -50,6 +50,13 @@
       "when": 1784009666466,
       "tag": "0006_striped_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787657456576,
+      "tag": "0007_hard_boomer",
+      "breakpoints": true
     }
   ]
 }

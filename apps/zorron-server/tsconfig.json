@@ -15,7 +15,9 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@zorron/flow-schema": ["../../packages/flow-schema/src/index.ts"],
+      "@zorron/flow-schema/*": ["../../packages/flow-schema/src/*"]
     },
     "types": ["bun", "vitest/globals"]
   },
