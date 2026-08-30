@@ -30,6 +30,9 @@ import { getTerminalTypes, getNodeAccent } from '@/engine/nodeRegistry';
 import { cn } from '@/lib/utils';
 
 const TERMINAL_TYPES = getTerminalTypes();
+
+/** Node count above which the canvas renders only the elements in view. */
+const VIRTUALISATION_THRESHOLD = 60;
 const edgeTypes = { zorron: ZorronEdge };
 
 export interface FlowCanvasProps {
@@ -239,6 +242,11 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     );
   }, []);
 
+  // Rendering hundreds of nodes unconditionally is what makes a large story
+  // feel heavy. Above this count we render only what is on screen; below it,
+  // the viewport bookkeeping costs more than it saves.
+  const virtualise = nodes.length > VIRTUALISATION_THRESHOLD;
+
   const minimapNodeColor = useCallback((n: Node) => getNodeAccent(n.type as NodeType), []);
   const flowNodes = useMemo(() => nodes, [nodes]);
   const flowEdges = useMemo(() => edges, [edges]);
@@ -271,6 +279,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         onPaneContextMenu={onPaneContextMenu}
         isValidConnection={isValidConnection}
         onInit={setRfInstance}
+        onlyRenderVisibleElements={virtualise}
         fitView
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{
