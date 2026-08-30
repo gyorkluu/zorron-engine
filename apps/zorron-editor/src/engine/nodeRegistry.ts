@@ -29,17 +29,35 @@ export interface InspectorFormProps<TData extends BaseNodeData = BaseNodeData> {
   update: (data: Partial<TData>) => void;
 }
 
+/** High-level functional category grouping for nodes. */
+export type NodeCategory = 'narrative' | 'interaction' | 'logic' | 'gameplay' | 'output';
+
+export interface CategoryInfo {
+  id: NodeCategory;
+  labelKey: TranslationKey;
+  descKey: TranslationKey;
+  color: string;
+}
+
+export const NODE_CATEGORIES: CategoryInfo[] = [
+  { id: 'narrative', labelKey: 'category.narrative', descKey: 'category.narrative.desc', color: '#38bdf8' },
+  { id: 'interaction', labelKey: 'category.interaction', descKey: 'category.interaction.desc', color: '#a78bfa' },
+  { id: 'logic', labelKey: 'category.logic', descKey: 'category.logic.desc', color: '#f59e0b' },
+  { id: 'gameplay', labelKey: 'category.gameplay', descKey: 'category.gameplay.desc', color: '#10b981' },
+  { id: 'output', labelKey: 'category.output', descKey: 'category.output.desc', color: '#f472b6' },
+];
+
 /**
  * Complete metadata for a single node type.
  *
- * Aggregates: identity (type/label/icon), canvas rendering (CanvasComponent),
- * inspection (InspectorForm), defaults (createDefault), and connection rules
- * (isTerminal / canConnectTo). The `processor` field is reserved for the
- * generalized engine execution layer (GEN-004) and is intentionally optional.
+ * Aggregates: identity (type/label/icon), category grouping, canvas rendering,
+ * inspection, defaults, and connection rules.
  */
 export interface NodeDefinition<TData extends BaseNodeData = BaseNodeData> {
   /** React Flow node type discriminator. */
   type: NodeType;
+  /** High-level functional category grouping. */
+  category?: NodeCategory;
   /** i18n key for the human-readable label. */
   labelKey: TranslationKey;
   /** i18n key for the palette description. */
@@ -68,13 +86,45 @@ export interface NodeDefinition<TData extends BaseNodeData = BaseNodeData> {
   processor?: (node: FlowNode, ctx: unknown) => unknown;
 }
 
-const registry = new Map<NodeType, NodeDefinition>();
+import { CustomNode } from '@/components/flow/nodes/CustomNode';
+import { CustomNodeForm } from '@/components/inspector/CustomNodeForm';
+import { Sparkles } from 'lucide-react';
+
+const registry = new Map<NodeType | string, NodeDefinition>();
 
 /** Register a node definition. Idempotent for the same `type`. */
 export function registerNode<TData extends BaseNodeData>(
   def: NodeDefinition<TData>,
 ): void {
   registry.set(def.type, def as NodeDefinition);
+}
+
+/** Dynamically register a custom AI-created node type at runtime. */
+export function registerCustomNodeType(
+  customType: string,
+  label: string,
+  accent = '#ec4899',
+  defaultData: Record<string, unknown> = {},
+): void {
+  if (registry.has(customType as NodeType)) return;
+
+  const customDef: NodeDefinition = {
+    type: customType as NodeType,
+    labelKey: 'node.scene.label' as TranslationKey,
+    descKey: 'node.scene.desc' as TranslationKey,
+    icon: Sparkles,
+    accent,
+    CanvasComponent: CustomNode,
+    InspectorForm: CustomNodeForm,
+    createDefault: () => ({
+      label,
+      customName: label,
+      description: `AI 动态创建的节点类型: ${customType}`,
+      ...defaultData,
+    }),
+  };
+
+  registry.set(customType as NodeType, customDef);
 }
 
 /** Look up a node definition by type. */
@@ -151,3 +201,14 @@ export function canConnect(sourceType: NodeType, targetType: NodeType): boolean 
   if (sourceDef.canConnectTo) return sourceDef.canConnectTo(targetType);
   return true;
 }
+
+/** Look up all node definitions belonging to a specific category. */
+export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
+  return getAllNodeDefinitions().filter((d) => (d.category ?? 'narrative') === category);
+}
+
+/** Look up a node's category, defaulting to 'narrative'. */
+export function getNodeCategory(type: NodeType): NodeCategory {
+  return getNodeDefinition(type)?.category ?? 'narrative';
+}
+

@@ -9,6 +9,7 @@ import type { Node, Edge, XYPosition } from '@xyflow/react';
 
 /** Supported narrative node types in Zorron Engine. */
 export type NodeType =
+  | 'stage'
   | 'start'
   | 'scene'
   | 'logic'
@@ -334,8 +335,22 @@ export interface NumberPickerNodeData extends BaseNodeData {
   defaultValue?: number;
 }
 
+/** Re-export Stage 2.0 types from @zorron/flow-schema (SSOT) */
+export type {
+  StageNodeData,
+  StageCarrier,
+  StageInteraction,
+  StageFX,
+  StageFlow,
+  StageChoice,
+  StageHitbox,
+  StageDialogue,
+} from '@zorron/flow-schema';
+import type { StageNodeData } from '@zorron/flow-schema';
+
 /** Discriminated union of all node data payloads. */
 export type GameNodeData =
+  | StageNodeData
   | StartNodeData
   | SceneNodeData
   | LogicNodeData

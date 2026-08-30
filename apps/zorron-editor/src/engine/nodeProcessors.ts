@@ -88,7 +88,7 @@ export function applyCalculator(
 
 /** Apply a scene choice's side effects (vector delta + fragment). */
 export function applyChoice(
-  choice: SceneChoice,
+  choice: SceneChoice | { vector?: PersonalityVector; dropFragmentId?: string },
   ctx: ProcessorContext,
 ): { pendingVector: PersonalityVector; fragments: Set<string> } {
   const pendingVector = (ctx.vectorEnabled && choice.vector)
@@ -99,6 +99,25 @@ export function applyChoice(
     fragments.add(choice.dropFragmentId);
   }
   return { pendingVector, fragments };
+}
+
+/** Apply variable mutations from a Stage node's flow configuration. */
+export function applyStageMutations(
+  mutations: Array<{ variable: string; operator: 'set' | 'add' | 'sub'; value: any }> | undefined,
+  ctx: ProcessorContext,
+): Variables {
+  if (!mutations || mutations.length === 0) return ctx.variables;
+  const next: Variables = { ...ctx.variables };
+  for (const m of mutations) {
+    if (m.operator === 'set') {
+      next[m.variable] = m.value;
+    } else {
+      const current = Number(next[m.variable] ?? 0);
+      const delta = Number(m.value);
+      next[m.variable] = m.operator === 'add' ? current + delta : current - delta;
+    }
+  }
+  return next;
 }
 
 /** Evaluate a settlement node and return the result. */
