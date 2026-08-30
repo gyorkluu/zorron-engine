@@ -56,6 +56,10 @@ export type StageHitbox = z.infer<typeof StageHitboxSchema>;
 
 export const StageDialogueSchema = z.object({
   speaker: z.string().optional(),
+  /** Reference into FlowData.characters. Wins over free-text `speaker`. */
+  characterId: z.string().optional(),
+  /** Expression variant id from the referenced character. */
+  expression: z.string().optional(),
   text: z.string(),
   voiceUrl: z.string().optional(),
   voiceDurationSec: z.number().optional(), // Ingested via ffprobe

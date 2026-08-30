@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { FlowNode, StageNodeData, StageCarrier, StageChoice, StageHitbox } from '@/types/flow';
 import { useEditorStore } from '@/stores/editorStore';
+import { useProjectStore } from '@/stores/projectStore';
 
 export interface StageFormProps {
   node?: FlowNode;
@@ -25,6 +26,7 @@ export interface StageFormProps {
 export function StageForm({ node, update, data, onChange }: StageFormProps) {
   const [activeTab, setActiveTab] = useState<'carrier' | 'interaction' | 'fx' | 'flow'>('carrier');
   const nodes = useEditorStore((s) => s.nodes);
+  const characters = useProjectStore((s) => s.characters);
 
   const nodeData = (node?.data as StageNodeData | undefined) || data || ({} as StageNodeData);
   const handleUpdate = update || onChange || (() => {});
@@ -32,6 +34,12 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
   const carrier = nodeData.carrier || { type: 'video', url: '', loop: false, playbackRate: 1.0 };
   const interaction = nodeData.interaction || {};
   const dialogue = interaction.dialogue || { text: '' };
+  // Character referenced by this line — undefined when the id no longer resolves.
+  const activeCharacter = characters.find((c) => c.id === dialogue.characterId);
+  const activeExpressions = activeCharacter?.expressions ?? [];
+  const activeSprite =
+    activeExpressions.find((e) => e.id === dialogue.expression)?.url ??
+    activeCharacter?.portraitUrl;
   const choices = interaction.choices || [];
   const hitboxes = interaction.hitboxes || [];
   const fx = nodeData.fx || {};
@@ -263,12 +271,61 @@ export function StageForm({ node, update, data, onChange }: StageFormProps) {
           {/* Dialogue Section */}
           <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
             <div className="font-semibold text-cyan-300">剧情对话 / 字幕</div>
+
+            {/* Character reference — takes precedence over the free-text speaker. */}
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={dialogue.characterId || ''}
+                onChange={(e) => {
+                  const characterId = e.target.value || undefined;
+                  updateDialogue({ characterId, expression: undefined });
+                }}
+                className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100"
+              >
+                <option value="">— 选择角色 —</option>
+                {characters.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={dialogue.expression || ''}
+                disabled={!activeCharacter || activeExpressions.length === 0}
+                onChange={(e) =>
+                  updateDialogue({ expression: e.target.value || undefined })
+                }
+                className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <option value="">默认立绘</option>
+                {activeExpressions.map((expr) => (
+                  <option key={expr.id} value={expr.id}>
+                    {expr.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {activeSprite && (
+              <div className="flex items-center gap-2 rounded border border-slate-800 bg-slate-950/60 p-1.5">
+                <img
+                  src={activeSprite}
+                  alt=""
+                  className="h-12 w-12 flex-shrink-0 rounded object-cover"
+                />
+                <span className="min-w-0 flex-1 truncate text-[11px] text-slate-400">
+                  {activeCharacter?.name}
+                  {dialogue.expression ? ` · ${dialogue.expression}` : ''}
+                </span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="text"
                 value={dialogue.speaker || ''}
                 onChange={(e) => updateDialogue({ speaker: e.target.value })}
-                placeholder="说话人姓名"
+                placeholder="说话人（未选角色时生效）"
                 className="rounded border border-slate-700 bg-slate-800 px-2 py-1 text-slate-100 placeholder-slate-500"
               />
               <input

@@ -157,6 +157,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
     return (
       <Stage
         state={state}
+        characters={flowData.characters}
         onRestart={handleRestart}
         onSettlementButton={selectSettlementButton}
       />

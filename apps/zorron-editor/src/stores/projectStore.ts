@@ -14,6 +14,7 @@ import {
   type FlowEdge,
   type ProjectSettings,
   type Variables,
+  type Character,
   createEmptyFlowData,
 } from '@/types/flow';
 import type {
@@ -88,6 +89,14 @@ interface ProjectState {
   setDescription: (description: string | null) => void;
   setVariables: (variables: Variables) => void;
   setSettings: (settings: ProjectSettings) => void;
+  /** Replace the whole character roster. */
+  setCharacters: (characters: Character[]) => void;
+  /** Add a character and return its generated id. */
+  addCharacter: (character?: Partial<Character>) => string;
+  /** Patch an existing character by id. */
+  updateCharacter: (id: string, patch: Partial<Character>) => void;
+  /** Remove a character by id. */
+  removeCharacter: (id: string) => void;
 
   // Snapshot helpers
   setSavedSnapshot: (flowData: FlowData) => void;
@@ -107,7 +116,7 @@ interface ProjectState {
 export function buildFlowData(
   store: Pick<
     ProjectState,
-    'variables' | 'settings' | 'version'
+    'variables' | 'settings' | 'version' | 'characters'
   >,
   nodes: FlowNode[],
   edges: FlowEdge[],
@@ -118,6 +127,11 @@ export function buildFlowData(
     variables: store.variables,
     settings: store.settings,
     version: store.version,
+    // Omitted when empty so snapshots that predate the field still compare as
+    // clean instead of being reported dirty forever.
+    ...(store.characters && store.characters.length > 0
+      ? { characters: store.characters }
+      : {}),
   };
 }
 
@@ -129,6 +143,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   isPublished: false,
   variables: {},
   settings: createEmptyFlowData().settings,
+  characters: [],
   version: '1.0.0',
   lastSavedSnapshot: null,
   lastSavedAt: null,
@@ -151,6 +166,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         isPublished: detail.isPublished,
         variables: flow.variables ?? {},
         settings: flow.settings ?? createEmptyFlowData().settings,
+        characters: flow.characters ?? [],
         version: flow.version ?? '1.0.0',
         lastSavedSnapshot: flow,
         lastSavedAt: detail.updatedAt,
@@ -177,6 +193,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         isPublished: detail.isPublished,
         variables: flow.variables ?? {},
         settings: flow.settings ?? createEmptyFlowData().settings,
+        characters: flow.characters ?? [],
         version: flow.version ?? '1.0.0',
         lastSavedSnapshot: flow,
         lastSavedAt: detail.updatedAt,
@@ -231,6 +248,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             isPublished: false,
             variables: {},
             settings: createEmptyFlowData().settings,
+            characters: [],
             lastSavedSnapshot: null,
             lastSavedAt: null,
             saveStatus: 'saved',
@@ -252,6 +270,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         isPublished: detail.isPublished,
         variables: flow.variables ?? {},
         settings: flow.settings ?? createEmptyFlowData().settings,
+        characters: flow.characters ?? [],
         version: flow.version ?? '1.0.0',
         lastSavedSnapshot: flow,
         lastSavedAt: detail.updatedAt,
@@ -279,6 +298,37 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   setDescription: (description) => set({ description, saveStatus: 'unsaved' }),
   setVariables: (variables) => set({ variables, saveStatus: 'unsaved' }),
   setSettings: (settings) => set({ settings, saveStatus: 'unsaved' }),
+
+  setCharacters: (characters) => set({ characters, saveStatus: 'unsaved' }),
+
+  addCharacter: (character) => {
+    const id =
+      character?.id ??
+      `char-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+    const next: Character = {
+      id,
+      name: character?.name ?? '\u65b0\u89d2\u8272',
+      color: character?.color ?? '#22d3ee',
+      portraitUrl: character?.portraitUrl,
+      expressions: character?.expressions ?? [],
+      voice: character?.voice,
+      description: character?.description,
+    };
+    set((state) => ({ characters: [...state.characters, next], saveStatus: 'unsaved' }));
+    return id;
+  },
+
+  updateCharacter: (id, patch) =>
+    set((state) => ({
+      characters: state.characters.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+      saveStatus: 'unsaved',
+    })),
+
+  removeCharacter: (id) =>
+    set((state) => ({
+      characters: state.characters.filter((c) => c.id !== id),
+      saveStatus: 'unsaved',
+    })),
 
   setSavedSnapshot: (flowData) => {
     set({ lastSavedSnapshot: flowData, lastSavedAt: new Date().toISOString(), saveStatus: 'saved' });
@@ -333,6 +383,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       isPublished: false,
       variables: {},
       settings: createEmptyFlowData().settings,
+      characters: [],
       version: '1.0.0',
       lastSavedSnapshot: null,
       lastSavedAt: null,

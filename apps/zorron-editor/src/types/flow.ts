@@ -409,6 +409,48 @@ export interface VectorSpaceConfig {
 /** Player UI theme presets. */
 export type PlayerTheme = 'modern' | 'ancient';
 
+/** One expression / costume variant of a character's sprite. */
+export interface CharacterExpression {
+  /** Stable id referenced by nodes (e.g. 'smile', 'angry'). */
+  id: string;
+  /** Human-readable label shown in the picker. */
+  label: string;
+  /** Sprite or portrait URL for this expression. */
+  url: string;
+}
+
+/** Voice configuration for a character. */
+export interface CharacterVoice {
+  /** TTS voice identifier, when speech is synthesised. */
+  voiceId?: string;
+  /** Speaking rate multiplier (1 = normal). */
+  rate?: number;
+  /** Pitch adjustment in semitones. */
+  pitch?: number;
+}
+
+/**
+ * A named character in the story.
+ *
+ * Characters are project-level assets: nodes reference them by id, so renaming
+ * a character or swapping a sprite updates every scene that uses them.
+ */
+export interface Character {
+  id: string;
+  /** Display name shown on the dialogue name plate. */
+  name: string;
+  /** Accent colour for the name plate (hex). */
+  color?: string;
+  /** Default sprite used when no expression is selected. */
+  portraitUrl?: string;
+  /** Alternate expressions the author can switch between. */
+  expressions?: CharacterExpression[];
+  /** Voice defaults; a per-line voiceUrl still wins. */
+  voice?: CharacterVoice;
+  /** Optional authoring notes. */
+  description?: string;
+}
+
 /** Project-level settings stored inside FlowData. */
 export interface ProjectSettings {
   title?: string;
@@ -434,6 +476,8 @@ export interface FlowData {
   variables: Variables;
   settings: ProjectSettings;
   version: string;
+  /** Project character roster. Optional for backwards compatibility. */
+  characters?: Character[];
 }
 
 /** Default empty flow data. */
@@ -444,6 +488,7 @@ export function createEmptyFlowData(): FlowData {
     variables: {},
     settings: {},
     version: '1.0.0',
+    characters: [],
   };
 }
 

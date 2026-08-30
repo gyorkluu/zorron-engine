@@ -19,13 +19,22 @@
  */
 
 import { memo, useCallback, useState } from 'react';
-import { Eye, Variable, Puzzle, LayoutTemplate, History, type LucideIcon } from 'lucide-react';
+import {
+  Eye,
+  Variable,
+  Users,
+  Puzzle,
+  LayoutTemplate,
+  History,
+  type LucideIcon,
+} from 'lucide-react';
 import { AssetPanel } from '@/components/asset/AssetPanel';
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { TemplateLibrary } from '@/components/flow/TemplateLibrary';
 import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { AICopilotPanel } from '@/components/ai/AICopilotPanel';
 import { VariablesPanel } from '@/components/inspector/VariablesPanel';
+import { CharacterPanel } from '@/components/inspector/CharacterPanel';
 import { FragmentPanel } from '@/components/inspector/FragmentPanel';
 import { HistoryPanel } from '@/components/inspector/HistoryPanel';
 import { EditorToolbar } from './EditorToolbar';
@@ -49,7 +58,13 @@ export interface EditorShellProps {
 }
 
 /** Which side panel is currently open (null = none). */
-type SidePanelId = 'variables' | 'fragments' | 'templates' | 'history' | null;
+type SidePanelId =
+  | 'variables'
+  | 'characters'
+  | 'fragments'
+  | 'templates'
+  | 'history'
+  | null;
 
 function EditorShellImpl({ projectId = null }: EditorShellProps) {
   const { t } = useT();
@@ -73,6 +88,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   /** Side panel toolbar button definitions. */
   const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: LucideIcon }> = [
     { id: 'variables', label: t('vars.title'), icon: Variable },
+    { id: 'characters', label: '角色库', icon: Users },
     { id: 'fragments', label: t('frag.title'), icon: Puzzle },
     { id: 'templates', label: t('tpl.title'), icon: LayoutTemplate },
     { id: 'history', label: t('history.title'), icon: History },
@@ -107,6 +123,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
             {activeSidePanel && (
               <div className="max-h-[60vh] w-72 overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/90 shadow-2xl backdrop-blur-md">
                 {activeSidePanel === 'variables' && <VariablesPanel />}
+                {activeSidePanel === 'characters' && <CharacterPanel />}
                 {activeSidePanel === 'fragments' && <FragmentPanel />}
                 {activeSidePanel === 'templates' && <TemplateLibrary />}
                 {activeSidePanel === 'history' && <HistoryPanel />}

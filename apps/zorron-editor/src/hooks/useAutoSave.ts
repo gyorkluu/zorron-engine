@@ -35,6 +35,7 @@ export function buildCurrentFlowData(): FlowData {
       variables: project.variables,
       settings: project.settings,
       version: project.version,
+      characters: project.characters,
     },
     editor.nodes,
     editor.edges,
@@ -49,6 +50,7 @@ export function useAutoSave({ delay = 3000, enabled = true }: UseAutoSaveOptions
   const edges = useEditorStore((s) => s.edges);
   const variables = useProjectStore((s) => s.variables);
   const settings = useProjectStore((s) => s.settings);
+  const characters = useProjectStore((s) => s.characters);
   const version = useProjectStore((s) => s.version);
   const id = useProjectStore((s) => s.id);
   const saveStatus = useProjectStore((s) => s.saveStatus);
@@ -80,5 +82,5 @@ export function useAutoSave({ delay = 3000, enabled = true }: UseAutoSaveOptions
         timerRef.current = null;
       }
     };
-  }, [nodes, edges, variables, settings, version, id, saveStatus, enabled, delay]);
+  }, [nodes, edges, variables, settings, characters, version, id, saveStatus, enabled, delay]);
 }

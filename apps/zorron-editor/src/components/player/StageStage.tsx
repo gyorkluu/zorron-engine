@@ -5,18 +5,28 @@ import { DualVideoStage } from './DualVideoStage';
 import { getAudioManager } from '@/engine/AudioManager';
 import { usePlayerStore } from '@/stores/playerStore';
 import type { GameState } from '@/engine/GameEngine';
+import type { PlayerStageProps } from '@/engine/processors/types';
 import type { StageHitbox } from '@/types/flow';
 
 export interface StageStageProps {
   state: GameState;
 }
 
-export function StageStage({ state }: StageStageProps) {
+export function StageStage({ state, characters }: PlayerStageProps) {
   const stage = state.stage;
   const selectChoice = usePlayerStore((s) => s.selectChoice);
   const engine = usePlayerStore((s) => s.engine);
 
   const dialogue = stage?.interaction?.dialogue;
+
+  // Resolve the speaker: a character reference wins over the free-text name,
+  // and gives us the accent colour plus the current expression's sprite.
+  const speaker = characters?.find((c) => c.id === dialogue?.characterId);
+  const speakerName = speaker?.name ?? dialogue?.speaker;
+  const speakerColor = speaker?.color ?? '#22d3ee';
+  const speakerSprite =
+    speaker?.expressions?.find((e) => e.id === dialogue?.expression)?.url ??
+    speaker?.portraitUrl;
   const { displayed, done, skip } = useTypewriter({
     text: dialogue?.text ?? '',
     speed: dialogue?.typewriterSpeed ?? 25,
@@ -121,16 +131,35 @@ export function StageStage({ state }: StageStageProps) {
           </div>
         )}
 
+        {/* Character sprite (only when the referenced character has one). */}
+        {speakerSprite && (
+          <div className="mb-2 flex justify-center">
+            <img
+              src={speakerSprite}
+              alt={speakerName ?? ''}
+              className="max-h-32 w-auto object-contain drop-shadow-2xl sm:max-h-44"
+            />
+          </div>
+        )}
+
         {/* Dialogue Box */}
         {dialogue?.text && (
           <div className="w-full max-w-lg sm:max-w-xl md:max-w-2xl pointer-events-auto">
             <div
               onClick={skip}
               className="player-card relative cursor-pointer rounded-xl border border-white/10 bg-black/60 p-4 shadow-2xl backdrop-blur-md transition-all hover:bg-black/70 sm:p-5"
+              style={speaker ? { borderColor: `${speakerColor}44` } : undefined}
             >
-              {dialogue.speaker && (
-                <div className="player-btn absolute -top-3 left-4 inline-flex items-center rounded-md border border-cyan-500/30 bg-cyan-950/80 px-3 py-0.5 text-xs font-semibold text-cyan-300 shadow-md">
-                  {dialogue.speaker}
+              {speakerName && (
+                <div
+                  className="absolute -top-3 left-4 inline-flex items-center rounded-md border px-3 py-0.5 text-xs font-semibold shadow-md"
+                  style={{
+                    borderColor: `${speakerColor}55`,
+                    background: `${speakerColor}1f`,
+                    color: speakerColor,
+                  }}
+                >
+                  {speakerName}
                 </div>
               )}
               <p className="player-text min-h-[2.5rem] text-sm leading-relaxed text-slate-100 sm:text-base">

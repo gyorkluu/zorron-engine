@@ -22,6 +22,7 @@ import type {
   Variables,
   PersonalityVector,
   ResultAnchor,
+  Character,
 } from '@/types/flow';
 import type { GameState } from '@/engine/GameEngine';
 
@@ -82,6 +83,8 @@ export type NodeProcessor = (ctx: NodeProcessorContext) => NodeProcessResult;
 export interface PlayerStageProps {
   /** Current engine state. */
   state: GameState;
+  /** Project character roster, so dialogue can resolve a speaker's sprite. */
+  characters?: Character[];
   /** Restart the run — provided to settlement stages. */
   onRestart?: () => void;
   /** Handle a settlement button press — provided to settlement stages. */
