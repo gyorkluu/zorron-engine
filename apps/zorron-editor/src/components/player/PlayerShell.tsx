@@ -32,7 +32,6 @@ export interface PlayerShellProps {
 
 function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
   const { t } = useT();
-  const navigate = useNavigate();
   const state = usePlayerStore((s) => s.state);
   const [isSaveLoadOpen, setIsSaveLoadOpen] = useState(false);
   const [saveLoadMode, setSaveLoadMode] = useState<'save' | 'load'>('save');
@@ -129,6 +128,12 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
     }
   }, [state?.scene?.sfx]);
 
+  /** Restart from the top, disengaging Auto/Skip first. */
+  const handleRestart = useCallback(() => {
+    resetModes();
+    restart();
+  }, [restart, resetModes]);
+
   if (!isRunning || !state) {
     return (
       <div data-theme={theme} className="player-bg player-font flex h-full w-full items-center justify-center text-slate-400">
@@ -136,12 +141,6 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
       </div>
     );
   }
-
-  /** Restart from the top, disengaging Auto/Skip first. */
-  const handleRestart = useCallback(() => {
-    resetModes();
-    restart();
-  }, [restart, resetModes]);
 
   /**
    * Resolve the current node's renderer from the node registry.

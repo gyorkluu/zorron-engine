@@ -685,6 +685,9 @@ export const translations = {
   'stageForm.bgmPlaceholder': { zh: 'BGM 音频 URL', en: 'BGM audio URL' },
   'stageForm.preload': { zh: '分支预加载 (Preload Tree)', en: 'Branch preload tree' },
 
+  'preview.tablet': { zh: '平板', en: 'Tablet' },
+  'preview.safeArea': { zh: '显示安全区参考线', en: 'Show safe-area guides' },
+
 } as const;
 
 /** Type of a translation key. */

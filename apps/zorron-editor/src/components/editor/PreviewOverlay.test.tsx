@@ -45,4 +45,32 @@ describe('PreviewOverlay Device Switcher', () => {
     fireEvent.click(mobilePortraitBtn);
     expect(mobilePortraitBtn.className).toContain('text-cyan-300');
   });
+
+  it('switches to the tablet viewport and toggles safe-area guides', () => {
+    useEditorStore.setState({
+      nodes: [
+        {
+          id: 'start_1',
+          type: 'start',
+          position: { x: 0, y: 0 },
+          data: { label: 'Start', title: 'Test Project', intro: 'Hello' },
+        },
+      ],
+      edges: [],
+    });
+
+    render(
+      <MemoryRouter>
+        <PreviewOverlay onExit={vi.fn()} />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId('device-tablet'));
+    expect(screen.getByTestId('stage-shell-tablet')).toBeTruthy();
+
+    // Safe-area guides are opt-in so they never obscure a normal preview.
+    expect(screen.queryByTestId('safe-area-guides')).toBeNull();
+    fireEvent.click(screen.getByTestId('toggle-safe-area'));
+    expect(screen.getByTestId('safe-area-guides')).toBeTruthy();
+  });
 });

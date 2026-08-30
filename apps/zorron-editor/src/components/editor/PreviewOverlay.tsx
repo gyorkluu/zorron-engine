@@ -6,7 +6,16 @@
  */
 
 import { memo, useState, useEffect, useCallback } from 'react';
-import { Smartphone, Monitor, RotateCw, X, Sparkles, Laptop } from 'lucide-react';
+import {
+  Smartphone,
+  Tablet,
+  Monitor,
+  RotateCw,
+  X,
+  Sparkles,
+  Laptop,
+  Ruler,
+} from 'lucide-react';
 import { PlayerShell } from '@/components/player/PlayerShell';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
 import { useEditorStore } from '@/stores/editorStore';
@@ -14,7 +23,35 @@ import { useT } from '@/i18n/useT';
 import type { FlowData } from '@/types/flow';
 import { cn } from '@/lib/utils';
 
-export type DeviceViewportMode = 'mobile-portrait' | 'mobile-landscape' | 'desktop';
+export type DeviceViewportMode =
+  | 'mobile-portrait'
+  | 'mobile-landscape'
+  | 'tablet'
+  | 'desktop';
+
+/** Logical viewport of each preset, in CSS pixels. */
+const DEVICE_VIEWPORTS: Record<
+  DeviceViewportMode,
+  { width: number; height: number }
+> = {
+  'mobile-portrait': { width: 390, height: 844 },
+  'mobile-landscape': { width: 844, height: 390 },
+  tablet: { width: 820, height: 1180 },
+  desktop: { width: 1280, height: 720 },
+};
+
+/** Dashed guides marking the iOS safe-area insets inside a viewport. */
+function SafeAreaGuides() {
+  const edge = 'absolute border-dashed border-amber-400/60 bg-amber-400/5';
+  return (
+    <div className="pointer-events-none absolute inset-0 z-40" data-testid="safe-area-guides">
+      <div className={`${edge} inset-x-0 top-0 h-11 border-b`} />
+      <div className={`${edge} inset-x-0 bottom-0 h-8 border-t`} />
+      <div className={`${edge} inset-y-0 left-0 w-4 border-r`} />
+      <div className={`${edge} inset-y-0 right-0 w-4 border-l`} />
+    </div>
+  );
+}
 
 /** Props for PreviewOverlay. */
 export interface PreviewOverlayProps {
@@ -26,6 +63,7 @@ function PreviewOverlayImpl({ onExit }: PreviewOverlayProps) {
   const { t } = useT();
   const nodes = useEditorStore((s) => s.nodes);
   const [deviceMode, setDeviceMode] = useState<DeviceViewportMode>('mobile-portrait');
+  const [showSafeArea, setShowSafeArea] = useState(false);
 
   // Snapshot the flow once on mount so preview isn't disrupted by background edits.
   const [flowData, setFlowData] = useState<FlowData>(() => buildCurrentFlowData());
@@ -100,6 +138,43 @@ function PreviewOverlayImpl({ onExit }: PreviewOverlayProps) {
             <Monitor size={14} />
             <span>电脑端 (16:9)</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setDeviceMode('tablet')}
+            className={cn(
+              'flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-medium transition-all',
+              deviceMode === 'tablet'
+                ? 'bg-cyan-500/20 text-cyan-300 shadow-sm border border-cyan-500/30'
+                : 'text-slate-400 hover:text-slate-200',
+            )}
+            data-testid="device-tablet"
+            title="切换至平板 (820 x 1180)"
+          >
+            <Tablet size={14} />
+            <span>{t('preview.tablet')}</span>
+          </button>
+        </div>
+
+        {/* Safe-area guide toggle + viewport readout */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setShowSafeArea((v) => !v)}
+            className={cn(
+              'flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-medium transition-all',
+              showSafeArea
+                ? 'border-amber-500/40 bg-amber-500/15 text-amber-300'
+                : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700',
+            )}
+            data-testid="toggle-safe-area"
+            title={t('preview.safeArea')}
+          >
+            <Ruler size={13} />
+          </button>
+          <span className="rounded bg-slate-800 px-2 py-0.5 text-[11px] font-mono text-slate-400">
+            {DEVICE_VIEWPORTS[deviceMode].width} × {DEVICE_VIEWPORTS[deviceMode].height}
+          </span>
         </div>
 
         {/* Exit Button */}
@@ -129,6 +204,7 @@ function PreviewOverlayImpl({ onExit }: PreviewOverlayProps) {
             <div className="h-full w-full overflow-hidden">
               <PlayerShell flowData={flowData} />
             </div>
+            {showSafeArea && <SafeAreaGuides />}
             {/* Home Indicator */}
             <div className="absolute bottom-1 z-40 h-1 w-28 rounded-full bg-white/20 pointer-events-none" />
           </div>
@@ -142,6 +218,20 @@ function PreviewOverlayImpl({ onExit }: PreviewOverlayProps) {
             <div className="h-full w-full overflow-hidden">
               <PlayerShell flowData={flowData} />
             </div>
+            {showSafeArea && <SafeAreaGuides />}
+          </div>
+        ) : deviceMode === 'tablet' ? (
+          /* Tablet shell (820 x 1180) */
+          <div
+            data-testid="stage-shell-tablet"
+            style={{ width: '100%', maxWidth: '820px', maxHeight: '1180px', height: '100%' }}
+            className="relative flex flex-col items-center justify-center rounded-[24px] border-[8px] border-slate-900 bg-black shadow-[0_0_50px_rgba(0,0,0,0.8)] ring-1 ring-slate-800 overflow-hidden"
+          >
+            <div className="h-full w-full overflow-hidden">
+              <PlayerShell flowData={flowData} />
+            </div>
+            {showSafeArea && <SafeAreaGuides />}
+            <div className="absolute bottom-1 z-40 h-1 w-20 rounded-full bg-white/20 pointer-events-none" />
           </div>
         ) : (
           /* Desktop Cinema Widescreen Shell (16:9) */
