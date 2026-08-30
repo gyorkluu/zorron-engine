@@ -738,6 +738,8 @@ export const translations = {
   'market.publishFailed': { zh: '发布失败', en: 'Publish failed' },
   'market.deleteFailed': { zh: '删除失败', en: 'Delete failed' },
 
+  'collab.editing': { zh: '人正在编辑', en: 'editing' },
+
 } as const;
 
 /** Type of a translation key. */

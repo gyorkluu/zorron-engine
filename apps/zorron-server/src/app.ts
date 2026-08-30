@@ -19,6 +19,7 @@ import { subscriptionRoute } from './modules/subscription/subscription.route';
 import { jx3Route } from './modules/jx3/jx3.route';
 import { saveslotRoute } from './modules/saveslot/saveslot.route';
 import { nodeAssetRoute } from './modules/nodeAsset/nodeAsset.route';
+import { collabRoute } from './modules/collab/collab.route';
 
 /**
  * [Elysia]: assembled application instance with global middleware and routes.
@@ -76,6 +77,7 @@ export function createApp() {
       .use(jx3Route)
       .use(saveslotRoute)
       .use(nodeAssetRoute)
+      .use(collabRoute)
       .get('/', () => ({ message: 'Zorron Engine API' }))
   );
 }

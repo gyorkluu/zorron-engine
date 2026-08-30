@@ -16,6 +16,7 @@ import { buildCurrentFlowData } from '@/hooks/useAutoSave';
 import { exportProjectJson, pickJsonFile } from '@/utils/fileIO';
 import { SyncStatusIndicator } from '@/components/cloud/SyncStatusIndicator';
 import { LayoutTools } from './LayoutTools';
+import { PresenceBar } from './PresenceBar';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { featureFlags } from '@/lib/featureFlags';
@@ -225,6 +226,7 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-2">
+        <PresenceBar projectId={id} />
         <LayoutTools selectedCount={selectedCount} />
         {featureFlags.cloudSync && <SyncStatusIndicator />}
 
