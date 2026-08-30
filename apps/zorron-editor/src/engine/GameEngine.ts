@@ -222,6 +222,9 @@ export interface GameState {
 /** Listener callback for state changes. */
 export type StateListener = (state: GameState) => void;
 
+/** Maximum number of restorable frames kept for step-back. */
+const FRAME_HISTORY_LIMIT = 50;
+
 /** Maximum number of backlog lines retained in memory. */
 const BACKLOG_LIMIT = 200;
 
@@ -291,6 +294,13 @@ export class GameEngine {
   private currentNodeId: string | null = null;
   private history: string[] = [];
   private backlogBuffer: BacklogItem[] = [];
+  /**
+   * Snapshots of rendered frames, newest last, powering GalGame step-back.
+   * Passthrough nodes never land here because they render nothing.
+   */
+  private frameHistory: GameStateSnapshot[] = [];
+  /** True while `restore()` replays a frame, suppressing history capture. */
+  private restoring = false;
   private listeners: Set<StateListener> = new Set();
   private state: GameState = createInitialState();
 
@@ -491,6 +501,9 @@ export class GameEngine {
     this.fragments.clear();
     this.currentVector = { ...ZERO_VECTOR };
     this.pendingVector = { ...ZERO_VECTOR };
+    this.backlogBuffer = [];
+    this.frameHistory = [];
+    this.restoring = false;
     this.notify();
     return this.state;
   }
@@ -564,7 +577,41 @@ export class GameEngine {
       return;
     }
 
+    // Presentational frame: remember it so the player can step back. Skipped
+    // while restoring, otherwise a rollback would push a duplicate frame.
+    if (!this.restoring) {
+      this.frameHistory.push(this.snapshot());
+      if (this.frameHistory.length > FRAME_HISTORY_LIMIT) {
+        this.frameHistory.shift();
+      }
+    }
+
     this.notify();
+  }
+
+  /** Whether a previously rendered frame is available to step back to. */
+  canGoBack(): boolean {
+    return this.frameHistory.length >= 2;
+  }
+
+  /**
+   * Step back to the previously rendered frame (GalGame rollback).
+   *
+   * Restores variables, fragments, vector and backlog exactly as they were
+   * when that frame was shown, so re-reading or re-choosing behaves
+   * consistently with the first pass.
+   */
+  goBack(): GameState {
+    if (!this.canGoBack()) return this.state;
+    // Discard the frame currently on screen.
+    this.frameHistory.pop();
+    const previous = this.frameHistory[this.frameHistory.length - 1];
+    if (!previous) return this.state;
+
+    this.restoring = true;
+    this.restore(previous);
+    this.restoring = false;
+    return this.state;
   }
 
   /**

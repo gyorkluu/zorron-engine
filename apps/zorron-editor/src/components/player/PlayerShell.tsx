@@ -6,17 +6,9 @@
  */
 
 import { useEffect, useState, memo, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  Layout,
-  FolderKanban,
-  RotateCcw,
-  Sparkles,
-  Save,
-  Download,
-  BookOpen,
-} from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { usePlayerStore } from '@/stores/playerStore';
+import { useGalgameStore } from '@/stores/galgameStore';
 import { useT } from '@/i18n/useT';
 import { getAudioManager } from '@/engine/AudioManager';
 import { getPlayerStage } from '@/engine/nodeRegistry';
@@ -26,6 +18,8 @@ import '@/components/flow/nodes';
 import { resolveMediaUrl } from '@/lib/media';
 import { SaveLoadModal } from './SaveLoadModal';
 import { BacklogModal } from './BacklogModal';
+import { SettingsModal } from './SettingsModal';
+import { PlayerControlBar } from './PlayerControlBar';
 import type { FlowData } from '@/types/flow';
 
 /** Props for PlayerShell. */
@@ -50,6 +44,53 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
   const stop = usePlayerStore((s) => s.stop);
   const globalBgmUrl = resolveMediaUrl(flowData.settings?.bgmUrl);
   const theme = flowData.settings?.theme ?? 'modern';
+
+  // GalGame playback state: preferences, Auto/Skip modes and read tracking.
+  const settings = useGalgameStore((s) => s.settings);
+  const settingsOpen = useGalgameStore((s) => s.settingsOpen);
+  const setSettingsOpen = useGalgameStore((s) => s.setSettingsOpen);
+  const autoMode = useGalgameStore((s) => s.autoMode);
+  const skipMode = useGalgameStore((s) => s.skipMode);
+  const resetModes = useGalgameStore((s) => s.resetModes);
+
+  // Push volume preferences into the 4-track mixer.
+  useEffect(() => {
+    const audio = getAudioManager();
+    audio.setTrackVolume('bgm', settings.bgmVolume);
+    audio.setTrackVolume('ambient', settings.ambientVolume);
+    audio.setTrackVolume('voice', settings.voiceVolume);
+    audio.setTrackVolume('sfx', settings.sfxVolume);
+  }, [
+    settings.bgmVolume,
+    settings.ambientVolume,
+    settings.voiceVolume,
+    settings.sfxVolume,
+  ]);
+
+  // GalGame shortcuts: Backspace steps back, L opens the backlog.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        resetModes();
+        usePlayerStore.getState().engine?.goBack();
+      } else if (e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        setIsBacklogOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [resetModes]);
 
   // Boot the engine on mount or when flowData changes.
   useEffect(() => {
@@ -96,6 +137,12 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
     );
   }
 
+  /** Restart from the top, disengaging Auto/Skip first. */
+  const handleRestart = useCallback(() => {
+    resetModes();
+    restart();
+  }, [restart, resetModes]);
+
   /**
    * Resolve the current node's renderer from the node registry.
    *
@@ -110,7 +157,7 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
     return (
       <Stage
         state={state}
-        onRestart={restart}
+        onRestart={handleRestart}
         onSettlementButton={selectSettlementButton}
       />
     );
@@ -127,9 +174,8 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
         if (e.key === 'Enter' || e.key === ' ') unlockAudio();
       }}
     >
-      {/* Top Floating Header & Navigation Bar */}
+      {/* Top bar: restart on the left, active playback modes on the right. */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center justify-between p-3 sm:p-4">
-        {/* Left: Quick exit & current status badge */}
         <div className="pointer-events-auto flex items-center gap-2">
           {onExit && (
             <button
@@ -141,72 +187,31 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
               <span>{t('player.restart')}</span>
             </button>
           )}
-          <div className="hidden items-center gap-1.5 rounded-full border border-slate-800/60 bg-slate-950/60 px-3 py-1 text-[11px] font-medium text-slate-400 backdrop-blur-md sm:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span className="capitalize">{state.currentNodeType} 节点</span>
+        </div>
+
+        {(autoMode || skipMode) && (
+          <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-cyan-500/40 bg-cyan-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-cyan-200 backdrop-blur-md">
+            {autoMode ? <span>Auto</span> : null}
+            {skipMode ? <span>Skip</span> : null}
           </div>
-        </div>
-
-        {/* Center/Right: GalGame Quick Toolset (Save, Load, Backlog) */}
-        <div className="pointer-events-auto flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => {
-              setSaveLoadMode('save');
-              setIsSaveLoadOpen(true);
-            }}
-            className="flex items-center gap-1 rounded-full border border-slate-700/60 bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300 shadow-md backdrop-blur-md hover:border-cyan-500/50 hover:bg-slate-800 hover:text-cyan-300 transition-colors"
-            title="保存当前进度 (F5)"
-          >
-            <Save size={12} />
-            <span>保存</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSaveLoadMode('load');
-              setIsSaveLoadOpen(true);
-            }}
-            className="flex items-center gap-1 rounded-full border border-slate-700/60 bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300 shadow-md backdrop-blur-md hover:border-cyan-500/50 hover:bg-slate-800 hover:text-cyan-300 transition-colors"
-            title="读取存档 (F8)"
-          >
-            <Download size={12} />
-            <span>读取</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsBacklogOpen(true)}
-            className="flex items-center gap-1 rounded-full border border-slate-700/60 bg-slate-900/80 px-2.5 py-1 text-[11px] font-medium text-slate-300 shadow-md backdrop-blur-md hover:border-cyan-500/50 hover:bg-slate-800 hover:text-cyan-300 transition-colors"
-            title="查看历史对话记录 (L)"
-          >
-            <BookOpen size={12} />
-            <span>回顾</span>
-          </button>
-        </div>
-
-        {/* Right: Quick shortcuts to Editor & Projects */}
-        <div className="pointer-events-auto flex items-center gap-2">
-          <Link
-            to="/projects"
-            className="flex items-center gap-1.5 rounded-full border border-slate-800/80 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-300 shadow-lg backdrop-blur-md transition-all hover:border-slate-700 hover:bg-slate-800 hover:text-white"
-            title="查看云端工程列表"
-          >
-            <FolderKanban size={13} className="text-slate-400" />
-            <span className="hidden sm:inline">工程列表</span>
-          </Link>
-          <Link
-            to="/editor"
-            className="group flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-cyan-500/15 px-3.5 py-1.5 text-xs font-medium text-cyan-200 shadow-lg shadow-cyan-500/10 backdrop-blur-md transition-all hover:border-cyan-400 hover:bg-cyan-500/25 hover:text-white"
-            title="进入可视化节点编辑器"
-          >
-            <Layout size={13} className="text-cyan-400 transition-transform group-hover:scale-110" />
-            <span>节点编辑器</span>
-          </Link>
-        </div>
+        )}
       </header>
 
       {/* Current node's stage — resolved from the node registry. */}
       {renderStage()}
+
+      {/* GalGame playback toolbar: Auto / Skip / step-back / save / settings */}
+      <PlayerControlBar
+        onOpenBacklog={() => setIsBacklogOpen(true)}
+        onOpenSave={() => {
+          setSaveLoadMode('save');
+          setIsSaveLoadOpen(true);
+        }}
+        onOpenLoad={() => {
+          setSaveLoadMode('load');
+          setIsSaveLoadOpen(true);
+        }}
+      />
 
       {/* GalGame Modals */}
       <SaveLoadModal
@@ -217,6 +222,10 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
       <BacklogModal
         isOpen={isBacklogOpen}
         onClose={() => setIsBacklogOpen(false)}
+      />
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
       />
     </div>
   );

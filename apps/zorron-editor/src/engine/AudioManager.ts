@@ -12,6 +12,9 @@
 
 export type AudioStateListener = (playing: boolean) => void;
 
+/** The four independent mixing channels. */
+export type AudioTrackName = 'bgm' | 'ambient' | 'voice' | 'sfx';
+
 interface ChannelTrack {
   audio: HTMLAudioElement | null;
   url: string | null;
@@ -25,6 +28,18 @@ export class AudioManager {
   private ambientTrack: ChannelTrack = { audio: null, url: null, baseVolume: 0.6 };
   private voiceTrack: ChannelTrack = { audio: null, url: null, baseVolume: 1.0 };
   private sfxTrack: ChannelTrack = { audio: null, url: null, baseVolume: 1.0 };
+
+  /**
+   * Player-controlled master multiplier per track (0–1). Applied on top of
+   * each call's own volume so the settings dialog can rebalance the mix
+   * without restarting whatever is playing.
+   */
+  private trackVolumes: Record<AudioTrackName, number> = {
+    bgm: 1,
+    ambient: 1,
+    voice: 1,
+    sfx: 1,
+  };
 
   private isAudioUnlocked = false;
   private isDucking = false;
@@ -78,7 +93,8 @@ export class AudioManager {
     audio.crossOrigin = 'anonymous';
     this.bgmTrack.audio = audio;
 
-    const targetVol = this.isDucking ? volume * 0.35 : volume;
+    const targetVol =
+      (this.isDucking ? volume * 0.35 : volume) * this.trackVolumes.bgm;
 
     this.safePlay(audio)
       .then(() => {
@@ -88,6 +104,42 @@ export class AudioManager {
       .catch(() => {
         // Queue for touch unlock
       });
+  }
+
+  /**
+   * Set a track's master volume multiplier (0–1).
+   *
+   * Takes effect immediately on anything currently playing and on every
+   * subsequent `playXxx` call for that track.
+   */
+  setTrackVolume(track: AudioTrackName, volume: number): void {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.trackVolumes[track] = clamped;
+
+    const channel = this.channelFor(track);
+    if (channel?.audio) {
+      const duck = track === 'bgm' && this.isDucking ? 0.35 : 1;
+      channel.audio.volume = channel.baseVolume * clamped * duck;
+    }
+  }
+
+  /** Read a track's master volume multiplier. */
+  getTrackVolume(track: AudioTrackName): number {
+    return this.trackVolumes[track];
+  }
+
+  /** Resolve the channel record backing a track name. */
+  private channelFor(track: AudioTrackName): ChannelTrack {
+    switch (track) {
+      case 'bgm':
+        return this.bgmTrack;
+      case 'ambient':
+        return this.ambientTrack;
+      case 'voice':
+        return this.voiceTrack;
+      default:
+        return this.sfxTrack;
+    }
   }
 
   getBgmPosition(): number {
@@ -120,7 +172,7 @@ export class AudioManager {
 
     this.safePlay(audio)
       .then(() => {
-        this.fadeIn(audio, volume, fadeInMs);
+        this.fadeIn(audio, volume * this.trackVolumes.ambient, fadeInMs);
       })
       .catch(() => {});
   }
@@ -138,7 +190,7 @@ export class AudioManager {
     }
 
     const audio = new Audio(url);
-    audio.volume = volume;
+    audio.volume = volume * this.trackVolumes.voice;
     audio.crossOrigin = 'anonymous';
     this.voiceTrack.audio = audio;
     this.voiceTrack.url = url;
@@ -176,7 +228,7 @@ export class AudioManager {
   playSfx(url: string, volume = 1.0): void {
     if (typeof window === 'undefined' || !url) return;
     const audio = new Audio(url);
-    audio.volume = volume;
+    audio.volume = volume * this.trackVolumes.sfx;
     audio.crossOrigin = 'anonymous';
     this.sfxTrack.audio = audio;
     this.safePlay(audio).catch(() => {});
@@ -187,9 +239,10 @@ export class AudioManager {
     this.isDucking = duck;
     if (!this.bgmTrack.audio) return;
 
-    const targetVolume = duck
+    const base = duck
       ? this.bgmTrack.baseVolume * 0.35
       : this.bgmTrack.baseVolume;
+    const targetVolume = base * this.trackVolumes.bgm;
 
     this.smoothVolume(this.bgmTrack.audio, targetVolume, 400);
   }
