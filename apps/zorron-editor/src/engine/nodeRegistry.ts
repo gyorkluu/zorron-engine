@@ -21,6 +21,12 @@ import type {
   NodeType,
 } from '@/types/flow';
 import type { TranslationKey } from '@/i18n/translations';
+import type {
+  NodeProcessor,
+  PlayerStageComponent,
+  NodeDataSchema,
+} from '@/engine/processors/types';
+import { getDefaultProcessor } from '@/engine/processors';
 
 /** Props passed to a node's Inspector form. */
 export interface InspectorFormProps<TData extends BaseNodeData = BaseNodeData> {
@@ -80,10 +86,17 @@ export interface NodeDefinition<TData extends BaseNodeData = BaseNodeData> {
    */
   canConnectTo?: (targetType: NodeType) => boolean;
   /**
-   * Optional pure-function processor for the generalized engine (GEN-004).
-   * Not consumed by the current GameEngine switch dispatch yet.
+   * Pure-function processor describing this node's runtime behaviour.
+   *
+   * When omitted, `getNodeProcessor()` falls back to the built-in catalogue in
+   * `engine/processors`, so a node type only supplies one when it behaves
+   * differently from the default.
    */
-  processor?: (node: FlowNode, ctx: unknown) => unknown;
+  processor?: NodeProcessor;
+  /** Player-side renderer for this node type. */
+  PlayerStage?: PlayerStageComponent;
+  /** Zod schema for this node's `data` payload (validation + AI compiler). */
+  schema?: NodeDataSchema;
 }
 
 import { CustomNode } from '@/components/flow/nodes/CustomNode';
@@ -210,5 +223,26 @@ export function getNodesByCategory(category: NodeCategory): NodeDefinition[] {
 /** Look up a node's category, defaulting to 'narrative'. */
 export function getNodeCategory(type: NodeType): NodeCategory {
   return getNodeDefinition(type)?.category ?? 'narrative';
+}
+
+/**
+ * Resolve the runtime processor for a node type.
+ *
+ * Registered processors win; otherwise the built-in catalogue in
+ * `engine/processors` is consulted. Undefined means the node type is unknown
+ * and the engine should stop rather than guess.
+ */
+export function getNodeProcessor(type: NodeType): NodeProcessor | undefined {
+  return getNodeDefinition(type)?.processor ?? getDefaultProcessor(type);
+}
+
+/** Resolve the player renderer for a node type. */
+export function getPlayerStage(type: NodeType): PlayerStageComponent | undefined {
+  return getNodeDefinition(type)?.PlayerStage;
+}
+
+/** Resolve the Zod schema for a node type's `data` payload. */
+export function getNodeSchema(type: NodeType): NodeDataSchema | undefined {
+  return getNodeDefinition(type)?.schema;
 }
 

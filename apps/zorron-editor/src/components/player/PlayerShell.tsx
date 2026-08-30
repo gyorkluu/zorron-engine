@@ -19,22 +19,11 @@ import {
 import { usePlayerStore } from '@/stores/playerStore';
 import { useT } from '@/i18n/useT';
 import { getAudioManager } from '@/engine/AudioManager';
+import { getPlayerStage } from '@/engine/nodeRegistry';
+// Side-effect import: registers every built-in node type so the registry can
+// resolve a PlayerStage renderer below.
+import '@/components/flow/nodes';
 import { resolveMediaUrl } from '@/lib/media';
-import { StartStage } from './StartStage';
-import { StageStage } from './StageStage';
-import { SceneStage } from './SceneStage';
-import { VideoStage } from './VideoStage';
-import { LinkStage } from './LinkStage';
-import { SettlementStage } from './SettlementStage';
-import {
-  MinigameStage,
-  RatingStage,
-  MultiSelectStage,
-  MediaStage,
-  TextInputStage,
-  RankOrderStage,
-  NumberPickerStage,
-} from './InteractionStages';
 import { SaveLoadModal } from './SaveLoadModal';
 import { BacklogModal } from './BacklogModal';
 import type { FlowData } from '@/types/flow';
@@ -106,6 +95,26 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
       </div>
     );
   }
+
+  /**
+   * Resolve the current node's renderer from the node registry.
+   *
+   * Node types declare their `PlayerStage` in `definitions.ts`, so supporting a
+   * new node type in the player requires no change to this shell.
+   */
+  const renderStage = () => {
+    const nodeType = state.currentNodeType;
+    if (!nodeType) return null;
+    const Stage = getPlayerStage(nodeType);
+    if (!Stage) return null;
+    return (
+      <Stage
+        state={state}
+        onRestart={restart}
+        onSettlementButton={selectSettlementButton}
+      />
+    );
+  };
 
   return (
     <div
@@ -196,26 +205,8 @@ function PlayerShellImpl({ flowData, onExit }: PlayerShellProps) {
         </div>
       </header>
 
-      {/* Stage Components */}
-      {state.currentNodeType === 'stage' && <StageStage state={state} />}
-      {state.currentNodeType === 'start' && <StartStage state={state} />}
-      {state.currentNodeType === 'scene' && <SceneStage state={state} />}
-      {state.currentNodeType === 'video' && <VideoStage state={state} />}
-      {state.currentNodeType === 'link' && <LinkStage state={state} />}
-      {state.currentNodeType === 'settlement' && (
-        <SettlementStage
-          state={state}
-          onRestart={restart}
-          onSettlementButton={selectSettlementButton}
-        />
-      )}
-      {state.currentNodeType === 'minigame' && <MinigameStage state={state} />}
-      {state.currentNodeType === 'rating' && <RatingStage state={state} />}
-      {state.currentNodeType === 'multi-select' && <MultiSelectStage state={state} />}
-      {state.currentNodeType === 'media' && <MediaStage state={state} />}
-      {state.currentNodeType === 'text-input' && <TextInputStage state={state} />}
-      {state.currentNodeType === 'rank-order' && <RankOrderStage state={state} />}
-      {state.currentNodeType === 'number-picker' && <NumberPickerStage state={state} />}
+      {/* Current node's stage — resolved from the node registry. */}
+      {renderStage()}
 
       {/* GalGame Modals */}
       <SaveLoadModal

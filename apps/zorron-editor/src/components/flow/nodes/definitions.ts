@@ -50,6 +50,21 @@ import {
   NumberPickerNode,
 } from './InteractionNodes';
 import { StageForm } from '@/components/inspector/StageForm';
+import { StageStage } from '@/components/player/StageStage';
+import { StartStage } from '@/components/player/StartStage';
+import { SceneStage } from '@/components/player/SceneStage';
+import { VideoStage } from '@/components/player/VideoStage';
+import { LinkStage } from '@/components/player/LinkStage';
+import { SettlementStage } from '@/components/player/SettlementStage';
+import {
+  MinigameStage,
+  RatingStage,
+  MultiSelectStage,
+  MediaStage,
+  TextInputStage,
+  RankOrderStage,
+  NumberPickerStage,
+} from '@/components/player/InteractionStages';
 import {
   StartForm,
   SceneForm,
@@ -78,6 +93,7 @@ registerNode({
   accent: '#06b6d4',
   CanvasComponent: StageNode,
   InspectorForm: StageForm,
+  PlayerStage: StageStage,
   createDefault: () => ({
     label: tt('node.default.stage'),
     carrier: {
@@ -110,6 +126,7 @@ registerNode({
   accent: '#22d3ee',
   CanvasComponent: StartNode,
   InspectorForm: StartForm,
+  PlayerStage: StartStage,
   createDefault: () => ({
     label: tt('node.default.start'),
     title: tt('node.default.newStory'),
@@ -126,6 +143,7 @@ registerNode({
   accent: '#a78bfa',
   CanvasComponent: SceneNode,
   InspectorForm: SceneForm,
+  PlayerStage: SceneStage,
   createDefault: () => ({
     label: tt('node.default.scene'),
     dialogue: '',
@@ -142,6 +160,7 @@ registerNode({
   accent: '#38bdf8',
   CanvasComponent: MediaNode,
   InspectorForm: MediaForm,
+  PlayerStage: MediaStage,
   createDefault: () => ({
     label: tt('node.default.media'),
     mediaType: 'image',
@@ -160,6 +179,7 @@ registerNode({
   accent: '#fb7185',
   CanvasComponent: VideoNode,
   InspectorForm: VideoForm,
+  PlayerStage: VideoStage,
   createDefault: () => ({
     label: tt('node.default.video'),
     videoUrl: '',
@@ -177,6 +197,7 @@ registerNode({
   accent: '#94a3b8',
   CanvasComponent: LinkNode,
   InspectorForm: LinkForm,
+  PlayerStage: LinkStage,
   isTerminal: true,
   createDefault: () => ({
     label: tt('node.default.link'),
@@ -195,6 +216,7 @@ registerNode({
   accent: '#818cf8',
   CanvasComponent: TextInputNode,
   InspectorForm: TextInputForm,
+  PlayerStage: TextInputStage,
   createDefault: () => ({
     label: tt('node.default.textInput'),
     question: '',
@@ -214,6 +236,7 @@ registerNode({
   accent: '#c084fc',
   CanvasComponent: MultiSelectNode,
   InspectorForm: MultiSelectForm,
+  PlayerStage: MultiSelectStage,
   createDefault: () => ({
     label: tt('node.default.multiSelect'),
     options: [],
@@ -231,6 +254,7 @@ registerNode({
   accent: '#e879f9',
   CanvasComponent: RatingNode,
   InspectorForm: RatingForm,
+  PlayerStage: RatingStage,
   createDefault: () => ({
     label: tt('node.default.rating'),
     min: 1,
@@ -249,6 +273,7 @@ registerNode({
   accent: '#a855f7',
   CanvasComponent: RankOrderNode,
   InspectorForm: RankOrderForm,
+  PlayerStage: RankOrderStage,
   createDefault: () => ({
     label: tt('node.default.rankOrder'),
     question: '',
@@ -265,6 +290,7 @@ registerNode({
   accent: '#6366f1',
   CanvasComponent: NumberPickerNode,
   InspectorForm: NumberPickerForm,
+  PlayerStage: NumberPickerStage,
   createDefault: () => ({
     label: tt('node.default.numberPicker'),
     question: '',
@@ -332,6 +358,7 @@ registerNode({
   accent: '#14b8a6',
   CanvasComponent: MinigameNode,
   InspectorForm: MinigameForm,
+  PlayerStage: MinigameStage,
   createDefault: () => ({
     label: tt('node.default.minigame'),
     gameUrl: '',
@@ -350,6 +377,7 @@ registerNode({
   accent: '#f472b6',
   CanvasComponent: SettlementNode,
   InspectorForm: SettlementForm,
+  PlayerStage: SettlementStage,
   isTerminal: true,
   createDefault: () => ({
     label: tt('node.default.settlement'),
