@@ -21,6 +21,7 @@ import {
   verifyDirectoryPermission,
   type WorkspaceMode,
 } from '@/services/workspace.service';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { featureFlags } from '@/lib/featureFlags';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [error, setError] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSwitch = useCallback(
     async (next: WorkspaceMode) => {
@@ -48,7 +50,7 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
 
       if (next === 'cloud') {
         if (!isAuthenticated) {
-          setError(t('ws.cloud.signin'));
+          setIsAuthModalOpen(true);
           return;
         }
         setMode('cloud');
@@ -150,6 +152,12 @@ function WorkspaceSwitcherImpl({ className }: WorkspaceSwitcherProps) {
           {error}
         </span>
       )}
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setMode('cloud')}
+      />
     </div>
   );
 }

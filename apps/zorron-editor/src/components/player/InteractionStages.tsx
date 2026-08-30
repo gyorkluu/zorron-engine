@@ -21,27 +21,28 @@ import type { GameState } from '@/engine/GameEngine';
 function StageShell({ children, bgUrl }: { children: React.ReactNode; bgUrl?: string | null }) {
   const resolvedBg = bgUrl ? resolveMediaUrl(bgUrl) : null;
   return (
-    <div className="player-bg player-font player-text relative flex h-full w-full flex-col items-center gap-6 overflow-y-auto p-6 text-center sm:p-8">
+    <div className="player-bg player-font player-text relative flex h-full w-full flex-col items-center justify-center overflow-y-auto p-4 sm:p-8 text-center">
       {resolvedBg && (
         <div className="pointer-events-none absolute inset-0 z-0">
           <img
             src={resolvedBg}
             alt=""
-            className="h-full w-full object-cover"
-            style={{ opacity: 0.2 }}
+            className="h-full w-full object-cover opacity-25 filter blur-[1px]"
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)',
+                'linear-gradient(180deg, rgba(2,6,23,0.6) 0%, rgba(2,6,23,0.85) 100%)',
             }}
           />
         </div>
       )}
-      {/* my-auto centers short content vertically; when content overflows,
-          the outer overflow-y-auto lets the whole stage scroll. */}
-      <div className="relative z-10 my-auto flex w-full flex-col items-center gap-6">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
+
+      {/* my-auto centers content vertically; max-w-2xl keeps comfortable reading width on desktop */}
+      <div className="relative z-10 my-auto flex w-full max-w-2xl flex-col items-center gap-6 rounded-3xl border border-slate-800/60 bg-slate-950/50 p-6 sm:p-10 shadow-2xl backdrop-blur-md">
         {children}
       </div>
     </div>
@@ -63,7 +64,7 @@ function PrimaryButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className="player-btn px-6 py-2.5 text-sm font-medium"
+      className="group relative inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/50 bg-gradient-to-r from-cyan-600/30 via-cyan-500/20 to-teal-500/30 px-8 py-3 text-sm font-semibold text-cyan-100 shadow-lg shadow-cyan-500/10 backdrop-blur-sm transition-all duration-150 hover:scale-[1.02] hover:border-cyan-400 hover:bg-cyan-500/30 hover:text-white disabled:pointer-events-none disabled:opacity-40 disabled:hover:scale-100 active:scale-[0.98]"
     >
       {children}
     </button>
@@ -516,51 +517,60 @@ function TextInputStageImpl({ state }: TextInputStageProps) {
   return (
     <StageShell bgUrl={state.stageBackgroundUrl}>
       {ti.question && (
-        <h2 className="text-lg font-bold sm:text-xl">{ti.question}</h2>
+        <h2 className="text-xl font-bold tracking-tight text-slate-100 sm:text-2xl">
+          {ti.question}
+        </h2>
       )}
 
-      <div className="flex w-full max-w-md flex-col items-center gap-3">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            if (lookupError) {
-              usePlayerStore.setState({ lookupError: null });
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && canSubmit) handleSubmit();
-          }}
-          placeholder={ti.placeholder ?? ''}
-          maxLength={maxLength}
-          disabled={isLookingUp}
-          className="player-surface player-border player-text player-radius w-full px-4 py-3 text-center text-base outline-none transition-colors focus:player-border-hover disabled:opacity-60"
-          style={{ color: 'hsl(var(--p-text))' }}
-          autoFocus
-        />
+      <div className="flex w-full max-w-md flex-col items-center gap-3.5">
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              if (lookupError) {
+                usePlayerStore.setState({ lookupError: null });
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && canSubmit) handleSubmit();
+            }}
+            placeholder={ti.placeholder ?? ''}
+            maxLength={maxLength}
+            disabled={isLookingUp}
+            className="w-full rounded-2xl border border-slate-700/80 bg-slate-900/90 px-5 py-3.5 text-center text-lg font-medium text-slate-100 placeholder-slate-500 shadow-inner outline-none transition-all duration-200 focus:border-cyan-400 focus:bg-slate-900 focus:ring-4 focus:ring-cyan-500/20 disabled:opacity-50"
+            autoFocus
+          />
+          {canSubmit && !isLookingUp && (
+            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 rounded-md border border-slate-700 bg-slate-800/80 px-2 py-0.5 text-[10px] font-mono text-slate-400">
+              Enter ↵
+            </span>
+          )}
+        </div>
 
         {ti.hint && !lookupError && (
-          <p className="player-text-muted text-xs leading-relaxed">
+          <p className="text-xs leading-relaxed text-slate-400">
             {ti.hint}
           </p>
         )}
 
         {isLookingUp && (
-          <p className="player-accent-text text-xs animate-pulse">
-            正在查询推栏号...
+          <p className="inline-flex items-center gap-1.5 text-xs text-cyan-400 animate-pulse">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
+            正在查询推栏号信息...
           </p>
         )}
 
         {lookupError && isTuilanId && (
           <div className="flex flex-col items-center gap-2">
-            <p className="text-xs leading-relaxed text-red-500">
+            <p className="text-xs leading-relaxed text-rose-400">
               查询失败：{lookupError}
             </p>
             <button
               type="button"
               onClick={() => skipTuilanLookup(value)}
-              className="player-text-muted text-xs underline transition-colors hover:player-accent-text"
+              className="text-xs text-slate-400 underline transition-colors hover:text-cyan-300"
             >
               查询服务不可用，手动填写信息 →
             </button>

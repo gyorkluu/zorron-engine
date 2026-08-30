@@ -36,6 +36,10 @@ interface AssetState {
   isUploading: boolean;
   error: string | null;
 
+  /** Active tab in asset panel: 'library' | 'studio'. */
+  activeTab: 'library' | 'studio';
+  setActiveTab: (tab: 'library' | 'studio') => void;
+
   /** Active type filter (undefined = all). */
   typeFilter: AssetType | undefined;
   keyword: string;
@@ -94,6 +98,8 @@ export const useAssetStore = create<AssetState>((set, get) => ({
   isLoading: false,
   isUploading: false,
   error: null,
+  activeTab: 'library',
+  setActiveTab: (activeTab) => set({ activeTab }),
   typeFilter: undefined,
   keyword: '',
   selectedAssetId: null,
@@ -118,9 +124,9 @@ export const useAssetStore = create<AssetState>((set, get) => ({
         pageSize: res.meta.pageSize,
         isLoading: false,
       });
-    } catch (err) {
-      const message = err instanceof AppError ? err.message : 'Failed to load assets';
-      set({ isLoading: false, error: message });
+    } catch {
+      // Remote backend unavailable; fall back to local IndexedDB assets silently.
+      set({ isLoading: false, error: null });
     }
   },
 

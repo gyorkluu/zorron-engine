@@ -85,3 +85,45 @@ function MediaNodeImpl({ data, selected }: ZorronNodeProps) {
   );
 }
 export const MediaNode = memo(MediaNodeImpl);
+
+function TextInputNodeImpl({ data, selected }: ZorronNodeProps) {
+  const d = data as any;
+  return (
+    <NodeShell type="text-input" label={d.label} selected={selected}>
+      <div className="space-y-1">
+        <p className="text-[11px] text-slate-300 font-medium truncate">{d.question || d.placeholder || '文本录入交互'}</p>
+        {d.variable && (
+          <p className="text-[10px] font-mono text-cyan-400">→ ${d.variable}</p>
+        )}
+      </div>
+    </NodeShell>
+  );
+}
+export const TextInputNode = memo(TextInputNodeImpl);
+
+function RankOrderNodeImpl({ data, selected }: ZorronNodeProps) {
+  const d = data as any;
+  const items = d.items ?? [];
+  return (
+    <NodeShell type="rank-order" label={d.label} selected={selected}>
+      <div className="space-y-1">
+        <p className="text-[11px] text-slate-300 font-medium truncate">{d.question || '优先级排序'}</p>
+        <p className="text-[10px] text-slate-400">{items.length} 个排序项</p>
+      </div>
+    </NodeShell>
+  );
+}
+export const RankOrderNode = memo(RankOrderNodeImpl);
+
+function NumberPickerNodeImpl({ data, selected }: ZorronNodeProps) {
+  const d = data as any;
+  return (
+    <NodeShell type="number-picker" label={d.label} selected={selected}>
+      <div className="space-y-1">
+        <p className="text-[11px] text-slate-300 font-medium truncate">{d.question || '数值拾取'}</p>
+        <p className="text-[10px] text-slate-400">{d.min ?? 0} ~ {d.max ?? 100} {d.unit ?? ''}</p>
+      </div>
+    </NodeShell>
+  );
+}
+export const NumberPickerNode = memo(NumberPickerNodeImpl);

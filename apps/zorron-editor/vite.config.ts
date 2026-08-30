@@ -19,11 +19,19 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@zorron/flow-schema': path.resolve(__dirname, '../../packages/flow-schema/src'),
     },
   },
   server: {
     port: 3004,
     host: true,
+    allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3005',
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     globals: true,

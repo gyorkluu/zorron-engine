@@ -3,6 +3,7 @@ import App from './App';
 import { EditorShell } from '@/components/editor/EditorShell';
 import { CloudProjectList } from '@/components/cloud/CloudProjectList';
 import { PlayerPage } from '@/h5/PlayerPage';
+import { RouteErrorBoundary } from '@/components/common/RouteErrorBoundary';
 import HomePage from './HomePage';
 import TestCardPage from './TestCardPage';
 import TestCardProfilePage from './TestCardProfilePage';
@@ -16,35 +17,42 @@ export const router = createBrowserRouter([
     // URL 查询参数 ?tuilanId=xxx 可动态查询玩家 profile
     path: '/',
     element: <HomePage />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     // 编辑器（原 / 路径下移）
     path: '/editor',
     element: <App />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     // 旧的 test-card 测试入口（保留兼容）
     path: '/test-card',
     element: <TestCardPage />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     path: '/test-card-profile',
     element: <TestCardProfilePage />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     // Cloud project list dashboard.
     path: '/projects',
     element: <CloudProjectList />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     // Open a specific cloud project by id.
     path: '/projects/:projectId',
     element: <ProjectRoute />,
+    errorElement: <RouteErrorBoundary />,
   },
   {
     // Standalone player page (no editor chrome).
     path: '/player/:projectId',
     element: <PlayerPage />,
+    errorElement: <RouteErrorBoundary />,
   },
 ]);
 

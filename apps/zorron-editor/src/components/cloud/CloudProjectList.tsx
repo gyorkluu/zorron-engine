@@ -32,6 +32,9 @@ import {
   LayoutGrid,
   ArrowRight,
   HardDrive,
+  LogIn,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -40,6 +43,7 @@ import { featureFlags } from '@/lib/featureFlags';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
 import { BrandLogo } from '@/components/brand/BrandLogo';
 import { EmptyStateIllustration } from '@/components/brand/EmptyStateIllustration';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { useT } from '@/i18n/useT';
 import { cn } from '@/lib/utils';
 import type { ListProjectsQuery, ProjectListItem } from '@/types/project';
@@ -283,14 +287,19 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
     return { total: list.length, published, recent };
   }, [list]);
 
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+
   // Feature flag off: render nothing.
   if (!featureFlags.cloudSync) return null;
 
-  // Not authenticated: show sign-in prompt.
+  // Not authenticated: show sign-in prompt with direct login modal trigger.
   if (!isAuthenticated) {
     return (
       <div
-        className={cn('flex min-h-screen items-center justify-center bg-slate-950', className)}
+        className={cn('flex min-h-screen items-center justify-center bg-slate-950 px-4', className)}
         data-testid="cloud-list-unauth"
       >
         {/* Background decoration */}
@@ -299,18 +308,50 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
           <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl" />
         </div>
 
-        <div className="relative max-w-md rounded-2xl border border-slate-800/60 bg-slate-900/60 p-8 text-center shadow-2xl backdrop-blur-xl">
+        <div className="relative w-full max-w-md rounded-2xl border border-slate-800/80 bg-slate-900/80 p-8 text-center shadow-2xl backdrop-blur-xl">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 ring-1 ring-cyan-500/30">
             <CloudOff size={32} className="text-cyan-300" />
           </div>
           <h1 className="mb-2 text-2xl font-bold text-slate-100">{t('cloud.signinTitle')}</h1>
-          <p className="mb-6 text-sm leading-relaxed text-slate-400">
+          <p className="mb-6 text-xs leading-relaxed text-slate-400">
             {t('cloud.signinDesc')}
           </p>
-          <div className="flex justify-center">
+
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => {
+                setAuthModalMode('login');
+                setIsAuthModalOpen(true);
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30 active:scale-[0.98]"
+              data-testid="cloud-login-btn"
+            >
+              <LogIn size={14} />
+              <span>立即登录 / 注册账号</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/editor')}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-all active:scale-[0.98]"
+            >
+              <span>使用本地模式（无需登录）</span>
+              <ArrowRight size={13} />
+            </button>
+          </div>
+
+          <div className="mt-6 flex justify-center border-t border-slate-800/60 pt-4">
             <WorkspaceSwitcher />
           </div>
         </div>
+
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          defaultMode={authModalMode}
+          onClose={() => setIsAuthModalOpen(false)}
+          onSuccess={() => loadList()}
+        />
       </div>
     );
   }
@@ -340,6 +381,21 @@ function CloudProjectListImpl({ className }: CloudProjectListProps) {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-1.5 text-xs text-slate-300">
+                <User size={13} className="text-cyan-400" />
+                <span className="font-medium max-w-[120px] truncate">
+                  {user?.nickname || user?.email || '已登录'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="ml-1 text-slate-500 hover:text-rose-400 transition-colors"
+                  title="退出登录"
+                  data-testid="header-logout-btn"
+                >
+                  <LogOut size={12} />
+                </button>
+              </div>
               <WorkspaceSwitcher />
               <button
                 type="button"

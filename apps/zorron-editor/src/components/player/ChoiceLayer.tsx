@@ -81,8 +81,9 @@ function ChoiceButton({
       type="button"
       {...handlers}
       className={`
-        player-choice group relative w-full overflow-visible px-4 py-3
-        text-center font-medium
+        player-choice group relative w-full overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/70 px-4 py-3
+        text-center font-medium shadow-md backdrop-blur-sm transition-all duration-150
+        hover:scale-[1.02] hover:border-cyan-500/50 hover:bg-cyan-950/30 hover:shadow-cyan-500/10 active:scale-[0.98]
         ${compact ? 'flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 text-xs sm:text-sm' : 'sm:px-6 sm:py-3.5 sm:text-base'}
       `}
     >
@@ -107,7 +108,7 @@ function ChoiceButton({
           <img
             src={resolveMediaUrl(choice.icon)}
             alt=""
-            className={`flex-shrink-0 object-contain ${
+            className={`flex-shrink-0 object-contain transition-transform duration-200 group-hover:scale-110 ${
               compact ? 'h-10 w-10 sm:h-11 sm:w-11' : 'h-10 w-10'
             }`}
             loading="lazy"

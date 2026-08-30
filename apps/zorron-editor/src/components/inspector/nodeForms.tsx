@@ -384,3 +384,94 @@ export function MediaForm({ node, update }: { node: FlowNode; update: (data: Par
     </div>
   );
 }
+
+/** Form for a text-input node. */
+export function TextInputForm({ node, update }: { node: FlowNode; update: (data: Partial<any>) => void }) {
+  const { t } = useT();
+  const d = node.data as any;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
+      <Field label="题目/提示"><TextField value={d.question ?? ''} onChange={(question) => update({ question })} /></Field>
+      <Field label="占位文字"><TextField value={d.placeholder ?? ''} onChange={(placeholder) => update({ placeholder })} /></Field>
+      <Field label="辅助说明"><TextField value={d.hint ?? ''} onChange={(hint) => update({ hint })} /></Field>
+      <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
+      <SwitchField checked={d.required ?? false} onChange={(required) => update({ required })} label="必填输入" />
+      <Field label="最大字数限制"><NumberField value={d.maxLength ?? 0} onChange={(maxLength) => update({ maxLength })} /></Field>
+    </div>
+  );
+}
+
+/** Form for a rank-order node. */
+export function RankOrderForm({ node, update }: { node: FlowNode; update: (data: Partial<any>) => void }) {
+  const { t } = useT();
+  const d = node.data as any;
+  const items: Array<{ id: string; label: string }> = d.items ?? [];
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
+      <Field label="题目/引导"><TextField value={d.question ?? ''} onChange={(question) => update({ question })} /></Field>
+      <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
+      <Field label="排序选项列表">
+        <div className="space-y-2">
+          {items.map((item, i) => (
+            <div key={item.id || i} className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-slate-500 w-4 text-center">{i + 1}</span>
+              <input
+                type="text"
+                value={item.label}
+                onChange={(e) => {
+                  const newItems = [...items];
+                  newItems[i] = { ...item, label: e.target.value };
+                  update({ items: newItems });
+                }}
+                className="flex-1 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-sm text-slate-100"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const newItems = items.filter((_, idx) => idx !== i);
+                  update({ items: newItems });
+                }}
+                className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              const newItems = [...items, { id: `item_${Date.now()}`, label: '新排序项' }];
+              update({ items: newItems });
+            }}
+            className="rounded border border-slate-600 px-3 py-1 text-xs text-slate-400 hover:bg-slate-800"
+          >
+            + 添加排序项
+          </button>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+/** Form for a number-picker node. */
+export function NumberPickerForm({ node, update }: { node: FlowNode; update: (data: Partial<any>) => void }) {
+  const { t } = useT();
+  const d = node.data as any;
+  return (
+    <div className="space-y-3">
+      <Field label={t('field.label')}><TextField value={d.label ?? ''} onChange={(label) => update({ label })} /></Field>
+      <Field label={t('field.bgUrl')} hint={t('field.dragImage')}><UrlField value={d.backgroundUrl ?? ''} onChange={(backgroundUrl) => update({ backgroundUrl })} /></Field>
+      <Field label="题目/提示"><TextField value={d.question ?? ''} onChange={(question) => update({ question })} /></Field>
+      <Field label={t('field.variable')}><TextField value={d.variable ?? ''} onChange={(variable) => update({ variable })} /></Field>
+      <Field label={t('field.min')}><NumberField value={d.min ?? 0} onChange={(min) => update({ min })} /></Field>
+      <Field label={t('field.max')}><NumberField value={d.max ?? 100} onChange={(max) => update({ max })} /></Field>
+      <Field label={t('field.step')}><NumberField value={d.step ?? 1} onChange={(step) => update({ step })} /></Field>
+      <Field label="默认值"><NumberField value={d.defaultValue ?? 0} onChange={(defaultValue) => update({ defaultValue })} /></Field>
+      <Field label="单位"><TextField value={d.unit ?? ''} onChange={(unit) => update({ unit })} /></Field>
+    </div>
+  );
+}

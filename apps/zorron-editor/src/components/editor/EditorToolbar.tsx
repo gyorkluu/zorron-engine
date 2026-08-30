@@ -5,17 +5,22 @@
  * Save status is reflected as a colored badge (saved / saving / unsaved / error).
  */
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Check, Loader2, AlertCircle, type LucideIcon } from 'lucide-react';
+import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Swords, Clapperboard, Check, Loader2, AlertCircle, LogIn, LogOut, User, type LucideIcon } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
+import { useAuthStore } from '@/stores/authStore';
+import { useAIStore } from '@/stores/aiStore';
 import { buildCurrentFlowData } from '@/hooks/useAutoSave';
 import { exportProjectJson, pickJsonFile } from '@/utils/fileIO';
 import { SyncStatusIndicator } from '@/components/cloud/SyncStatusIndicator';
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher';
+import { AuthModal } from '@/components/auth/AuthModal';
 import { featureFlags } from '@/lib/featureFlags';
 import { sampleFlowData, sampleProjectMeta } from '@/data/sampleProject';
+import { buildJx3CardFlowData } from '@/data/jx3CardFlowData';
+import { fullDemoFlowData, fullDemoProjectMeta } from '@/data/fullDemoProject';
 import { useT } from '@/i18n/useT';
 import { useLocaleStore } from '@/i18n/localeStore';
 import { BrandLogo } from '@/components/brand/BrandLogo';
@@ -80,6 +85,10 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   const importProject = useProjectStore((s) => s.importProject);
   const setTitle = useProjectStore((s) => s.setTitle);
   const loadFlow = useEditorStore((s) => s.loadFlow);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSave = useCallback(() => {
     void save(buildCurrentFlowData());
@@ -132,6 +141,39 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
       saveStatus: 'saved',
     });
     loadFlow(sampleFlowData.nodes, sampleFlowData.edges);
+  }, [loadFlow]);
+
+  // 加载 JX3 社交名片工程：每次构建独立实例，避免跨实例状态污染
+  const handleLoadJx3 = useCallback(() => {
+    const jx3Flow = buildJx3CardFlowData();
+    useProjectStore.getState().reset();
+    useProjectStore.setState({
+      title: jx3Flow.settings?.title ?? '剑网3游戏社交名片',
+      description: jx3Flow.settings?.description ?? '',
+      variables: jx3Flow.variables,
+      settings: jx3Flow.settings,
+      version: jx3Flow.version,
+      lastSavedSnapshot: jx3Flow,
+      lastSavedAt: new Date().toISOString(),
+      saveStatus: 'saved',
+    });
+    loadFlow(jx3Flow.nodes, jx3Flow.edges);
+  }, [loadFlow]);
+
+  // 加载全节点互动影游综合 Demo
+  const handleLoadFullDemo = useCallback(() => {
+    useProjectStore.getState().reset();
+    useProjectStore.setState({
+      title: fullDemoProjectMeta.title,
+      description: fullDemoProjectMeta.description,
+      variables: {},
+      settings: {},
+      version: fullDemoProjectMeta.version,
+      lastSavedSnapshot: fullDemoFlowData,
+      lastSavedAt: new Date().toISOString(),
+      saveStatus: 'saved',
+    });
+    loadFlow(fullDemoFlowData.nodes, fullDemoFlowData.edges);
   }, [loadFlow]);
 
   const statusLabel: Record<string, string> = {
@@ -197,16 +239,76 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
         />
 
         <ToolbarButton
+          onClick={handleLoadFullDemo}
+          icon={Clapperboard}
+          label="全节点Demo"
+          variant="accent"
+          title="加载《风起稻香》AI 互动影游全节点演示工程"
+        />
+        <ToolbarButton
           onClick={handleLoadSample}
           icon={Sparkles}
           label={t('toolbar.sample')}
           variant="accent"
           title={t('toolbar.sample.tip')}
         />
+        <ToolbarButton
+          onClick={handleLoadJx3}
+          icon={Swords}
+          label={t('toolbar.jx3')}
+          variant="accent"
+          title={t('toolbar.jx3.tip')}
+        />
         <ToolbarButton onClick={handleImport} icon={Upload} label={t('toolbar.import')} />
         <ToolbarButton onClick={handleExport} icon={Download} label={t('toolbar.export')} />
         <ToolbarButton onClick={handleSave} icon={Save} label={t('toolbar.save')} variant="primary" />
+
+        {/* User Auth Profile / Login Button */}
+        {isAuthenticated ? (
+          <div className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-xs text-slate-300">
+            <User size={12} className="text-cyan-400" />
+            <span className="max-w-[80px] truncate font-medium text-[11px]">
+              {user?.nickname || user?.email || '已登录'}
+            </span>
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="text-slate-500 hover:text-rose-400 transition-colors p-0.5"
+              title="退出登录"
+              data-testid="toolbar-logout-btn"
+            >
+              <LogOut size={11} />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsAuthModalOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1.5 text-xs font-medium text-cyan-200 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all duration-150 active:scale-95"
+            data-testid="toolbar-login-btn"
+            title="登录云端账号"
+          >
+            <LogIn size={13} />
+            <span>登录</span>
+          </button>
+        )}
+
+        {/* AI Copilot Panel Toggle */}
+        <button
+          type="button"
+          onClick={() => useAIStore.getState().togglePanel()}
+          className="ml-1 inline-flex items-center gap-1.5 rounded-lg border border-purple-500/50 bg-purple-600/20 px-3 py-1.5 text-xs font-semibold text-purple-200 hover:bg-purple-600/30 hover:border-purple-400 shadow-lg shadow-purple-500/10 transition-all duration-150 active:scale-95"
+          title="打开/关闭 AI Copilot 对话助手"
+        >
+          <Sparkles size={13} className="text-purple-300 animate-pulse" />
+          <span>AI 助手</span>
+        </button>
       </div>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </header>
   );
 }

@@ -18,7 +18,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@zorron/flow-schema": ["../../packages/flow-schema/src/index.ts"],
+      "@zorron/flow-schema/*": ["../../packages/flow-schema/src/*"]
     },
     "resolveJsonModule": true,
     "types": ["vitest/globals", "@testing-library/jest-dom"]

@@ -60,6 +60,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [rfInstance, setRfInstance] = useState<any>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -85,13 +86,12 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
       event.preventDefault();
       const type = event.dataTransfer.getData('application/zorron-node-type') as NodeType;
       if (!type) return;
-      const bounds = wrapperRef.current?.getBoundingClientRect();
-      const position = bounds
-        ? { x: event.clientX - bounds.left, y: event.clientY - bounds.top }
-        : { x: 0, y: 0 };
+      const position = rfInstance?.screenToFlowPosition
+        ? rfInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY })
+        : { x: event.clientX - (wrapperRef.current?.getBoundingClientRect().left ?? 0), y: event.clientY - (wrapperRef.current?.getBoundingClientRect().top ?? 0) };
       addNode(type, position);
     },
-    [addNode],
+    [addNode, rfInstance],
   );
 
   const onDragOver = useCallback((event: React.DragEvent) => {
@@ -142,16 +142,31 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
     return () => window.removeEventListener('keydown', handler);
   }, [undo, redo, removeNode]);
 
-  const onNodeClick = useCallback((_event: MouseEvent | React.MouseEvent, node: Node) => { selectNode(node.id); }, [selectNode]);
-  const onPaneClick = useCallback(() => { selectNode(null); }, [selectNode]);
+  const onNodeClick = useCallback((_event: MouseEvent | React.MouseEvent, node: Node) => {
+    selectNode(node.id);
+    setContextMenu(null);
+  }, [selectNode]);
+
+  const onPaneClick = useCallback(() => {
+    selectNode(null);
+    setContextMenu(null);
+  }, [selectNode]);
+
   const onNodeContextMenu = useCallback((event: MouseEvent | React.MouseEvent, node: Node) => {
     event.preventDefault();
-    setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id });
-  }, []);
+    const flowPosition = rfInstance?.screenToFlowPosition
+      ? rfInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY })
+      : { x: event.clientX, y: event.clientY };
+    setContextMenu({ x: event.clientX, y: event.clientY, flowPosition, nodeId: node.id });
+  }, [rfInstance]);
+
   const onPaneContextMenu = useCallback((event: MouseEvent | React.MouseEvent) => {
     event.preventDefault();
-    setContextMenu({ x: event.clientX, y: event.clientY, nodeId: null });
-  }, []);
+    const flowPosition = rfInstance?.screenToFlowPosition
+      ? rfInstance.screenToFlowPosition({ x: event.clientX, y: event.clientY })
+      : { x: event.clientX, y: event.clientY };
+    setContextMenu({ x: event.clientX, y: event.clientY, flowPosition, nodeId: null });
+  }, [rfInstance]);
 
   const minimapNodeColor = useCallback((n: Node) => getNodeAccent(n.type as NodeType), []);
   const flowNodes = useMemo(() => nodes, [nodes]);
@@ -183,6 +198,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
         onNodeContextMenu={onNodeContextMenu}
         onPaneContextMenu={onPaneContextMenu}
         isValidConnection={isValidConnection}
+        onInit={setRfInstance}
         fitView
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{
@@ -235,7 +251,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
                 <Sparkles size={16} className="text-purple-400" />
               </div>
               <p className="text-sm text-slate-400">
-                从左侧面板拖拽节点到画布上，或点击节点快速创建
+                右键画布任意位置快速添加节点，或按 Ctrl+P 搜索创建
               </p>
             </div>
             <div className="flex items-center gap-3 text-[11px] text-slate-500">
@@ -248,7 +264,7 @@ export function FlowCanvas({ className }: FlowCanvasProps) {
               <span className="text-slate-700">·</span>
               <span className="flex items-center gap-1">
                 <MousePointer2 size={12} />
-                <span>拖拽创建</span>
+                <span>右键画布添加</span>
               </span>
             </div>
           </div>

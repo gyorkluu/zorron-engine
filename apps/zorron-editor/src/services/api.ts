@@ -18,7 +18,7 @@ import { AppError, type AppErrorShape } from '@/lib/errors';
 
 /** Base API URL injected at build time. Never hardcode. */
 export const API_BASE_URL: string =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+  import.meta.env.VITE_API_BASE_URL || '';
 
 /**
  * Base URL for the JX3 backend service (service-lover).

@@ -22,9 +22,9 @@ import { memo, useCallback, useState } from 'react';
 import { Eye, Variable, Puzzle, LayoutTemplate, History, type LucideIcon } from 'lucide-react';
 import { AssetPanel } from '@/components/asset/AssetPanel';
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
-import { NodePalette } from '@/components/flow/NodePalette';
 import { TemplateLibrary } from '@/components/flow/TemplateLibrary';
 import { InspectorPanel } from '@/components/inspector/InspectorPanel';
+import { AICopilotPanel } from '@/components/ai/AICopilotPanel';
 import { VariablesPanel } from '@/components/inspector/VariablesPanel';
 import { FragmentPanel } from '@/components/inspector/FragmentPanel';
 import { HistoryPanel } from '@/components/inspector/HistoryPanel';
@@ -58,25 +58,12 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   // Debounced auto-save whenever the canvas / metadata changes.
   useAutoSave({ delay: 3000, enabled: true });
 
-  const addNode = useEditorStore((s) => s.addNode);
-
   // P1-1: Preview overlay state.
   const [showPreview, setShowPreview] = useState(false);
   // P2 side panels: only one open at a time.
   const [activeSidePanel, setActiveSidePanel] = useState<SidePanelId>(null);
   // P1-2: Onboarding tutorial (auto-shows on first visit).
   const onboarding = useOnboarding();
-
-  /** Click-to-create from the palette: add at a reasonable center offset. */
-  const handleCreateNode = useCallback(
-    (type: NodeType) => {
-      // Place near the canvas center with a small cascade so successive
-      // clicks don't stack on top of each other.
-      const count = useEditorStore.getState().nodes.length;
-      addNode(type, { x: 250 + count * 40, y: 200 + count * 40 });
-    },
-    [addNode],
-  );
 
   /** Toggle a side panel; clicking the active one closes it. */
   const toggleSidePanel = useCallback((id: Exclude<SidePanelId, null>) => {
@@ -98,16 +85,13 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
         <AssetPanel />
         <main className="relative min-w-0 flex-1">
           <FlowCanvas className="h-full w-full" />
-          {/* Floating node palette overlay on the canvas top-left. */}
-          <div className="absolute left-3 top-3 z-10 max-h-[70vh] w-56 overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/80 shadow-xl backdrop-blur-md">
-            <NodePalette onCreateNode={handleCreateNode} />
-          </div>
 
           {/* Floating top-right toolbar: Simulation + Preview. */}
           <div className="absolute right-3 top-3 z-10 flex items-center gap-2">
             <SimulationTrigger />
             <button
               type="button"
+              data-testid="preview-trigger"
               onClick={() => setShowPreview(true)}
               className="group flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-medium text-cyan-200 shadow-lg shadow-cyan-500/10 backdrop-blur-md transition-all duration-150 hover:border-cyan-400/50 hover:bg-cyan-500/25 hover:text-cyan-100 active:scale-[0.97]"
               title={t('toolbar.preview.tip')}
@@ -160,6 +144,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
           )}
         </main>
         <InspectorPanel />
+        <AICopilotPanel />
       </div>
 
       {/* P1-1: Preview overlay (full-screen in-editor player). */}
