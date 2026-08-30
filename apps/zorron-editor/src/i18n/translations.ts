@@ -716,6 +716,10 @@ export const translations = {
   'script.overwriteWarning': { zh: '这会替换当前画布上的全部内容', en: 'This replaces everything on the canvas' },
   'script.confirm': { zh: '确认替换', en: 'Replace' },
 
+  'script.check': { zh: '连贯性检查', en: 'Consistency check' },
+  'script.noIssues': { zh: '没有发现问题，故事可以正常推进。', en: 'No issues — the story can be played through.' },
+  'script.issuesFound': { zh: '发现 {n} 个问题', en: '{n} issues found' },
+
 } as const;
 
 /** Type of a translation key. */

@@ -7,10 +7,17 @@
  */
 
 import { memo, useCallback, useMemo, useState } from 'react';
-import { FileText, Download, Wand2, AlertTriangle } from 'lucide-react';
+import {
+  FileText,
+  Download,
+  Wand2,
+  AlertTriangle,
+  ShieldCheck,
+} from 'lucide-react';
 import { useEditorStore } from '@/stores/editorStore';
 import { useT } from '@/i18n/useT';
 import { nodesToScript, parseScript, scriptToGraph } from '@/lib/scriptParser';
+import { checkConsistency, isStoryPlayable } from '@/lib/consistencyCheck';
 import { cn } from '@/lib/utils';
 
 export interface ScriptPanelProps {
@@ -25,6 +32,13 @@ function ScriptPanelImpl({ className }: ScriptPanelProps) {
 
   const [text, setText] = useState('');
   const [confirming, setConfirming] = useState(false);
+  const [showIssues, setShowIssues] = useState(false);
+
+  /** Structural problems in the current canvas, computed on demand. */
+  const issues = useMemo(
+    () => (showIssues ? checkConsistency(nodes as never, edges as never) : []),
+    [showIssues, nodes, edges],
+  );
 
   /** Live breakdown of whatever is in the textarea. */
   const preview = useMemo(() => {
@@ -118,6 +132,63 @@ function ScriptPanelImpl({ className }: ScriptPanelProps) {
             </ul>
           </div>
         ) : null}
+
+        {/* Consistency check */}
+        <div className="flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowIssues((v) => !v)}
+            data-testid="script-check"
+            className="flex w-full items-center justify-between rounded-lg border border-slate-700/60 bg-slate-900/60 px-2.5 py-1.5 text-[11px] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+          >
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck size={11} />
+              {t('script.check')}
+            </span>
+            {showIssues ? (
+              <span
+                className={cn(
+                  'rounded px-1.5 py-0.5 text-[10px]',
+                  isStoryPlayable(issues)
+                    ? 'bg-emerald-500/20 text-emerald-300'
+                    : 'bg-rose-500/20 text-rose-300',
+                )}
+              >
+                {issues.length === 0
+                  ? '✓'
+                  : t('script.issuesFound', { n: issues.length })}
+              </span>
+            ) : null}
+          </button>
+
+          {showIssues ? (
+            issues.length === 0 ? (
+              <p className="mt-1.5 px-1 text-[10px] text-slate-500">
+                {t('script.noIssues')}
+              </p>
+            ) : (
+              <ul
+                className="mt-1.5 max-h-32 space-y-1 overflow-y-auto"
+                data-testid="script-issues"
+              >
+                {issues.map((issue, idx) => (
+                  <li
+                    key={`${issue.kind}-${issue.nodeId ?? idx}`}
+                    className={cn(
+                      'flex items-start gap-1.5 rounded border px-1.5 py-1 text-[10px] leading-relaxed',
+                      issue.severity === 'error'
+                        ? 'border-rose-500/30 bg-rose-500/10 text-rose-200'
+                        : 'border-amber-500/30 bg-amber-500/10 text-amber-200',
+                    )}
+                  >
+                    <AlertTriangle size={9} className="mt-0.5 flex-shrink-0" />
+                    <span className="min-w-0 flex-1">{issue.message}</span>
+                  </li>
+                ))}
+              </ul>
+            )
+          ) : null}
+        </div>
 
         {confirming ? (
           <div className="flex-shrink-0 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2">
