@@ -23,6 +23,7 @@ import {
   Eye,
   Variable,
   Users,
+  FileText,
   Puzzle,
   LayoutTemplate,
   History,
@@ -35,6 +36,7 @@ import { InspectorPanel } from '@/components/inspector/InspectorPanel';
 import { AICopilotPanel } from '@/components/ai/AICopilotPanel';
 import { VariablesPanel } from '@/components/inspector/VariablesPanel';
 import { CharacterPanel } from '@/components/inspector/CharacterPanel';
+import { ScriptPanel } from '@/components/inspector/ScriptPanel';
 import { FragmentPanel } from '@/components/inspector/FragmentPanel';
 import { HistoryPanel } from '@/components/inspector/HistoryPanel';
 import { EditorToolbar } from './EditorToolbar';
@@ -61,6 +63,7 @@ export interface EditorShellProps {
 type SidePanelId =
   | 'variables'
   | 'characters'
+  | 'script'
   | 'fragments'
   | 'templates'
   | 'history'
@@ -89,6 +92,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
   const sidePanelButtons: Array<{ id: Exclude<SidePanelId, null>; label: string; icon: LucideIcon }> = [
     { id: 'variables', label: t('vars.title'), icon: Variable },
     { id: 'characters', label: '角色库', icon: Users },
+    { id: 'script', label: '剧本', icon: FileText },
     { id: 'fragments', label: t('frag.title'), icon: Puzzle },
     { id: 'templates', label: t('tpl.title'), icon: LayoutTemplate },
     { id: 'history', label: t('history.title'), icon: History },
@@ -124,6 +128,7 @@ function EditorShellImpl({ projectId = null }: EditorShellProps) {
               <div className="max-h-[60vh] w-72 overflow-hidden rounded-xl border border-slate-800/60 bg-slate-950/90 shadow-2xl backdrop-blur-md">
                 {activeSidePanel === 'variables' && <VariablesPanel />}
                 {activeSidePanel === 'characters' && <CharacterPanel />}
+                {activeSidePanel === 'script' && <ScriptPanel />}
                 {activeSidePanel === 'fragments' && <FragmentPanel />}
                 {activeSidePanel === 'templates' && <TemplateLibrary />}
                 {activeSidePanel === 'history' && <HistoryPanel />}

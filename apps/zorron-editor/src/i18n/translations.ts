@@ -705,6 +705,17 @@ export const translations = {
   'asset.scope.global': { zh: '全局库', en: 'Global library' },
   'asset.filters': { zh: '筛选', en: 'Filters' },
 
+  'script.title': { zh: '剧本', en: 'Script' },
+  'script.tip': { zh: '用文本写故事，再一键生成节点图', en: 'Draft in text, then build the graph' },
+  'script.export': { zh: '从画布导出', en: 'From canvas' },
+  'script.apply': { zh: '生成节点图', en: 'Build graph' },
+  'script.placeholder': { zh: '粘贴剧本… # 标题 / 角色: 台词 / > 选项 -> 目标', en: 'Paste script… # title / Speaker: line / > choice -> target' },
+  'script.scenes': { zh: '场景', en: 'Scenes' },
+  'script.lines': { zh: '台词', en: 'Lines' },
+  'script.choices': { zh: '选项', en: 'Choices' },
+  'script.overwriteWarning': { zh: '这会替换当前画布上的全部内容', en: 'This replaces everything on the canvas' },
+  'script.confirm': { zh: '确认替换', en: 'Replace' },
+
 } as const;
 
 /** Type of a translation key. */
