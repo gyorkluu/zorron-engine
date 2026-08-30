@@ -19,6 +19,9 @@ import { usePlayerStore } from '@/stores/playerStore';
 import type { GameState } from '@/engine/GameEngine';
 import { VectorScene } from '@/components/vector3d/VectorScene';
 import { SocialCardSummary } from './SocialCardSummary';
+import { VisualBlockRenderer } from './blocks/VisualBlockRenderer';
+import { getVisualBlock } from './blocks/registry';
+import './blocks/library';
 import cdnMapping from '@/assets/cdn-mapping.json';
 import { featureFlags } from '@/lib/featureFlags';
 import { submitJx3Submission } from '@/services/jx3.service';
@@ -75,6 +78,13 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
   const layerA = result.resultTexts?.layerA;
   const layerB = result.resultTexts?.layerB;
   const hasSocialCard = result.visualBlocks?.some((b) => b.type === 'social-card-summary');
+
+  // Blocks this build actually knows how to render. The JX3 social card is
+  // handled separately below because it owns its own submission side effect.
+  const declaredBlocks = (result.visualBlocks ?? []).filter(
+    (b) => b.type !== 'social-card-summary' && getVisualBlock(b.type),
+  );
+  const hasDeclaredBlocks = declaredBlocks.length > 0;
 
   const spriteUrl = useMemo(() => {
     const sectId = result.anchor?.id;
@@ -147,11 +157,24 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
 
       <div className="player-text relative flex h-full flex-col items-center overflow-y-auto p-5 text-center sm:p-8">
         <div className="flex w-full max-w-3xl flex-col items-center gap-5">
+          {/* Declared visual blocks: badge / sprite / layered-texts / radar … */}
+          {hasDeclaredBlocks && (
+            <VisualBlockRenderer
+              blocks={declaredBlocks}
+              result={result}
+              settings={settings}
+              state={state}
+            />
+          )}
+
           {/* Custom visual block: JX3 social card summary. */}
           {result.visualBlocks?.some((b) => b.type === 'social-card-summary') && result.variables && (
             <SocialCardSummary variables={result.variables} />
           )}
 
+          {/* Legacy fixed layout — used when the node declares no blocks. */}
+          {!hasDeclaredBlocks && (
+            <>
           {result.anchor && (
             <span className="player-btn player-radius-full px-4 py-1 text-sm uppercase tracking-widest">
               {result.anchor.name}
@@ -190,6 +213,8 @@ function SettlementStageImpl({ state, onRestart, onSettlementButton }: Settlemen
                 {layerB}
               </p>
             </div>
+          )}
+            </>
           )}
 
           {/* Interactive 3D vector radar — only when vectorSpace is enabled. */}
