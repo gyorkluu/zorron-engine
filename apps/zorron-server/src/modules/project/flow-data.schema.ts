@@ -1,17 +1,12 @@
 import { z } from 'zod';
+import { StageNodeDataSchema } from '@zorron/flow-schema';
 
 export const PositionSchema = z.object({ x: z.number(), y: z.number() });
 
-/**
- * Generalized N-dimensional vector.
- *
- * Each key is an axis id, each value is the component along that axis. The
- * legacy 3D shape `{ x, y, z }` is a valid vector, so existing project data
- * needs no migration. Mirrors the frontend `Vector` type.
- */
 export const VectorSchema = z.record(z.string(), z.number());
 
 export const NodeTypeSchema = z.enum([
+  'stage',
   'start',
   'scene',
   'logic',
@@ -314,6 +309,14 @@ export const RankOrderNodeDataSchema = BaseNodeDataSchema.extend({
  * type-specific fields like `dialogue` and `choices` from scene nodes.
  */
 export const GameNodeSchema = z.discriminatedUnion('type', [
+  z.object({
+    id: z.string(),
+    type: z.literal('stage'),
+    position: PositionSchema,
+    data: StageNodeDataSchema,
+    width: z.number().optional(),
+    height: z.number().optional(),
+  }),
   z.object({
     id: z.string(),
     type: z.literal('start'),

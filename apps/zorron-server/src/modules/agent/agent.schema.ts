@@ -170,8 +170,8 @@ export const ScenarioIntentSchema = z.object({
   anchors: z.array(ResultAnchorSchema).optional(),
   /** Declarative interaction steps. */
   steps: z.array(ScenarioStepSchema).min(1),
-  /** Settlement configuration. Optional — scenarios without settlement (e.g. pure narrative, media gallery) end at the last step or a link node. */
-  settlement: ScenarioSettlementSchema.optional(),
+  /** Settlement configuration. */
+  settlement: ScenarioSettlementSchema,
   /** Output / persistence configuration. */
   output: z
     .object({

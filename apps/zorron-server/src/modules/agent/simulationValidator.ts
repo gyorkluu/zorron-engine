@@ -190,9 +190,9 @@ export function validateFlow(
   const settlementNodes = flow.nodes.filter((n) => n.type === 'settlement');
   if (settlementNodes.length === 0) {
     issues.push({
-      severity: 'warning',
+      severity: 'error',
       code: 'NO_SETTLEMENT',
-      message: 'Flow has no settlement node. This is valid for narrative-only or media gallery scenarios, but means no computed settlement will be shown.',
+      message: 'Flow has no settlement node. At least one settlement node is required.',
     });
   }
   const reachableSettlements = settlementNodes.filter((s) => reachable.has(s.id));
@@ -308,7 +308,7 @@ function simulateRun(
 
     const neighbors: AdjEntry[] = adj.get(currentId) ?? [];
 
-    if (node.type === 'scene') {
+    if (node.type === 'scene' || node.type === 'stage') {
       // Pick a random choice edge (by handle).
       const choiceEdges: AdjEntry[] = neighbors;
       if (choiceEdges.length === 0) {

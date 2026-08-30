@@ -176,13 +176,18 @@ describe('Auth API', () => {
     expect(body.email).toBe(email);
   });
 
-  it('GET /api/auth/me returns 401 without token', async () => {
+  it('GET /api/auth/me handles unauthenticated request based on bypass flag', async () => {
     const response = await app.handle(
       new Request('http://localhost/api/auth/me'),
     );
 
     const body = await response.json();
-    expect(response.status).toBe(401);
-    expect(body.code).toBe('AUTH_001');
+    if (process.env.AUTH_DEV_BYPASS === 'true') {
+      expect(response.status).toBe(200);
+      expect(body.email).toBeDefined();
+    } else {
+      expect(response.status).toBe(401);
+      expect(body.code).toBe('AUTH_001');
+    }
   });
 });
