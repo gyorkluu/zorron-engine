@@ -76,6 +76,9 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
   const activeTab = useAssetStore((s) => s.activeTab);
   const setActiveTab = useAssetStore((s) => s.setActiveTab);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [folderFilter, setFolderFilter] = useState<string | null>(null);
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'project' | 'global'>('all');
 
   const allAssets = useAllAssets();
   const typeFilter = useAssetStore((s) => s.typeFilter);
@@ -105,14 +108,42 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
     recomputeReferences(urls);
   }, [nodes, recomputeReferences]);
 
+  /** Tags across the library with counts, for the filter chips. */
+  const allTags = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const asset of allAssets) {
+      for (const tag of asset.tags ?? []) {
+        counts.set(tag, (counts.get(tag) ?? 0) + 1);
+      }
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]);
+  }, [allAssets]);
+
+  /** Folder paths in use, sorted. */
+  const allFolders = useMemo(
+    () =>
+      [
+        ...new Set(
+          allAssets.map((a) => a.folder).filter((f): f is string => Boolean(f)),
+        ),
+      ].sort(),
+    [allAssets],
+  );
+
+  const hasFilters = allTags.length > 0 || allFolders.length > 0;
+
   const filteredAssets = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return allAssets.filter((a) => {
       if (typeFilter && a.type !== typeFilter) return false;
       if (kw && !a.name.toLowerCase().includes(kw)) return false;
+      if (tagFilter && !(a.tags ?? []).includes(tagFilter)) return false;
+      if (folderFilter && a.folder !== folderFilter) return false;
+      if (scopeFilter === 'global' && a.scope !== 'global') return false;
+      if (scopeFilter === 'project' && (a.scope ?? 'project') !== 'project') return false;
       return true;
     });
-  }, [allAssets, typeFilter, keyword]);
+  }, [allAssets, typeFilter, keyword, tagFilter, folderFilter, scopeFilter]);
 
   return (
     <aside
@@ -209,6 +240,81 @@ function AssetPanelImpl({ className }: AssetPanelProps) {
               )}
             </div>
           </div>
+
+          {/* Library filters: scope, folders, tags */}
+          {hasFilters ? (
+            <div
+              className="space-y-1.5 border-b border-slate-800/40 px-2.5 pb-2.5"
+              data-testid="asset-filters"
+            >
+              <div className="flex items-center gap-1">
+                {(['all', 'project', 'global'] as const).map((scope) => (
+                  <button
+                    key={scope}
+                    type="button"
+                    onClick={() => setScopeFilter(scope)}
+                    className={cn(
+                      'rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors',
+                      scopeFilter === scope
+                        ? 'bg-cyan-500/20 text-cyan-200'
+                        : 'text-slate-500 hover:text-slate-300',
+                    )}
+                  >
+                    {scope === 'all'
+                      ? t('asset.scope.all')
+                      : scope === 'project'
+                        ? t('asset.scope.project')
+                        : t('asset.scope.global')}
+                  </button>
+                ))}
+              </div>
+
+              {allFolders.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-1">
+                  <FolderTree size={10} className="text-slate-600" />
+                  {allFolders.map((folder) => (
+                    <button
+                      key={folder}
+                      type="button"
+                      onClick={() =>
+                        setFolderFilter(folderFilter === folder ? null : folder)
+                      }
+                      className={cn(
+                        'rounded px-1.5 py-0.5 text-[10px] transition-colors',
+                        folderFilter === folder
+                          ? 'bg-amber-500/20 text-amber-200'
+                          : 'text-slate-500 hover:text-slate-300',
+                      )}
+                    >
+                      {folder}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {allTags.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-1">
+                  <Tags size={10} className="text-slate-600" />
+                  {allTags.map(([tag, count]) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                      className={cn(
+                        'rounded px-1.5 py-0.5 text-[10px] transition-colors',
+                        tagFilter === tag
+                          ? 'bg-cyan-500/20 text-cyan-200'
+                          : 'text-slate-500 hover:text-slate-300',
+                      )}
+                    >
+                      {tag}
+                      <span className="ml-0.5 text-slate-600">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           {/* Upload Dropzone */}
           <div className="p-2.5">

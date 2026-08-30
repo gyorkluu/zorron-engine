@@ -700,6 +700,11 @@ export const translations = {
   'layout.distribute.h': { zh: '水平等距', en: 'Distribute horizontally' },
   'layout.distribute.v': { zh: '垂直等距', en: 'Distribute vertically' },
 
+  'asset.scope.all': { zh: '全部', en: 'All' },
+  'asset.scope.project': { zh: '本项目', en: 'This project' },
+  'asset.scope.global': { zh: '全局库', en: 'Global library' },
+  'asset.filters': { zh: '筛选', en: 'Filters' },
+
 } as const;
 
 /** Type of a translation key. */

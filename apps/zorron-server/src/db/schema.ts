@@ -103,6 +103,17 @@ export const assets = pgTable(
       .default('local'),
     url: text('url').notNull(),
     metadata: jsonb('metadata').default({}),
+    /** Free-form tags used for filtering the library. */
+    tags: jsonb('tags').$type<string[]>().default([]),
+    /** Folder path, e.g. 'chapter-2/backgrounds'. */
+    folder: varchar('folder', { length: 255 }),
+    /**
+     * 'project' assets belong to one project; 'global' assets are shared
+     * across everything the owner makes.
+     */
+    scope: varchar('scope', { length: 10 }).notNull().default('project'),
+    /** How many nodes reference this asset, for safe deletion warnings. */
+    usageCount: integer('usage_count').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

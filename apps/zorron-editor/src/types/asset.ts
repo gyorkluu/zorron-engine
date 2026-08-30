@@ -41,6 +41,14 @@ export interface Asset {
   localHandleId?: string;
   /** ffprobe output for media assets; absent for images and legacy uploads. */
   metadata?: AssetMetadata;
+  /** Free-form tags used to filter the library. */
+  tags?: string[];
+  /** Folder path, e.g. 'chapter-2/backgrounds'. */
+  folder?: string | null;
+  /** 'project' assets belong to one project; 'global' ones are shared. */
+  scope?: 'project' | 'global';
+  /** How many nodes reference this asset — drives deletion warnings. */
+  usageCount?: number;
 }
 
 /** Type guard: true when the asset is backed by IndexedDB. */
