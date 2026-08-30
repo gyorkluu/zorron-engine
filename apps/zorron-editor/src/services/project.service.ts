@@ -48,6 +48,16 @@ export function updateProject(
 }
 
 /** Delete a project. */
+/** Publish the working copy so players see it. */
+export function publishProject(id: string): Promise<ProjectDetail> {
+  return api.post<ProjectDetail>(`/api/projects/${id}/publish`);
+}
+
+/** Roll the working copy back to the last published snapshot. */
+export function revertToPublished(id: string): Promise<ProjectDetail> {
+  return api.post<ProjectDetail>(`/api/projects/${id}/revert`);
+}
+
 export function deleteProject(id: string): Promise<void> {
   return http.delete<void>(`/api/projects/${id}`);
 }

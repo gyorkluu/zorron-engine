@@ -720,6 +720,11 @@ export const translations = {
   'script.noIssues': { zh: '没有发现问题，故事可以正常推进。', en: 'No issues — the story can be played through.' },
   'script.issuesFound': { zh: '发现 {n} 个问题', en: '{n} issues found' },
 
+  'toolbar.publish': { zh: '发布', en: 'Publish' },
+  'toolbar.revert': { zh: '回到已发布版本', en: 'Revert to published' },
+  'toolbar.publishConfirm': { zh: '发布后玩家将看到当前内容，未保存的修改不会包含在内。继续？', en: 'Players will see the current content once published. Unsaved changes are not included. Continue?' },
+  'toolbar.revertConfirm': { zh: '放弃未发布的修改，回到上一个已发布版本？', en: 'Discard unpublished edits and return to the last published version?' },
+
 } as const;
 
 /** Type of a translation key. */

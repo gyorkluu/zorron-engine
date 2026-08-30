@@ -95,6 +95,22 @@ export async function deleteProject(ctx: ParamsContext): Promise<void> {
 /**
  * Exports a project by id (same response shape as detail).
  */
+/**
+ * Publishes the working copy so players see it.
+ */
+export async function publishProject(ctx: ParamsContext): Promise<ProjectDetail> {
+  const auth = ensureAuth(ctx.user);
+  return service.publishProject(auth.id, ctx.params.id);
+}
+
+/**
+ * Rolls the working copy back to the last published snapshot.
+ */
+export async function revertToPublished(ctx: ParamsContext): Promise<ProjectDetail> {
+  const auth = ensureAuth(ctx.user);
+  return service.revertToPublished(auth.id, ctx.params.id);
+}
+
 export async function exportProject(ctx: ParamsContext): Promise<ProjectDetail> {
   const auth = ensureAuth(ctx.user);
   return service.getProject(auth.id, ctx.params.id);

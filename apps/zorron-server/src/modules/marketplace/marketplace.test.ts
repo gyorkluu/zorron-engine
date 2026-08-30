@@ -39,6 +39,8 @@ function makeProject(overrides: Partial<Project> = {}): Project {
     description: 'A great scenario',
     coverUrl: 'https://example.com/cover.png',
     isPublished: true,
+    publishedData: null,
+    publishedAt: null,
     data: { nodes: [], edges: [] },
     forkedFromId: null,
     forkedAt: null,
@@ -164,6 +166,8 @@ describe('MarketplaceService.forkScenario', () => {
       forkedFromId: 'src-uuid',
       forkedAt: new Date('2026-01-03'),
       isPublished: false,
+      publishedData: null,
+      publishedAt: null,
     });
     mockedRepo.createFork.mockResolvedValue(forkedProject);
 

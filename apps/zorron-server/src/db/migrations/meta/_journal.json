@@ -64,6 +64,13 @@
       "when": 1788076194644,
       "tag": "0008_asset_library",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788077028017,
+      "tag": "0009_draft_publish",
+      "breakpoints": true
     }
   ]
 }

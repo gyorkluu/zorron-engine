@@ -99,7 +99,75 @@ export async function getPlayableProject(projectId: string): Promise<ProjectDeta
     throw new AppError('PROJECT_003', 'Project is not published', 403);
   }
 
-  return toProjectDetail(project);
+  // Players always get the published snapshot, never the working copy, so
+  // an author can keep editing without changing the live experience.
+  return toProjectDetail({
+    ...project,
+    data: (project.publishedData ?? project.data) as Project['data'],
+  });
+}
+
+/**
+ * Publish the working copy.
+ *
+ * Snapshots `data` into `publishedData` and stamps `publishedAt`. From this
+ * point players see exactly this content until the next publish.
+ */
+export async function publishProject(
+  ownerId: string,
+  projectId: string,
+): Promise<ProjectDetail> {
+  const existing = await repository.findProjectById(projectId);
+
+  if (!existing) {
+    throw new AppError('PROJECT_001', 'Project not found', 404);
+  }
+  if (existing.ownerId !== ownerId) {
+    throw new AppError('PROJECT_002', 'Forbidden', 403);
+  }
+
+  const updated = await repository.updateProject(projectId, {
+    publishedData: existing.data,
+    publishedAt: new Date(),
+    isPublished: true,
+  });
+
+  if (!updated) {
+    throw new AppError('PROJECT_001', 'Project not found', 404);
+  }
+
+  return toProjectDetail(updated);
+}
+
+/**
+ * Roll the working copy back to the last published snapshot, discarding
+ * unpublished edits.
+ */
+export async function revertToPublished(
+  ownerId: string,
+  projectId: string,
+): Promise<ProjectDetail> {
+  const existing = await repository.findProjectById(projectId);
+
+  if (!existing) {
+    throw new AppError('PROJECT_001', 'Project not found', 404);
+  }
+  if (existing.ownerId !== ownerId) {
+    throw new AppError('PROJECT_002', 'Forbidden', 403);
+  }
+  if (!existing.publishedData) {
+    throw new AppError('PROJECT_004', 'Project has never been published', 409);
+  }
+
+  const updated = await repository.updateProject(projectId, {
+    data: existing.publishedData,
+  });
+
+  if (!updated) {
+    throw new AppError('PROJECT_001', 'Project not found', 404);
+  }
+
+  return toProjectDetail(updated);
 }
 
 /**

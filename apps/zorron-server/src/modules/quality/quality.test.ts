@@ -47,6 +47,8 @@ function makeProject(overrides: Partial<Project> = {}): Project {
     description: null,
     coverUrl: null,
     isPublished: true,
+    publishedData: null,
+    publishedAt: null,
     data: {},
     forkedFromId: null,
     forkedAt: null,

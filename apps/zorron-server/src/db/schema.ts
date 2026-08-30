@@ -62,7 +62,19 @@ export const projects = pgTable(
     description: text('description'),
     coverUrl: text('cover_url'),
     isPublished: boolean('is_published').notNull().default(false),
+    /**
+     * The working copy. Every autosave lands here and it is what the editor
+     * loads — including changes the author has not decided to ship yet.
+     */
     data: jsonb('data').notNull().default({}),
+    /**
+     * Snapshot taken at publish time. This — not `data` — is what players
+     * load, so editing a live project never changes the running experience.
+     * Null until the first publish.
+     */
+    publishedData: jsonb('published_data'),
+    /** When `publishedData` was last written. */
+    publishedAt: timestamp('published_at', { withTimezone: true }),
     /** ECO-004: The source project this was forked from (null for originals). */
     forkedFromId: uuid('forked_from_id'),
     /** ECO-004: When the fork was created (null for originals). */

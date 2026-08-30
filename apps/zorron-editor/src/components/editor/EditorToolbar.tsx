@@ -7,7 +7,7 @@
 
 import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, Download, Upload, FolderOpen, Languages, Sparkles, Swords, Clapperboard, Check, Loader2, AlertCircle, LogIn, LogOut, User, type LucideIcon } from 'lucide-react';
+import { Save, Download, Upload, Rocket, History as HistoryIcon, FolderOpen, Languages, Sparkles, Swords, Clapperboard, Check, Loader2, AlertCircle, LogIn, LogOut, User, type LucideIcon } from 'lucide-react';
 import { useProjectStore } from '@/stores/projectStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -86,6 +86,9 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   const importProject = useProjectStore((s) => s.importProject);
   const setTitle = useProjectStore((s) => s.setTitle);
   const loadFlow = useEditorStore((s) => s.loadFlow);
+  const publish = useProjectStore((s) => s.publish);
+  const revertToPublished = useProjectStore((s) => s.revertToPublished);
+  const isPublished = useProjectStore((s) => s.isPublished);
   // Drives the align/distribute affordances in the toolbar.
   const selectedCount = useEditorStore(
     (s) => s.nodes.filter((n) => n.selected).length,
@@ -98,6 +101,18 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
   const handleSave = useCallback(() => {
     void save(buildCurrentFlowData());
   }, [save]);
+
+  // Publishing snapshots the working copy, so save first to avoid shipping a
+  // stale draft.
+  const handlePublish = useCallback(() => {
+    if (!window.confirm(t('toolbar.publishConfirm'))) return;
+    void save(buildCurrentFlowData()).then(() => publish());
+  }, [save, publish, t]);
+
+  const handleRevert = useCallback(() => {
+    if (!window.confirm(t('toolbar.revertConfirm'))) return;
+    void revertToPublished();
+  }, [revertToPublished, t]);
 
   const handleExport = useCallback(() => {
     const flowData = buildCurrentFlowData();
@@ -268,6 +283,24 @@ function EditorToolbarImpl({ className }: EditorToolbarProps) {
         <ToolbarButton onClick={handleImport} icon={Upload} label={t('toolbar.import')} />
         <ToolbarButton onClick={handleExport} icon={Download} label={t('toolbar.export')} />
         <ToolbarButton onClick={handleSave} icon={Save} label={t('toolbar.save')} variant="primary" />
+        {id ? (
+          <>
+            <ToolbarButton
+              onClick={handlePublish}
+              icon={Rocket}
+              label={t('toolbar.publish')}
+              testId="toolbar-publish"
+            />
+            {isPublished ? (
+              <ToolbarButton
+                onClick={handleRevert}
+                icon={HistoryIcon}
+                label={t('toolbar.revert')}
+                testId="toolbar-revert"
+              />
+            ) : null}
+          </>
+        ) : null}
 
         {/* User Auth Profile / Login Button */}
         {isAuthenticated ? (

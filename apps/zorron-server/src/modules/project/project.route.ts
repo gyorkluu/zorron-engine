@@ -79,6 +79,22 @@ export const projectRoute = new Elysia({ prefix: '/api/projects' })
     },
   )
   .post(
+    '/:id/publish',
+    ({ params, user }) => controller.publishProject({ user, params }),
+    {
+      params: ProjectIdParamSchema,
+      response: ProjectDetailSchema,
+    },
+  )
+  .post(
+    '/:id/revert',
+    ({ params, user }) => controller.revertToPublished({ user, params }),
+    {
+      params: ProjectIdParamSchema,
+      response: ProjectDetailSchema,
+    },
+  )
+  .post(
     '/import',
     ({ body, user, set }) => {
       set.status = 201;

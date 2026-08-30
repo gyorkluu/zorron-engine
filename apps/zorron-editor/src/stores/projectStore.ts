@@ -80,6 +80,10 @@ interface ProjectState {
   loadProject: (id: string) => Promise<ProjectDetail>;
   createProject: (title: string, description?: string) => Promise<ProjectDetail>;
   save: (flowData: FlowData) => Promise<void>;
+  /** Publish the working copy; players see it from this point on. */
+  publish: () => Promise<void>;
+  /** Discard unpublished edits and return to the published snapshot. */
+  revertToPublished: () => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
   importProject: (data: FlowData, title?: string) => Promise<ProjectDetail>;
   fetchList: (query?: ListProjectsQuery) => Promise<void>;
@@ -232,6 +236,48 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       const message = err instanceof AppError ? err.message : 'Failed to save project';
       set({ saveStatus: 'error', error: message });
       throw err;
+    }
+  },
+
+  publish: async () => {
+    const { id } = get();
+    if (!id) return;
+    set({ saveStatus: 'saving', error: null });
+    try {
+      const detail = await projectService.publishProject(id);
+      set({
+        isPublished: detail.isPublished,
+        lastSavedSnapshot: detail.data ?? null,
+        lastSavedAt: detail.updatedAt,
+        saveStatus: 'saved',
+      });
+    } catch (err) {
+      const message =
+        err instanceof AppError ? err.message : 'Failed to publish project';
+      set({ saveStatus: 'error', error: message });
+    }
+  },
+
+  revertToPublished: async () => {
+    const { id } = get();
+    if (!id) return;
+    set({ saveStatus: 'saving', error: null });
+    try {
+      const detail = await projectService.revertToPublished(id);
+      // Reload nodes/edges from the restored working copy.
+      useEditorStore.getState().loadFlow(
+        (detail.data?.nodes ?? []) as never,
+        (detail.data?.edges ?? []) as never,
+      );
+      set({
+        lastSavedSnapshot: detail.data ?? null,
+        lastSavedAt: detail.updatedAt,
+        saveStatus: 'saved',
+      });
+    } catch (err) {
+      const message =
+        err instanceof AppError ? err.message : 'Failed to revert project';
+      set({ saveStatus: 'error', error: message });
     }
   },
 
