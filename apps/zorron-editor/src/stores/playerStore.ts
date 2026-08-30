@@ -284,19 +284,17 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
       previous.reset();
     }
     const engine = new GameEngine(flowData);
-    // Subscribe so the store mirrors engine state on every change.
-    // 同时检测 mbti 从空变为非空时预取 AI 判词（提前生成，避免 settlement 阶段等待）
     let prevMbti = '';
     let prevChoicesHash = '';
+    const initial = engine.start();
+
+    // Attach listener AFTER start() so initial transition does not trigger nested state updates
     engine.subscribe((next) => {
       set({ state: next });
 
       // ── AI 判词预取：检测 mbti + 5 题 choices 全部就绪那一刻 ──
-      // 兜底：confirmModify 注入旧 variables 后，mbti 一开始就有值，
-      // 此时 prevMbti='' 会触发第一次比较，命中预取。
       const sig = computeJudgmentSignature(next.variables);
       if (!sig.choicesHash) {
-        // 数据不完整（mbti 或 5 题任一为空）—— 不处理，但记录上一次状态
         prevMbti = sig.mbti;
         prevChoicesHash = sig.choicesHash;
         return;
@@ -334,19 +332,16 @@ export const usePlayerStore = create<PlayerStoreState>((set, get) => ({
           });
         })
         .catch(() => {
-          // 预取失败 —— 清空 loading，让 SocialCardSummary 兜底自己调一次
           set({ isPrefetchingJudgment: false, prefetchedJudgment: null });
         });
     });
-    const initial = engine.start();
+
     set({
       engine,
       state: initial,
       isRunning: true,
-      // 重置预取状态（新流程开始时清空旧缓存）
       prefetchedJudgment: null,
       isPrefetchingJudgment: false,
-      // 重置最终判词状态（新流程开始时清空旧判词，等 SocialCardSummary 重新写入）
       finalJudgment: null,
       judgmentFinalized: false,
     });
