@@ -174,7 +174,8 @@
 | `tsc --noEmit`（zorron-server） | 0 error |
 | `tsc --noEmit`（zorron-editor） | 0 error |
 | 新增单元测试 | 33 / 33 |
-| 基线回归 | 442 / 442 |
+| 前端测试（全量分批跑完） | 35 文件 / 259 tests 全绿 |
+| 后端测试 | 已跑 11 个模块全绿，auth 需 Redis（见下） |
 
 新增测试文件：
 
@@ -199,6 +200,8 @@
 - 改完 drizzle schema 必须跑 `npx drizzle-kit migrate`，否则后端测试全挂（PG 42703 列不存在）
 - Elysia 的 `authPlugin` 必须在需要 `user` 的路由**之前** `.use()`
 - `definitions.ts` 是 `.ts`，不能写 JSX；表单组件要放 `nodeForms.tsx`
+- `src/modules/auth/auth.test.ts` 会拉起整个 app，而 app 挂载了依赖 Redis 的限流中间件。**本机 Redis 未启动时该测试会在连接重试阶段挂起**（`ECONNREFUSED 6379`），表现为"无输出 + exit 1"，与代码无关。启动 Redis 后重跑即可
+- vitest 的 `--pool=forks` 在部分目录下会让进程静默崩溃；默认线程池反而稳定。批处理时"多目录 + grep 管道"的组合也容易让 shell 崩，宁可拆小、少用管道
 
 ## 遗留事项
 
